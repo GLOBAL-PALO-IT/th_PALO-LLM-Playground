@@ -1,0 +1,74 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Define your models here
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  policies Policy[] // One-to-many relationship with Policy
+  claims   Claim[] // One-to-many relationship with Claim
+  payments Payment[] // One-to-many relationship with Payment
+}
+
+// Policy model
+model Policy {
+  id             String   @id @default(uuid())
+  policyNumber   String   @unique
+  clientId       String
+  startDate      DateTime
+  endDate        DateTime
+  coverageAmount Float
+  premium        Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  client   Client    @relation(fields: [clientId], references: [id])
+  claims   Claim[] // One-to-many relationship with Claim
+  payments Payment[] // One-to-many relationship with Payment
+}
+
+// Claim model
+model Claim {
+  id            String   @id @default(uuid())
+  claimNumber   String   @unique
+  policyId      String
+  clientId      String
+  dateOfClaim   DateTime
+  amountClaimed Float
+  status        String
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  policy Policy @relation(fields: [policyId], references: [id])
+  client Client @relation(fields: [clientId], references: [id])
+}
+
+// Payment model
+model Payment {
+  id            String   @id @default(uuid())
+  paymentNumber String   @unique
+  clientId      String
+  policyId      String
+  amount        Float
+  dateOfPayment DateTime
+  method        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id])
+  policy Policy @relation(fields: [policyId], references: [id])
+}

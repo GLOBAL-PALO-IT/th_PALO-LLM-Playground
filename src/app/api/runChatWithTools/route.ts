@@ -85,9 +85,15 @@ const SearchParams = z.object({
 })
 type SearchParams = z.infer<typeof SearchParams>
 async function searchBooks({ name }: SearchParams) {
-  return db
-    .filter((item) => item.name.includes(name))
-    .map((item) => ({ name: item.name, id: item.id }))
+  return (
+    db
+      // .filter((item) => item.name.includes(name))// match name
+      //match partial name or at least 1 words
+      .filter((item) =>
+        item.name.split(' ').some((word) => name.includes(word))
+      )
+      .map((item) => ({ name: item.name, id: item.id }))
+  )
 }
 
 const GetParams = z.object({

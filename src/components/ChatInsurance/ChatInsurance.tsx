@@ -27,13 +27,15 @@ import ExamplesDropDown from './ExamplesDropDown'
 const SYSTEM_PROMPT: ChatCompletionMessageParam = {
   role: 'system',
   content:
-    'You must use our book database, which you can access using functions to answer the following questions.',
+    'You must use our insurance api, which you can access using functions to answer the following questions.',
 }
-const ChatWithTools = () => {
+const ChatInsurance = () => {
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
     SYSTEM_PROMPT,
   ])
-  const [input, setInput] = useState<string>('')
+  const [input, setInput] = useState<string>(
+    'Who is the top client by total payments?'
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
 
@@ -55,13 +57,13 @@ const ChatWithTools = () => {
     try {
       const payload: ChatCompletionMessageParam[] = [SYSTEM_PROMPT, newMessage]
       setMessages(payload)
-      const response = await fetch('/api/runChatWithTools', {
+      const response = await fetch('/api/runChatInsurance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: payload }),
       })
       const { message } = await response.json()
-      console.log({ message })
+
       setMessages(message)
       // setMessages((prev) => [...prev, message])
     } catch (error: any) {
@@ -82,8 +84,8 @@ const ChatWithTools = () => {
     <div className="">
       <div className="">
         {/* Chat history */}
-        <div className="p-4 flex flex-row">
-          <h1 className="text-2xl font-bold">Chat with Tools</h1>
+        <div className="pl-4 flex flex-row">
+          <h1 className="text-2xl font-bold">Chat with Insurance API</h1>
           {showFormattedPrompt ? (
             <button onClick={() => setShowFormattedPrompt(false)}>
               <FaMagic className="m-1" />
@@ -97,6 +99,7 @@ const ChatWithTools = () => {
         <div className="pl-4">
           <ExamplesDropDown setInput={setInput} />
         </div>
+
         <div className="flex flex-col p-4 m-4 max-h-[54vh] h-[54vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
           {showFormattedPrompt ? (
             messages?.map((message, index) => {
@@ -145,9 +148,6 @@ const ChatWithTools = () => {
                   message.role === 'assistant' &&
                   message.tool_calls &&
                   message.tool_calls.length > 0 ? (
-                    // <span>
-                    //   {message.role}:{JSON.stringify(message.tool_calls)}
-                    // </span>
                     <JsonView
                       data={message.tool_calls}
                       shouldExpandNode={allExpanded}
@@ -165,12 +165,6 @@ const ChatWithTools = () => {
                   ) : (
                     <></>
                   )}
-                  {/* <span>{messageMode} </span>
-                  <JsonView
-                    data={message}
-                    shouldExpandNode={allExpanded}
-                    style={darkStyles}
-                  /> */}
                 </div>
               )
             })
@@ -210,4 +204,4 @@ const ChatWithTools = () => {
   )
 }
 
-export default ChatWithTools
+export default ChatInsurance

@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 
 const NavBar = () => {
   const pathName = usePathname()
@@ -57,6 +58,13 @@ const NavBar = () => {
                   aria-current="page"
                 >
                   RAG Qdrant
+                </Link>
+                <Link
+                  href="/chatInsurance"
+                  className={`px-3 py-2 font-medium ${pathName === '/chatInsurance' ? 'text-[#F57D2B]' : null}  hover:text-green-500`}
+                  aria-current="page"
+                >
+                  Chat Insurance
                 </Link>
               </div>
             </div>

@@ -277,7 +277,7 @@ const RAGQdrant = () => {
               <div className="mt-6">
                 <h2>Documents Chunk Size {pdfContent.length}</h2>
                 {pdfContent.map((doc, index) => (
-                  <div>
+                  <div key={index}>
                     <h3>{doc.id}</h3>
                     <pre className="p-4 bg-gray-100 rounded whitespace-pre-wrap max-h-[20vh] overflow-auto">
                       {doc.pageContent}
