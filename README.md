@@ -21,6 +21,12 @@ https://github.com/user-attachments/assets/ab4950d1-9ad7-4f61-a79f-2fbcf72bac08
 
 https://github.com/user-attachments/assets/9b3ebb4c-b231-417e-9bf7-ebfad94d7d2d
 
+- Chat with Insurance API
+
+https://github.com/user-attachments/assets/a8d4cef0-4f69-4df4-a40b-9aeedc8a8dac
+
+
+
 
 - RAG Chunking Raw Text
 
