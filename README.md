@@ -46,7 +46,6 @@ Set up Key Globally:
 
 - In your `~/.bash_profile` or other type of shell profile
 - OpenAI: Add `export OPENAI_API_KEY='YOUR_KEY'`
-- Groq: Add `export GROQ_API_KEY='YOUR_KEY'`
 
 Setup the `.env` file:
 
@@ -55,7 +54,6 @@ Setup the `.env` file:
 
 ```bash
 OPENAI_API_KEY=YOUR_KEY
-GROQ_API_KEY=YOUR_KEY
 ```
 
 Install:
@@ -72,10 +70,6 @@ Run the development server:
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3201](http://localhost:3201) with your browser to see the result.
