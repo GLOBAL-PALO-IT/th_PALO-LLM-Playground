@@ -99,6 +99,9 @@ const NavBarStack = () => {
                           calling insurance API(clients, claims, policies,
                           payments). Agent is connecting to real world.
                         </ListItem>
+                        <ListItem href="/chatVoice" title="Chat Voice">
+                          calling Realtime Voice Chat.
+                        </ListItem>
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
@@ -131,6 +134,9 @@ const NavBarStack = () => {
                         <ListItem href="/ragQdrant" title="RAG with Qdrant">
                           show how the chunk actually works with Qdrant for
                           similarity search. Required Qdrant docker to start up
+                        </ListItem>
+                        <ListItem href="/ragChat" title="RAG with Chat">
+                          show how to integrate RAG with Chat in prompt
                         </ListItem>
                       </ul>
                     </NavigationMenuContent>

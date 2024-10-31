@@ -28,6 +28,8 @@ import {
   defaultStyles,
 } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
+import { generateShortUUID } from '@/lib/utils'
+import { examplesInstructionForShellAgent } from './examples'
 
 const DiagramState = {
   aiRunning: `${coreFunctionMermaid}\nclass F yellow`,
@@ -43,12 +45,9 @@ const BashScriptGenerator = () => {
   const [output, setOutput] = useState<string[]>([])
   const [bashLog, setBashLog] = useState<string[]>([])
   const [openAILog, setOpenAILog] = useState<ExecutionSchemaType[]>([])
-  const [exampleInstructions, setExampleInstructions] = useState<string[]>([
-    'Set up a local backend REST API for /products and return a list of 5 products.',
-    'Say Hello with Current Time',
-    'Create json-server that has mock claims api and show me the openapi spec',
-    'Extract content from a webpage and filter out all the HTML, make it into nice looking markdown file',
-  ])
+  const [exampleInstructions, setExampleInstructions] = useState<string[]>(
+    examplesInstructionForShellAgent
+  )
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
     {
       role: 'system',
@@ -63,16 +62,23 @@ const BashScriptGenerator = () => {
   const [showLog, setShowLog] = useState(false)
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const STARTING_DIRECTORY = `workspace_react_${Date.now().toString()}_${generateShortUUID()}`
   const [workingDirectory, setWorkingDirectory] =
-    useState<string>('workspace_react')
+    useState<string>(STARTING_DIRECTORY)
 
   const runAIRef = useRef((observation?: string) => {})
+  const bottomRef = useRef<any>(null)
 
   // Diagram
   const [diagramState, setDiagramState] = useState('')
   // Sticky action button
   const [showStickyActionButton, setShowStickyActionButton] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
+
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   runAIRef.current = async (observation?: string) => {
     if (isStopped || isStoppedRef.current) {
@@ -466,6 +472,7 @@ const BashScriptGenerator = () => {
             </div>
           </div>
         </Card>
+        {/* Prompt Log Column */}
         <Card className="p-4 w-full overflow-y-auto whitespace-nowrap">
           <div className="flex mb-4">
             <h3 className="text-xl font-semibold mr-2 ">
@@ -514,6 +521,7 @@ const BashScriptGenerator = () => {
               style={darkStyles}
             />
           )}
+          <div ref={bottomRef} /> {/* Empty div for scroll target */}
         </Card>
         {showLog && (
           <Card
@@ -579,16 +587,16 @@ const BashScriptGenerator = () => {
           </Card>
         )}
       </div>
-      <MermaidDiagrams coreFunctionDiagram={diagramState} />
+      {/* <MermaidDiagrams coreFunctionDiagram={diagramState} /> */}
 
       {/* Sticky action button at the bottom right */}
-      <div
+      {/* <div
         className={`fixed bottom-0 w-full ${showStickyActionButton ? '' : 'hidden'}`}
       >
         <div className="my-8 float-right px-5 mx-4 space-y-2">
           {renderActionButton()}
         </div>
-      </div>
+      </div> */}
     </>
   )
 }
