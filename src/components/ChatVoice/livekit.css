@@ -11,6 +11,10 @@
     background-color: rgb(255, 255, 255);
 }
 
+.lk-audio-bar-visualizer {
+    height: 60%;
+}
+
 .lk-agent-control-bar {
 @apply border-t-0 p-0 h-min mr-4;
 }

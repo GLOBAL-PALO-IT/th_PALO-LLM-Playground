@@ -50,6 +50,7 @@ export default function Page() {
         for (const segment of segments) {
           newTranscriptions[segment.id] = segment
         }
+        console.log({ newTranscriptions })
         return newTranscriptions
       })
     }
@@ -109,20 +110,32 @@ export default function Page() {
 function SimpleVoiceAssistant(props: {
   onStateChange: (state: AgentState) => void
 }) {
-  const { state, audioTrack } = useVoiceAssistant()
+  const { state, audioTrack, agentTranscriptions } = useVoiceAssistant()
   useEffect(() => {
     props.onStateChange(state)
   }, [props, state])
   return (
-    <div className="h-[300px] max-w-[90vw] mx-auto bg-green-300">
-      <BarVisualizer
-        state={state}
-        barCount={5}
-        trackRef={audioTrack}
-        className="agent-visualizer"
-        options={{ minHeight: 24 }}
-      />
-    </div>
+    <>
+      <div className="p-10 h-[450px] max-w-[90vw] mx-auto">
+        <ul className="h-[150px] text-md text-black overflow-auto border-2 border-blue-500 bg-white text-blue-500 rounded-md p-2">
+          {agentTranscriptions.map((value, index) => (
+            <div key={index}>
+              <li className="p-1">
+                {index}: {value.text}
+              </li>
+              <hr />
+            </div>
+          ))}
+        </ul>
+        <BarVisualizer
+          state={state}
+          barCount={5}
+          trackRef={audioTrack}
+          className="agent-visualizer"
+          options={{ minHeight: 30 }}
+        />
+      </div>
+    </>
   )
 }
 
@@ -140,7 +153,7 @@ function ControlBar(props: {
   }, [])
 
   return (
-    <div className="relative h-[100px]">
+    <div className="relative h-[200px]">
       <AnimatePresence>
         {props.agentState === 'disconnected' && (
           <motion.button
