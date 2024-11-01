@@ -424,16 +424,19 @@ const BashScriptGenerator = () => {
             ) : (
               <></>
             )}
-            <Input
-              placeholder="Enter your Working Directory Name that exist at $HOME (e.g. my-project)"
-              value={workingDirectory}
-              onChange={(e) => {
-                setWorkingDirectory(e.target.value.trim())
-              }}
-              className="mb-2 mr-2 text-sm"
-              disabled={isLoading}
-            />
-
+            {isClient ? (
+              <Input
+                placeholder="Enter your Working Directory Name that exist at $HOME (e.g. my-project)"
+                value={workingDirectory}
+                onChange={(e) => {
+                  setWorkingDirectory(e.target.value.trim())
+                }}
+                className="mb-2 mr-2 text-sm"
+                disabled={isLoading}
+              />
+            ) : (
+              <></>
+            )}
             {/* "Auto mode" toggle button */}
             <div className="flex">
               <label className="inline-flex items-center mr-2 cursor-pointer">
