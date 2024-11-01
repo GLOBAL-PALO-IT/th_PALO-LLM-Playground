@@ -123,7 +123,7 @@ const ChatWithTools = () => {
               return (
                 <div
                   key={index}
-                  className={`message-bubble ${message.role === 'user' ? 'human-message bg-blue-200' : 'ai-message bg-green-200'} ${message.role === 'user' ? 'ml-auto' : 'mr-auto'}`}
+                  className={`message-bubble ${message.role === 'user' || message.role === 'tool' ? 'human-message bg-blue-200' : 'ai-message bg-green-200'} ${message.role === 'user' || message.role === 'tool' ? 'ml-auto' : 'mr-auto'}`}
                 >
                   <h3 className="text-sm font-bold">{message.role}</h3>
                   {messageMode === 'text' &&

@@ -7,15 +7,12 @@ This project is used for training developer to understand the numbers of core co
 ## List of Examples
 
 - [Shell Agent](./docs/ShellAgent.md)
-  
 
 https://github.com/user-attachments/assets/1ecab839-f7cd-4ca2-9f12-cf92c7bd96c9
-
 
 - Chat
 
 https://github.com/user-attachments/assets/ab4950d1-9ad7-4f61-a79f-2fbcf72bac08
-
 
 - Chat with Tools
 
@@ -25,20 +22,13 @@ https://github.com/user-attachments/assets/9b3ebb4c-b231-417e-9bf7-ebfad94d7d2d
 
 https://github.com/user-attachments/assets/a8d4cef0-4f69-4df4-a40b-9aeedc8a8dac
 
-
-
-
 - RAG Chunking Raw Text
 
 https://github.com/user-attachments/assets/18f7a74e-968f-44dd-a29c-c91b5ee3098c
 
-
 - RAG Qdrant
 
 https://github.com/user-attachments/assets/b9be1ad1-f23b-4f83-ae9d-16af1f6661bd
-
-
-
 
 ## Getting Started
 
@@ -72,7 +62,7 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3201](http://localhost:3201) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Setup Vector Database
 

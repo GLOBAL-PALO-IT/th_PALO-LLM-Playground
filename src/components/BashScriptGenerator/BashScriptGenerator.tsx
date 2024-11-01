@@ -65,6 +65,7 @@ const BashScriptGenerator = () => {
   const STARTING_DIRECTORY = `workspace_react_${Date.now().toString()}_${generateShortUUID()}`
   const [workingDirectory, setWorkingDirectory] =
     useState<string>(STARTING_DIRECTORY)
+  const [isClient, setIsClient] = useState(false)
 
   const runAIRef = useRef((observation?: string) => {})
   const bottomRef = useRef<any>(null)
@@ -74,7 +75,9 @@ const BashScriptGenerator = () => {
   // Sticky action button
   const [showStickyActionButton, setShowStickyActionButton] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
-
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
   // Scroll to bottom whenever messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -414,9 +417,13 @@ const BashScriptGenerator = () => {
               Run AI Number: {countAction}
             </pre>
 
-            <pre className="bg-gray-100 p-2 rounded whitespace-pre-wrap mb-2 mr-2 text-sm">
-              Working Directory $HOME/{workingDirectory}
-            </pre>
+            {isClient ? (
+              <pre className="bg-gray-100 p-2 rounded whitespace-pre-wrap mb-2 mr-2 text-sm">
+                Working Directory $HOME/{workingDirectory}
+              </pre>
+            ) : (
+              <></>
+            )}
             <Input
               placeholder="Enter your Working Directory Name that exist at $HOME (e.g. my-project)"
               value={workingDirectory}
