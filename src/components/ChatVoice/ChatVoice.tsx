@@ -10,56 +10,110 @@ import {
   VoiceAssistantControlBar,
   AgentState,
   DisconnectButton,
+  TrackReference,
 } from '@livekit/components-react'
 
 import { useCallback, useEffect, useState } from 'react'
 import {
   MediaDeviceFailure,
+  Participant,
   RoomEvent,
+  TrackPublication,
   TranscriptionSegment,
 } from 'livekit-client'
 import type { ConnectionDetails } from '../../app/api/connection-details/route'
 import { NoAgentNotification } from '@/components/NoAgentNotification'
-import { CloseIcon } from '@/components/CloseIcon'
-import { useKrispNoiseFilter } from '@livekit/components-react/krisp'
 import '@livekit/components-styles'
 import './livekit.css'
-
+import SimpleVoiceAssistant from './SimpleVoiceAssistant'
+import ControlBar from './ControlBar'
+import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+interface Transcription {
+  segment: TranscriptionSegment
+  participant?: Participant
+  publication?: TrackPublication
+}
 export default function Page() {
   const [connectionDetails, updateConnectionDetails] = useState<
     ConnectionDetails | undefined
   >(undefined)
   const [agentState, setAgentState] = useState<AgentState>('disconnected')
   const room = useMaybeRoomContext()
-  const [transcriptions, setTranscriptions] = useState<{
-    [id: string]: TranscriptionSegment
+  const [rawSegments, setRawSegments] = useState<{
+    [id: string]: Transcription
   }>({})
+  const [displayTranscriptions, setDisplayTranscriptions] = useState<
+    Transcription[]
+  >([])
 
   useEffect(() => {
+    console.log({ agentState, room })
     if (!room) {
       return
     }
-
-    const updateTranscriptions = (
-      segments: any,
-      participant: any,
-      publication: any
+    console.log('roomxxxx', room)
+    const updateRawSegments = (
+      segments: TranscriptionSegment[],
+      participant?: Participant,
+      publication?: TrackPublication
     ) => {
-      setTranscriptions((prev) => {
-        const newTranscriptions = { ...prev }
+      console.log('segmentsxxxx', segments)
+      setRawSegments((prev) => {
+        const newSegments = { ...prev }
         for (const segment of segments) {
-          newTranscriptions[segment.id] = segment
+          newSegments[segment.id] = { segment, participant, publication }
         }
-        console.log({ newTranscriptions })
-        return newTranscriptions
+        return newSegments
       })
     }
+    room.on(RoomEvent.TranscriptionReceived, updateRawSegments)
 
-    room.on(RoomEvent.TranscriptionReceived, updateTranscriptions)
     return () => {
-      room.off(RoomEvent.TranscriptionReceived, updateTranscriptions)
+      room.off(RoomEvent.TranscriptionReceived, updateRawSegments)
     }
-  }, [room])
+  }, [room, agentState])
+
+  useEffect(() => {
+    const sorted = Object.values(rawSegments).sort(
+      (a, b) =>
+        (a.segment.firstReceivedTime ?? 0) - (b.segment.firstReceivedTime ?? 0)
+    )
+    const mergedSorted = sorted.reduce((acc, current) => {
+      if (acc.length === 0) {
+        return [current]
+      }
+
+      const last = acc[acc.length - 1]
+      if (
+        last.participant === current.participant &&
+        last.participant?.isAgent &&
+        (current.segment.firstReceivedTime ?? 0) -
+          (last.segment.lastReceivedTime ?? 0) <=
+          1000 &&
+        !last.segment.id.startsWith('status-') &&
+        !current.segment.id.startsWith('status-')
+      ) {
+        // Merge segments from the same participant if they're within 1 second of each other
+        return [
+          ...acc.slice(0, -1),
+          {
+            ...current,
+            segment: {
+              ...current.segment,
+              text: `${last.segment.text} ${current.segment.text}`,
+              id: current.segment.id, // Use the id of the latest segment
+              firstReceivedTime: last.segment.firstReceivedTime, // Keep the original start time
+            },
+          },
+        ]
+      } else {
+        return [...acc, current]
+      }
+    }, [] as Transcription[])
+    setDisplayTranscriptions(mergedSorted)
+  }, [rawSegments])
+
   const onConnectButtonClicked = useCallback(async () => {
     const url = new URL(
       process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ??
@@ -74,118 +128,52 @@ export default function Page() {
   return (
     <main
       data-lk-theme="default"
-      className="h-full grid content-center bg-white"
+      className="h-[95vh] p-4 flex flex-row overflow-x-auto whitespace-nowrap space-x-4"
     >
-      {/* <ul>
-        {Object.values(transcriptions)
-          .sort((a, b) => a.firstReceivedTime - b.firstReceivedTime)
-          .map((segment) => (
-            <li key={segment.id}>{segment.text}</li>
-          ))}
-      </ul> */}
-      <LiveKitRoom
-        token={connectionDetails?.participantToken}
-        serverUrl={connectionDetails?.serverUrl}
-        connect={connectionDetails !== undefined}
-        audio={true}
-        video={false}
-        onMediaDeviceFailure={onDeviceFailure}
-        onDisconnected={() => {
-          updateConnectionDetails(undefined)
-        }}
-        className="grid grid-rows-[2fr_1fr] items-center"
-      >
-        <SimpleVoiceAssistant onStateChange={setAgentState} />
-        <ControlBar
-          onConnectButtonClicked={onConnectButtonClicked}
-          agentState={agentState}
-        />
-        <RoomAudioRenderer />
-        <NoAgentNotification state={agentState} />
-      </LiveKitRoom>
-    </main>
-  )
-}
-
-function SimpleVoiceAssistant(props: {
-  onStateChange: (state: AgentState) => void
-}) {
-  const { state, audioTrack, agentTranscriptions } = useVoiceAssistant()
-  useEffect(() => {
-    props.onStateChange(state)
-  }, [props, state])
-  return (
-    <>
-      <div className="p-10 h-[450px] max-w-[90vw] mx-auto">
-        <ul className="h-[150px] text-md text-black overflow-auto border-2 border-blue-500 bg-white text-blue-500 rounded-md p-2">
-          {agentTranscriptions.map((value, index) => (
-            <div key={index}>
-              <li className="p-1">
-                {index}: {value.text}
-              </li>
-              <hr />
-            </div>
-          ))}
-        </ul>
-        <BarVisualizer
-          state={state}
-          barCount={5}
-          trackRef={audioTrack}
-          className="agent-visualizer"
-          options={{ minHeight: 30 }}
-        />
-      </div>
-    </>
-  )
-}
-
-function ControlBar(props: {
-  onConnectButtonClicked: () => void
-  agentState: AgentState
-}) {
-  /**
-   * Use Krisp background noise reduction when available.
-   * Note: This is only available on Scale plan, see {@link https://livekit.io/pricing | LiveKit Pricing} for more details.
-   */
-  const krisp = useKrispNoiseFilter()
-  useEffect(() => {
-    krisp.setNoiseFilterEnabled(true)
-  }, [])
-
-  return (
-    <div className="relative h-[200px]">
-      <AnimatePresence>
-        {props.agentState === 'disconnected' && (
-          <motion.button
-            initial={{ opacity: 0, top: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, top: '-10px' }}
-            transition={{ duration: 1, ease: [0.09, 1.04, 0.245, 1.055] }}
-            className="uppercase absolute left-1/2 -translate-x-1/2 px-4 py-2 border-2 border-blue-500 bg-white text-blue-500 rounded-md"
-            onClick={() => props.onConnectButtonClicked()}
-          >
-            Start a conversation
-          </motion.button>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {props.agentState !== 'disconnected' &&
-          props.agentState !== 'connecting' && (
-            <motion.div
-              initial={{ opacity: 0, top: '10px' }}
-              animate={{ opacity: 1, top: 0 }}
-              exit={{ opacity: 0, top: '-10px' }}
-              transition={{ duration: 0.4, ease: [0.09, 1.04, 0.245, 1.055] }}
-              className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
-            >
-              <VoiceAssistantControlBar controls={{ leave: false }} />
-              <DisconnectButton>
-                <CloseIcon />
-              </DisconnectButton>
-            </motion.div>
+      <Card className="p-4 w-full overflow-y-auto">
+        <LiveKitRoom
+          token={connectionDetails?.participantToken}
+          serverUrl={connectionDetails?.serverUrl}
+          connect={connectionDetails !== undefined}
+          audio={true}
+          video={false}
+          onMediaDeviceFailure={onDeviceFailure}
+          onDisconnected={() => {
+            updateConnectionDetails(undefined)
+          }}
+          className="grid grid-rows-[2fr_1fr] items-center"
+        >
+          <SimpleVoiceAssistant onStateChange={setAgentState} />
+          <ControlBar
+            onConnectButtonClicked={onConnectButtonClicked}
+            agentState={agentState}
+          />
+          <RoomAudioRenderer />
+          <NoAgentNotification state={agentState} />
+        </LiveKitRoom>
+      </Card>
+      {/* <Card className="p-4 w-full overflow-y-auto">
+        <div className="space-y-4">
+          {displayTranscriptions.map(
+            ({ segment, participant, publication }) =>
+              segment.text.trim() !== '' && (
+                <div
+                  key={segment.id}
+                  className={cn(
+                    'flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm',
+                    participant?.isAgent
+                      ? 'bg-neutral-100 text-[#09090B]'
+                      : 'ml-auto border border-neutral-300'
+                  )}
+                >
+                  {segment.text.trim()}
+                </div>
+              )
           )}
-      </AnimatePresence>
-    </div>
+          <div ref={transcriptEndRef} />
+        </div> 
+      </Card>*/}
+    </main>
   )
 }
 

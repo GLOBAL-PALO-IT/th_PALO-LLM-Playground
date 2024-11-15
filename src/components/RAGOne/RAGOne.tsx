@@ -13,10 +13,16 @@ import { chunk } from 'llm-chunk'
 import { get } from 'http'
 import { calculateCosineSimilarity } from '@/lib/utils'
 import { set } from 'zod'
+import ExamplesDocsDropDown from './ExamplesDocsDropDown'
+import ExamplesQuestionDropDown from './ExamplesQuestionDropDown'
 const RAGOne = () => {
   const [sourceDocument, setSourceDocument] = useState<string>('')
   const [query, setQuery] = useState<string>('')
   const [chunks, setChunks] = useState<string[]>([])
+  const [systemPrompt, setSystemPrompt] = useState<string>(
+    'You are a helpful assistant bot that helps users find information in a source document.'
+  )
+  const [context, setContext] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [embeddingsSourceDocuments, setEmbeddingsSourceDocuments] = useState<
     OpenAI.Embeddings.Embedding[]
@@ -25,8 +31,8 @@ const RAGOne = () => {
     OpenAI.Embeddings.Embedding[]
   >([])
   const [chunksOptions, setChunksOptions] = useState({
-    minLength: 0,
-    maxLength: 500,
+    minLength: 2000,
+    maxLength: 2500,
     splitter: 'paragraph' as 'paragraph',
     overlap: 0,
     delimiters: '\n',
@@ -115,6 +121,7 @@ const RAGOne = () => {
   }, [query, getQueryEmbedding])
 
   useEffect(() => {
+    if (!embeddingsQuery || !embeddingsSourceDocuments) return
     if (embeddingsQuery.length === 0 || embeddingsSourceDocuments?.length === 0)
       return
     getCosineSimilarity()
@@ -178,6 +185,9 @@ const RAGOne = () => {
       </div>
       <div className="h-[95vh] p-4 flex flex-row overflow-x-auto whitespace-nowrap space-x-4">
         <Card className="p-4 w-full overflow-y-auto">
+          <div className="mb-2">
+            <ExamplesQuestionDropDown setInput={setQuery} />
+          </div>
           <h3 className="text-xl font-bold mb-4">Query</h3>
           <Textarea
             placeholder="Enter your query here"
@@ -188,7 +198,9 @@ const RAGOne = () => {
             className="mb-4"
             disabled={isLoading}
           />
-
+          <div className="mb-2">
+            <ExamplesDocsDropDown setInput={setSourceDocument} />
+          </div>
           <h3 className="text-xl font-bold mb-4">Source Document</h3>
           <Textarea
             value={sourceDocument}
@@ -247,6 +259,41 @@ const RAGOne = () => {
             </div>
           ))}
         </Card>
+      </div>
+      <div className="h-[55vh] p-4 flex flex-row content-center items-center">
+        <div className="flex flex-col h-full w-full">
+          <h3 className="text-sm font-bold mb-2 mr-2">Context Prompt</h3>
+          <Textarea
+            placeholder="Your Context Prompt"
+            value={sortedSimilarities
+              .slice(0, topK)
+              .map((similarity, index) => chunks[similarity.index])
+              .join('')}
+            onChange={(e) => {
+              setContext(e.target.value)
+            }}
+            className="mb-2 mr-2 h-full"
+            disabled={isLoading}
+          />
+        </div>
+        <div className="flex flex-col h-full w-full ml-4 ">
+          <h3 className="text-sm font-bold mb-2 mr-2">Example System Prompt</h3>
+          <Textarea
+            placeholder="Your System Prompt"
+            value={`<context>${sortedSimilarities
+              .slice(0, topK)
+              .map(
+                (similarity, index) =>
+                  `<${index}>${chunks[similarity.index]}</${index}>`
+              )
+              .join('')}</context> ${systemPrompt} \nQuestion: ${query}`}
+            onChange={(e) => {
+              setSystemPrompt(e.target.value)
+            }}
+            className="mb-2 mr-2 h-full"
+            disabled={isLoading}
+          />
+        </div>
       </div>
     </div>
   )

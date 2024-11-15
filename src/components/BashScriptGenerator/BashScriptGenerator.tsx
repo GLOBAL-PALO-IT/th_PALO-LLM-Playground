@@ -391,7 +391,7 @@ const BashScriptGenerator = () => {
     <>
       <div className="h-[95vh] p-4 flex flex-row overflow-x-auto whitespace-nowrap space-x-4">
         <Card className="p-4 w-full overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-4">Bash Script Magician</h2>
+          <h2 className="text-2xl font-bold mb-4">Developer Agent</h2>
           <Textarea
             placeholder="Enter your query here"
             value={query}
