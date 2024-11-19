@@ -6,27 +6,61 @@ This project is used for training developer to understand the numbers of core co
 
 ## List of Examples
 
-- [Shell Agent](./docs/ShellAgent.md)
+### Developer Agent
+A powerful LLM-powered shell agent that can understand and execute shell commands based on natural language instructions. This agent can:
+- Execute complex shell operations through simple English commands
+- Handle file system operations, text processing, and system commands
+- Create short POC projects such as web servers, databases, and backend APIs
+- Handle Kubernetes, Docker, and other containerization tasks
+- Provide reasoning of commands before execution
+- Maintain context and handle multi-step tasks
+
+[Developer Agent](./docs/DeveloperAgent.md)
 
 https://github.com/user-attachments/assets/1ecab839-f7cd-4ca2-9f12-cf92c7bd96c9
 
-- Chat
+### Chat
+A basic chat implementation demonstrating:
+- Direct interaction with OpenAI's GPT models
+- Simple conversation handling
+- Basic prompt engineering techniques
+- Memory management for contextual conversations
 
 https://github.com/user-attachments/assets/ab4950d1-9ad7-4f61-a79f-2fbcf72bac08
 
-- Chat with Tools
+### Chat with Tools
+An advanced chat system that incorporates:
+- Custom tool integration with LLM
+- Function calling capabilities
+- Dynamic response handling
+- Tool-augmented conversations for enhanced functionality
 
 https://github.com/user-attachments/assets/9b3ebb4c-b231-417e-9bf7-ebfad94d7d2d
 
-- Chat with Insurance API
+### Chat with Insurance API
+A specialized chat implementation that:
+- Integrates with insurance-specific APIs
+- Handles insurance-related queries and calculations
+- Provides policy information and quotes
+- Demonstrates real-world API integration with LLM
 
 https://github.com/user-attachments/assets/a8d4cef0-4f69-4df4-a40b-9aeedc8a8dac
 
-- RAG Chunking Raw Text
+### RAG Chunking Raw Text
+A Retrieval-Augmented Generation (RAG) example showing:
+- Text chunking strategies for large documents
+- Efficient document processing
+- Optimal chunk size determination
+- Enhanced context retrieval for more accurate responses
 
 https://github.com/user-attachments/assets/18f7a74e-968f-44dd-a29c-c91b5ee3098c
 
-- RAG Qdrant
+### RAG Qdrant
+An advanced RAG implementation using Qdrant vector database:
+- Vector-based similarity search
+- Efficient document embedding and storage
+- Fast and accurate information retrieval
+- Scalable knowledge base management
 
 https://github.com/user-attachments/assets/b9be1ad1-f23b-4f83-ae9d-16af1f6661bd
 
@@ -74,3 +108,42 @@ docker run -p 6333:6333 -p 6334:6334 \
     -v $(pwd)/qdrant_storage:/qdrant/storage:z \
     qdrant/qdrant
 ```
+
+## Setup Prisma SQLite
+
+This project uses Prisma with SQLite as the database. Here's how to set it up and interact with it:
+
+### Initial Setup
+
+1. The database schema is defined in `prisma/schema.prisma`
+2. After any schema changes, run the following command to apply migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+This will:
+- Create a new migration file
+- Apply the migration to your database
+- Generate the Prisma Client
+
+### Using Prisma Studio
+
+To view and edit your database through a GUI interface:
+
+1. Run Prisma Studio:
+```bash
+npx prisma studio
+```
+
+2. Open your browser and navigate to `http://localhost:5555`
+
+### What You Should See
+
+When Prisma Studio opens, you should see:
+- All your defined models listed in the left sidebar
+- Empty tables if this is a fresh setup
+- Ability to add, edit, and delete records directly through the interface
+- Real-time updates as you modify the data
+
+The database file is located at `prisma/dev.db` by default.

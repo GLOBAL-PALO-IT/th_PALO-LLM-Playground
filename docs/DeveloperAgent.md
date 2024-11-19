@@ -1,6 +1,6 @@
-# Shell Agent
+# Developer Agent
 
-LLM Shell Agent is an AI Agent that uses Shell commands to automate your computer
+LLM Developer Agent is an AI Agent that uses Shell commands to automate your computer
 
 - Here is how shell agent works: currently there are two steps.
 
