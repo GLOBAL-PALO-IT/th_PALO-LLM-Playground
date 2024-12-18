@@ -18,8 +18,7 @@ export async function POST(request: Request) {
       max_tokens: 8192,
       top_p: 0.2,
       frequency_penalty: 0,
-      presence_penalty: 0,
-      stop: ['Observation'],
+      presence_penalty: 0
     })
 
     console.log(completion.choices[0])

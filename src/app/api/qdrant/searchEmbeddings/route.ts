@@ -77,15 +77,16 @@ export async function POST(request: Request) {
   }
 }
 
-const searchQuery = async (
+export const searchQuery = async (
   collectionName: string,
-  vector: number[]
+  vector: number[],
+  topK: number = 3
 ): Promise<SearchResult> => {
   try {
     const client = new QdrantClient({ host: 'localhost', port: 6333 })
     let searchResult = await client.query(collectionName, {
       query: vector,
-      limit: 3,
+      limit: topK,
       with_vector: true,
       with_payload: true,
     })
