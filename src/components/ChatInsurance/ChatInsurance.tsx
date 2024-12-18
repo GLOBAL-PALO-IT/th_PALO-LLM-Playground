@@ -100,7 +100,7 @@ const ChatInsurance = () => {
           <ExamplesDropDown setInput={setInput} />
         </div>
 
-        <div className="flex flex-col p-4 m-4 max-h-[54vh] h-[54vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
+        <div className="flex flex-col p-4 m-4 max-h-[50vh] h-[50vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
           {showFormattedPrompt ? (
             messages?.map((message, index) => {
               let messageMode:

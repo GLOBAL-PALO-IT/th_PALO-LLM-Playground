@@ -138,6 +138,12 @@ const NavBarStack = () => {
                         <ListItem href="/ragChat" title="RAG with Chat">
                           show how to integrate RAG with Chat in prompt
                         </ListItem>
+                        <ListItem href="/ragGraph" title="Graph RAG">
+                          showcase of Graph RAG
+                        </ListItem>
+                        <ListItem href="/ragAgentic" title="Agentic RAG">
+                          showcase of agentic RAG
+                        </ListItem>
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
