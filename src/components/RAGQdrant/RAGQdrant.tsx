@@ -31,6 +31,7 @@ const RAGQdrant = () => {
     []
   )
   const [collectionName, setCollectionName] = useState<string>('')
+  const [targetCollectionName, setTargetCollectionName] = useState<string>('')
   const [collections, setCollections] = useState<string[]>([])
 
   const [embeddingsSourceDocuments, setEmbeddingsSourceDocuments] = useState<
@@ -357,8 +358,7 @@ const RAGQdrant = () => {
         </Card>
         <Card className="p-4 w-full overflow-y-auto flex flex-col">
           <h3 className="text-xl font-bold mb-4">Collection Management</h3>
-          {embeddingsSourceDocuments?.length > 0 ||
-          embeddingsQuery?.length > 0 ? (
+          
             <>
               <Input
                 placeholder="Enter collection name"
@@ -402,9 +402,7 @@ const RAGQdrant = () => {
                 </Button>
               </div>
             </>
-          ) : (
-            <></>
-          )}
+          
 
           <h3 className="text-xl font-bold mb-4">List</h3>
           <Button
@@ -418,23 +416,24 @@ const RAGQdrant = () => {
             Get Collection List
           </Button>
           {collections?.map((collection, index) => (
-            <div key={index}>
+            <div className="cursor-pointer"  key={index} onClick={() => setTargetCollectionName(collection)}>
               <span className="text-sm text-gray-500 whitespace-pre-wrap w-full mb-6">
                 {collection}
               </span>
               <hr />
             </div>
           ))}
+          <h3 className="text-xl font-bold mb-1 mt-4">Target Collection is {targetCollectionName}</h3>
 
           <Button
             key="run-insert"
             onClick={async () => {
               insertEmbeddingsSourceDocumentsToVectorDatabase()
             }}
-            className="w-full bg-blue-800 text-[9px] mt-8 mb-8"
+            className="w-full bg-blue-800 text-[9px] mt-1 mb-8"
             disabled={isLoading}
           >
-            Insert Source Embedding to Vector Database
+            Insert Source Embedding to {targetCollectionName} Index
           </Button>
         </Card>
         <Card className="p-4 w-full overflow-y-auto">

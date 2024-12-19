@@ -16,11 +16,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-interface ExamplesDropDownProps {
+interface IndexesDropDownProps {
   setInput: React.Dispatch<React.SetStateAction<string>>
+  collections: string[]
 }
-const ExamplesQuestionDropDown: React.FC<ExamplesDropDownProps> = ({
+const IndexesDropDown: React.FC<IndexesDropDownProps> = ({
   setInput,
+  collections
 }) => {
   const handleSelectExample = (example: string) => {
     setInput(example)
@@ -30,28 +32,26 @@ const ExamplesQuestionDropDown: React.FC<ExamplesDropDownProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="p-1 border-2 border-blue-500 bg-white text-blue-500 rounded">
-          Select an example Question
+          Select Knowledge to Talk To
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2 m-2 border-2 border-blue-500 rounded-lg">
+      <DropdownMenuLabel>Knowledge Collection</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Example Prompts</DropdownMenuLabel>
+        {collections.map((collection) => (
           <DropdownMenuItem
-            onClick={() => handleSelectExample('Who is expert in NestJS?')}
+            key={collection}
+            onClick={() => handleSelectExample(collection)}
           >
-            Who is expert in NestJS?
+            {collection}
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              handleSelectExample('GRI 305_ Emissions 2016 Question')
-            }
-          >
-            GRI 305_ Emissions 2016 Question
-          </DropdownMenuItem>
+        ))}
+          
+          
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
 
-export default ExamplesQuestionDropDown
+export default IndexesDropDown

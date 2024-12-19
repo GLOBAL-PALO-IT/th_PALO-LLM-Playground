@@ -6,7 +6,7 @@ import { searchQuery } from '../qdrant/searchEmbeddings/route'
 import { ragChatPromptBuilder } from './prompt'
 
 export async function POST(request: Request) {
-  const { messages }: { messages: ChatCompletionMessageParam[] } =
+  const { messages, searchIndex }: { messages: ChatCompletionMessageParam[]; searchIndex: string } =
     await request.json()
   console.log(messages)
   try {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     if (typeof question !== 'string' || question.length === 0) {
       return NextResponse.json({ output: 'Please enter a valid text' }, { status: 400 })
     }
-    const prompt = await getPromptWithContext(question)
+    const prompt = await getPromptWithContext(question, searchIndex)
     const openai = new OpenAI()
     let llm = openai
     const completion = await llm.chat.completions.create({
@@ -45,9 +45,9 @@ export async function POST(request: Request) {
   }
 }
 
-const getPromptWithContext=async(question: string)=>{
+const getPromptWithContext=async(question: string, searchIndex: string)=>{
   const embeddings = await getEmbedding(question)
-  const searchResult = await searchQuery('Expert Bio', embeddings,10)
+  const searchResult = await searchQuery(searchIndex, embeddings,10)
   const searchResultText = searchResult.points.map((point) => point.payload?.pageContent as string)
   const prompt = await ragChatPromptBuilder(searchResultText, question)
   console.log({prompt})
