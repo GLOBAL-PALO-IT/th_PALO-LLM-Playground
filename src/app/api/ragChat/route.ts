@@ -50,7 +50,7 @@ const getPromptWithContext=async(question: string, searchIndex: string)=>{
   const searchResult = await searchQuery(searchIndex, embeddings,10)
   const searchResultText = searchResult.points.map((point) => point.payload?.pageContent as string)
   const prompt = await ragChatPromptBuilder(searchResultText, question)
-  console.log({prompt})
+  // console.log({prompt})
   return prompt
 }
 

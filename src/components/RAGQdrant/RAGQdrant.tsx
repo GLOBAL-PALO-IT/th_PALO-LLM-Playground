@@ -5,7 +5,7 @@ import { Document } from '@langchain/core/documents'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import './chat.css'
+
 import {
   JsonView,
   allExpanded,
@@ -22,6 +22,7 @@ import {
   OperationInfo,
 } from '@/app/api/qdrant/insertEmbeddings/route'
 import { SearchResult } from '@/app/api/qdrant/searchEmbeddings/route'
+import IndexesDropDown from './IndexesDropDown'
 
 const RAGQdrant = () => {
   const [query, setQuery] = useState<string>('')
@@ -33,6 +34,8 @@ const RAGQdrant = () => {
   const [collectionName, setCollectionName] = useState<string>('')
   const [targetCollectionName, setTargetCollectionName] = useState<string>('')
   const [collections, setCollections] = useState<string[]>([])
+  const [chunkAPIs, setChunkAPIs] = useState<string[]>(['/uploadPDF','/uploadPDFByToken'])
+  const [selectedChunkAPI, setSelectedChunkAPI] = useState<string>('/uploadPDF')
 
   const [embeddingsSourceDocuments, setEmbeddingsSourceDocuments] = useState<
     OpenAI.Embeddings.Embedding[]
@@ -228,7 +231,7 @@ const RAGQdrant = () => {
       const formData = new FormData()
       formData.append('pdf', selectedFile)
 
-      const response = await fetch('/api/uploadPDF', {
+      const response = await fetch(`/api${selectedChunkAPI}`, {
         method: 'POST',
         body: formData,
       })
@@ -273,6 +276,7 @@ const RAGQdrant = () => {
                 Upload PDF
               </Button>
             </form>
+            {chunkAPIs.length > 0 && <IndexesDropDown setInput={setSelectedChunkAPI} collections={chunkAPIs} selectedCollection={selectedChunkAPI} />}
 
             {pdfContent && (
               <div className="mt-6">

@@ -18,14 +18,17 @@ export async function POST(req: Request) {
     const loader = new PDFLoader(pdfBlob)
     const docs: Document<Record<string, any>>[] = await loader.load()
     const textSplitter = new TokenTextSplitter({
-      chunkSize: 10000,
+      chunkSize: 5000,
       chunkOverlap: 100,
     });
     const docsToText = docs.map((doc) => {
       return doc.pageContent
     }).join('[end of page]')
 
-    const docsSplit = textSplitter.splitText(docsToText)
+    const docsSplit = await textSplitter.createDocuments([docsToText])
+
+    // const docsSplit = textSplitter.splitText(docsToText)
+    console.log({ docsSplit })
 
     return NextResponse.json({ content: docsSplit }, { status: 200 })
   } catch (error) {
