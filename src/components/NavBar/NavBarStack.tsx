@@ -102,6 +102,9 @@ const NavBarStack = () => {
                         <ListItem href="/chatVoice" title="Chat Voice">
                           calling Realtime Voice Chat.
                         </ListItem>
+                        <ListItem href="/phoneCall" title="Phone Call">
+                          calling real phone number
+                        </ListItem>
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
