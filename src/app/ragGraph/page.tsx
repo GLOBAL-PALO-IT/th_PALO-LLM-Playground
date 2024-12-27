@@ -1,7 +1,7 @@
-import RAGChat from '@/components/RAGChat/RAGChat'
+import RAGGraph from '@/components/RAGGraph/RAGGraph'
 
 const Page = () => {
-  return <RAGChat />
+  return <RAGGraph />
 }
 
 export default Page

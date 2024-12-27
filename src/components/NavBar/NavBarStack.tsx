@@ -144,6 +144,9 @@ const NavBarStack = () => {
                         <ListItem href="/ragGraph" title="Graph RAG">
                           showcase of Graph RAG
                         </ListItem>
+                        <ListItem href="/ragGraphPipeline" title="Graph RAG Pipeline">
+                          showcase of Graph RAG Pipeline
+                        </ListItem>
                         <ListItem href="/ragAgentic" title="Agentic RAG">
                           showcase of agentic RAG
                         </ListItem>
