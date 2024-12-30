@@ -98,7 +98,7 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Setup Vector Database
+## Setup Qdrant Vector Database
 
 [Qdrant](https://qdrant.tech/documentation/quickstart/)
 
@@ -108,6 +108,26 @@ docker run -p 6333:6333 -p 6334:6334 \
     -v $(pwd)/qdrant_storage:/qdrant/storage:z \
     qdrant/qdrant
 ```
+
+## Setup Neo4j Graph Database
+
+[Neo4j](https://neo4j.com/docs/operations-manual/current/docker/introduction/)
+
+```bash
+docker run \
+    --name neo4j \
+    --restart always \
+    --publish=7474:7474 --publish=7687:7687 \
+    -e NEO4J_AUTH=neo4j/yourpassword \
+    -e NEO4JLABS_PLUGINS='["apoc"]' \
+    -v $PWD/data:/data \
+    -v $PWD/logs:/logs \
+    neo4j:5.26.0
+```
+
+- Username is `neo4j`
+- Password is `yourpassword`
+- URI is `neo4j://localhost:7687`
 
 ## Setup Prisma SQLite
 

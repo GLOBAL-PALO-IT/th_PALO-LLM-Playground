@@ -4,17 +4,6 @@ import { OpenAI } from 'openai'
 import { constructionPrompt } from './contruction-prompt'
 import { ModelName } from '@/lib/utils'
 
-//Example usage in react
-/*
-const response = await fetch('/api/graph/create', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ text: 'Example text' }),
-});
-const graph = await response.json();
-*/
 export async function POST(request: Request) {
     const openai = new OpenAI()
     const { text,targetNodes, targetRelationships } = await request.json()

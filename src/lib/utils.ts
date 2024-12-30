@@ -7,6 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export enum ModelName {
+  GPT4 = 'gpt-4-turbo-preview',
   GPT4O = 'gpt-4o-2024-08-06',
   GPT4O_MINI = 'gpt-4o-mini-2024-07-18',
   Llama3 = 'llama3-70b-8192',

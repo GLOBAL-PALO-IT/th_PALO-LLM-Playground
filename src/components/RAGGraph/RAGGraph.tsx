@@ -24,8 +24,10 @@ const RAGGraph = () => {
   const [selectedChunkAPI, setSelectedChunkAPI] = useState<string>('/uploadPDF')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [question, setQuestion] = useState<string>('')
-  
+
   const [searchResult, setSearchResult] = useState<string>()
+
+  const [neo4jConnection, setNeo4jConnection] = useState<string>('')
 
   const connectNeo4j = useCallback(async () => {
     const URI = 'neo4j://localhost:7687'
@@ -37,15 +39,17 @@ const RAGGraph = () => {
       const serverInfo = await driver.getServerInfo()
       console.log('Connection established')
       console.log(serverInfo)
+      setNeo4jConnection(JSON.stringify(serverInfo))
     } catch (err) {
       console.log(`Connection error\n${err}\nCause: ${err}`)
     }
   }, [])
- const nodesQuery = 'MATCH (n) RETURN DISTINCT labels(n) AS NodeLabels'
- const relationshipsQuery = 'MATCH ()-[r]->() RETURN DISTINCT type(r) AS RelationshipTypes'
+  const nodesQuery = 'MATCH (n) RETURN DISTINCT labels(n) AS NodeLabels'
+  const relationshipsQuery = 'MATCH ()-[r]->() RETURN DISTINCT type(r) AS RelationshipTypes'
+  const deleteAll='MATCH (n) DETACH DELETE n'
 
   const runQuery = async (query: string) => {
-    if(!query || query === '') return
+    if (!query || query === '') return
     setIsLoading(true)
     try {
       const URI = 'neo4j://localhost:7687'
@@ -55,12 +59,12 @@ const RAGGraph = () => {
       driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
       const session = driver.session()
       const result = await session.run(query)
-      
-      console.log('Result Records: ',result.records)
+
+      console.log('Result Records: ', result.records)
       driver.close()
       //Transform result to string for both NodeLabels and RelationshipTypes
       const resultString = result.records.map((record) => record.get(0)).join(', ')
-      console.log({resultString})
+      console.log({ resultString })
       return resultString
     } catch (e) {
       console.error(e)
@@ -144,7 +148,7 @@ const RAGGraph = () => {
 
   //Generate Search Query
   const generateSearchQuery = async (question: string) => {
-    if(!question || question === '') return
+    if (!question || question === '') return
     setIsLoading(true)
     const nodeLabels = await runQuery(nodesQuery)
     const relationshipTypes = await runQuery(relationshipsQuery)
@@ -155,7 +159,7 @@ const RAGGraph = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ question,name: graphDBBrand, description: `Node Labels: ${nodeLabels}, Relationship Types: ${relationshipTypes}` }),
+        body: JSON.stringify({ question, name: graphDBBrand, description: `Node Labels: ${nodeLabels}, Relationship Types: ${relationshipTypes}` }),
       });
       const { query } = await response.json();
       console.log({ query });
@@ -174,7 +178,9 @@ const RAGGraph = () => {
 
 
   return <div className="flex flex-col">
-    <div className="p-4 flex flex-row content-center items-center"></div>
+    <div className={`p-4 flex flex-row content-center items-center ${neo4jConnection ? 'text-green-500' : 'text-gray-500'}`}>
+      Neo4J Connection: {neo4jConnection}
+    </div>
     <div className="h-[95vh] p-4 flex flex-row overflow-x-auto whitespace-nowrap space-x-4">
       <Card className="p-4 w-full overflow-y-auto">
         <div className="space-y-4">
@@ -205,9 +211,9 @@ const RAGGraph = () => {
             />
             <Button
               type="submit"
-              key="run-search"
+              key="upload-pdf"
               className="w-full bg-blue-800 mt-4"
-              disabled={isLoading}
+              disabled={isLoading || !selectedFile}
             >
               Upload PDF
             </Button>
@@ -246,20 +252,20 @@ const RAGGraph = () => {
         </div>
       </Card>
       <Card className="p-4 w-full overflow-y-auto">
-      <Button
-            onClick={() => describeGraph(selectedText)}
-            key="create-graph"
-            className="w-full bg-blue-800 mt-4"
-            disabled={isLoading}
-          >
-            Create Graph Description
-          </Button>
-          <h3 className="text-xl font-bold mb-4 mt-6">Graph Description</h3>
-          <div>
-            <span
-              className='text-sm text-gray-500 whitespace-pre-wrap w-full mb-6'
-            >{graphDescription}</span>
-          </div>
+        <Button
+          onClick={() => describeGraph(selectedText)}
+          key="create-graph"
+          className="w-full bg-blue-800 mt-4"
+          disabled={isLoading}
+        >
+          Create Graph Description
+        </Button>
+        <h3 className="text-xl font-bold mb-4 mt-6">Graph Description</h3>
+        <div>
+          <span
+            className='text-sm text-gray-500 whitespace-pre-wrap w-full mb-6'
+          >{graphDescription}</span>
+        </div>
         <h3 className="text-xl font-bold mb-4 mt-6">Graph Query</h3>
         {/* Text Input of Different Brand of Graph DB */}
         <Input
@@ -330,6 +336,17 @@ const RAGGraph = () => {
         <span
           className='text-sm text-gray-500 whitespace-pre-wrap w-full mb-6 mt-6'
         >{searchResult}</span>
+        <Button
+          onClick={async () => {
+            await runQuery(deleteAll)
+            
+          }}
+          key="delete-all"
+          className="w-full bg-red-800 mt-4"
+          disabled={isLoading}
+        >
+          Delete All
+        </Button>
       </Card>
     </div>
     <div className="p-4 flex flex-row content-center items-center"></div>

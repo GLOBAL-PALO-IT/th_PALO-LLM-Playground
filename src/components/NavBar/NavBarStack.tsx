@@ -142,10 +142,10 @@ const NavBarStack = () => {
                           show how to integrate RAG with Chat in prompt
                         </ListItem>
                         <ListItem href="/ragGraph" title="Graph RAG">
-                          showcase of Graph RAG
+                          showcase of Graph RAG Construction
                         </ListItem>
                         <ListItem href="/ragGraphPipeline" title="Graph RAG Pipeline">
-                          showcase of Graph RAG Pipeline
+                          showcase of Graph RAG Construction Pipeline using LangChain
                         </ListItem>
                         <ListItem href="/ragAgentic" title="Agentic RAG">
                           showcase of agentic RAG
