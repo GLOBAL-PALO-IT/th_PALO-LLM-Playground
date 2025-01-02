@@ -42,6 +42,10 @@ const RAGGraphPipeline = () => {
   const [textNodeProperty, setTextNodeProperty] = useState<string>('')
   //query
   const [query, setQuery] = useState<string>('')
+  //searchResult
+  const [searchResult, setSearchResult] = useState<Document<Record<string, any>>[]>(
+    []
+  )
 
   const connectNeo4j = useCallback(async () => {
     const URI = 'neo4j://localhost:7687'
@@ -170,6 +174,7 @@ const RAGGraphPipeline = () => {
       });
       const { searchResults } = await response.json()
       console.log({ searchResults })
+      setSearchResult(searchResults)
     } catch (e) {
       console.error(e)
     } finally {
@@ -356,6 +361,22 @@ const RAGGraphPipeline = () => {
         >
           Similarity Search
         </Button>
+        <h3 className="text-xl font-bold mb-4 mt-6">Search Result</h3>
+        {searchResult && (
+            <div className="mt-6 max-h-[50vh] overflow-y-auto">
+              <h2>Documents Chunk Size {searchResult.length}</h2>
+              {searchResult.map((doc, index) => (
+                <div key={index} className='cursor-pointer'>
+                  <JsonView
+                      data={doc}
+                      shouldExpandNode={collapseAllNested}
+                      style={darkStyles}
+                    />
+                  <hr className="border-t-2 border-blue-900 my-4" />
+                </div>
+              ))}
+            </div>
+          )}
       </Card>
     </div>
     <div className="p-4 flex flex-row content-center items-center"></div>

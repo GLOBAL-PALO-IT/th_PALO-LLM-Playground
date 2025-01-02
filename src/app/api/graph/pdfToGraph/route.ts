@@ -3,7 +3,7 @@ import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { Document } from '@langchain/core/documents'
 import { ChatOpenAI } from "@langchain/openai";
 import { LLMGraphTransformer } from "@langchain/community/experimental/graph_transformers/llm";
-import { ModelName } from '@/lib/utils';
+import { generateShortUUID, ModelName } from '@/lib/utils';
 import "neo4j-driver";
 import { Neo4jGraph } from "@langchain/community/graphs/neo4j_graph";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
@@ -25,6 +25,10 @@ interface GraphResult {
     type: string;
     properties: Record<string, any>;
   }[];
+  source: {
+    metadata: Record<string, any>;
+    pageContent: string;
+  };
 }
 export async function POST(req: Request) {
   const formData = await req.formData()
@@ -45,7 +49,7 @@ export async function POST(req: Request) {
   try {
     //Load PDF
     const loader = new PDFLoader(pdfBlob)
-    const docs: Document<Record<string, any>>[] = await loader.load()
+    let docs: Document<Record<string, any>>[] = await loader.load()
     //Initialize Graph
     const url = process.env.NEO4J_URI;
     const username = process.env.NEO4J_USER;
@@ -68,7 +72,7 @@ export async function POST(req: Request) {
       allowedRelationships: allowedRelationships && allowedRelationships?.length > 0?allowedRelationships:undefined
     }
 
-    console.log({llmGraphParams})
+    // console.log({llmGraphParams})
 
     const llmGraphTransformer = new LLMGraphTransformer(llmGraphParams);
 
@@ -80,8 +84,10 @@ export async function POST(req: Request) {
     //TODO: use Promise.all() instead
     for (let i = fromPage; i < toPage; i++) {
       console.log('start transforming for doc', i)
-      const result = await llmGraphTransformer.convertToGraphDocuments([docs[i]]);
       
+      let result = await llmGraphTransformer.convertToGraphDocuments([docs[i]]);
+      console.log({docref: docs[i]})
+      //consolidate results
       combinedResult.push({
         nodes: result[0].nodes.map((node) => {
           return {
@@ -105,10 +111,26 @@ export async function POST(req: Request) {
             type: relationship.type,
             properties: relationship.properties
           }
-        })
+        }),
+        source: {
+          metadata: {
+            pageNumber: docs[i].metadata.loc.pageNumber
+          },
+          pageContent: docs[i].pageContent,
+        }
       })
+      //NEED TO modify source because nested structure cause error in neo4j query
+      result[0].source = {
+        metadata: {
+          pageNumber: docs[i].metadata.loc.pageNumber
+        },
+        pageContent: docs[i].pageContent,
+      }
       //TODO: use Promise.all() instead
-      await graph.addGraphDocuments(result);
+      await graph.addGraphDocuments(result, {
+        includeSource: true,
+        baseEntityLabel: true
+      });
     }
 
     //end time lapse
