@@ -3,10 +3,10 @@ import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { Document } from '@langchain/core/documents'
 import { ChatOpenAI } from "@langchain/openai";
 import { LLMGraphTransformer } from "@langchain/community/experimental/graph_transformers/llm";
-import { generateShortUUID, ModelName } from '@/lib/utils';
+import { ModelName } from '@/lib/utils';
 import "neo4j-driver";
 import { Neo4jGraph } from "@langchain/community/graphs/neo4j_graph";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { consolidateResults, docsToSource } from './consolidate';
 
 interface Node {
   id: string | number;
@@ -68,8 +68,8 @@ export async function POST(req: Request) {
 
     const llmGraphParams = {
       llm: model,
-      allowedNodes: allowedNodes && allowedNodes?.length > 0?allowedNodes:undefined,
-      allowedRelationships: allowedRelationships && allowedRelationships?.length > 0?allowedRelationships:undefined
+      allowedNodes: allowedNodes && allowedNodes?.length > 0 ? allowedNodes : undefined,
+      allowedRelationships: allowedRelationships && allowedRelationships?.length > 0 ? allowedRelationships : undefined
     }
 
     // console.log({llmGraphParams})
@@ -81,57 +81,32 @@ export async function POST(req: Request) {
     //start time lapse
     const startTime = Date.now();
     let combinedResult: GraphResult[] = []
-    //TODO: use Promise.all() instead
+    let graphDocList = []
+    let addGraphList = []
     for (let i = fromPage; i < toPage; i++) {
       console.log('start transforming for doc', i)
-      
-      let result = await llmGraphTransformer.convertToGraphDocuments([docs[i]]);
-      console.log({docref: docs[i]})
-      //consolidate results
-      combinedResult.push({
-        nodes: result[0].nodes.map((node) => {
-          return {
-            id: node.id,
-            type: node.type,
-            properties: node.properties
-          }
-        }),
-        relationships: result[0].relationships.map((relationship) => {
-          return {
-            source: {
-              id: relationship.source.id,
-              type: relationship.source.type,
-              properties: relationship.source.properties
-            },            
-            target: {
-              id: relationship.target.id,
-              type: relationship.target.type,
-              properties: relationship.target.properties
-            },
-            type: relationship.type,
-            properties: relationship.properties
-          }
-        }),
-        source: {
-          metadata: {
-            pageNumber: docs[i].metadata.loc.pageNumber
-          },
-          pageContent: docs[i].pageContent,
-        }
-      })
-      //NEED TO modify source because nested structure cause error in neo4j query
-      result[0].source = {
-        metadata: {
-          pageNumber: docs[i].metadata.loc.pageNumber
-        },
-        pageContent: docs[i].pageContent,
-      }
-      //TODO: use Promise.all() instead
-      await graph.addGraphDocuments(result, {
+
+      let graphDoc = llmGraphTransformer.convertToGraphDocuments([docs[i]]);
+      graphDocList.push(graphDoc)
+    }
+
+    let graphDocListPromised = await Promise.all(graphDocList)
+    graphDocListPromised = graphDocListPromised.map((graphDoc, index) => {
+      graphDoc[0].source = docsToSource(docs, index + fromPage)
+      combinedResult.push(consolidateResults(graphDoc, docs, index + fromPage))
+      return graphDoc
+    })
+
+    for (let i = 0; i < graphDocListPromised.length; i++) {
+      addGraphList.push(graph.addGraphDocuments(graphDocListPromised[i], {
         includeSource: true,
         baseEntityLabel: true
-      });
+      }),)
     }
+
+    await Promise.all(addGraphList)
+
+
 
     //end time lapse
     const endTime = Date.now();
