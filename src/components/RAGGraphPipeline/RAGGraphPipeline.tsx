@@ -26,11 +26,23 @@ const RAGGraphPipeline = () => {
   const [graphContent, setGraphContent] = useState<GraphDocument[]>(
     []
   )
-//Person, Title, Experience, Certification, Skills
+
+  const [fromPage, setFromPage] = useState<number>(50)
+  const [toPage, setToPage] = useState<number>(55)
+  //Person, Title, Experience, Certification, Skills
   const [targetNodesItems, setTargetNodesItems] = useState<string[]>(['Person', 'Title', 'Experience', 'Certification', 'Skills'])
-//'Obtain, Has Title, Has Skill, Has Experience'
+  //'Obtain, Has Title, Has Skill, Has Experience'
   const [targetRelationshipsItems, setTargetRelationshipsItems] = useState<string[]>(['Obtain', 'Has Title', 'Has Skill', 'Has Experience'])
   const [neo4jConnection, setNeo4jConnection] = useState<string>('')
+  //indexName
+  const [indexName, setIndexName] = useState<string>('')
+  //nodeLabel
+  const [nodeLabel, setNodeLabel] = useState<string>('')
+  //textNodeProperties
+  const [textNodeProperty, setTextNodeProperty] = useState<string>('')
+  //query
+  const [query, setQuery] = useState<string>('')
+
   const connectNeo4j = useCallback(async () => {
     const URI = 'neo4j://localhost:7687'
     const USER = 'neo4j'
@@ -46,30 +58,7 @@ const RAGGraphPipeline = () => {
       console.log(`Connection error\n${err}\nCause: ${err}`)
     }
   }, [])
-  const runQuery = async (query: string) => {
-    if (!query || query === '') return
-    setIsLoading(true)
-    try {
-      const URI = 'neo4j://localhost:7687'
-      const USER = 'neo4j'
-      const PASSWORD = 'yourpassword'
-      let driver
-      driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-      const session = driver.session()
-      const result = await session.run(query)
 
-      console.log('Result Records: ', result.records)
-      driver.close()
-      //Transform result to string for both NodeLabels and RelationshipTypes
-      const resultString = result.records.map((record) => record.get(0)).join(', ')
-      console.log({ resultString })
-      return resultString
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,6 +75,8 @@ const RAGGraphPipeline = () => {
 
       const formData = new FormData()
       formData.append('pdf', selectedFile)
+      formData.append('fromPage', fromPage.toString())
+      formData.append('toPage', toPage.toString())
       //replace all " " with "_"
       formData.append('targetNodes', JSON.stringify(targetNodesItems).toUpperCase().replace(/ /g, '_'))
       formData.append('targetRelationships', JSON.stringify(targetRelationshipsItems).toUpperCase().replace(/ /g, '_'))
@@ -139,6 +130,47 @@ const RAGGraphPipeline = () => {
     const newItems = targetRelationshipsItems.filter((_, i) => i !== index);
     setTargetRelationshipsItems(newItems);
   };
+
+  const vectorizedGraph = async () => {
+    setIsLoading(true)
+    try {
+      // vectorize graph by calling api endpoint /api/graph/vectorize
+      const response = await fetch('/api/graph/vectorize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ indexName, nodeLabel, textNodeProperties: [textNodeProperty] }),
+      });
+      const { status } = await response.json()
+      console.log({ status })
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsLoading(false)
+    }
+
+  }
+
+  const similaritySearch = async() => {
+    setIsLoading(true)
+    try {
+      // similarity search by calling api endpoint /api/graph/similaritySearch
+      const response = await fetch('/api/graph/similaritySearch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ indexName, nodeLabel, textNodeProperty, query }),
+      });
+      const { searchResults } = await response.json()
+      console.log({ searchResults })
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
 
   return <div className="flex flex-col">
@@ -226,9 +258,27 @@ const RAGGraphPipeline = () => {
               accept="application/pdf"
               onChange={handleFileChange}
             />
+            <h4 className="text-xl font-bold mb-4 mt-4">From Page</h4>
+            <Input
+              type="number"
+              className="mb-4"
+              value={fromPage}
+              onChange={(e) => {
+                setFromPage(parseInt(e.target.value))
+              }}
+            />
+            <h4 className="text-xl font-bold mb-4">To Page</h4>
+            <Input
+              type="number"
+              className="mb-4"
+              value={toPage}
+              onChange={(e) => {
+                setToPage(parseInt(e.target.value))
+              }}
+            />
             <Button
               type="submit"
-              key="run-search"
+              key="run-search-and-construct-graph-button"
               className="w-full bg-blue-800 mt-4"
               disabled={isLoading || !selectedFile}
             >
@@ -252,6 +302,55 @@ const RAGGraphPipeline = () => {
             </div>
           )}
         </div>
+      </Card>
+      <Card className="p-4 w-full overflow-y-auto">
+        <h3 className="text-xl font-bold mb-4">Vectorized Graph</h3>
+        {/* Input indexName */}
+        <Input
+          placeholder="Enter index name"
+          value={indexName}
+          onChange={(e) => setIndexName(e.target.value)}
+          className="mb-2"
+        />
+        {/* Input nodeLabel */}
+        <Input
+          placeholder="Enter node label"
+          value={nodeLabel}
+          onChange={(e) => setNodeLabel(e.target.value)}
+          className="mb-1"
+        />
+        {/* Input textNodeProperties */}
+        <Input
+          placeholder="Enter text node properties"
+          value={textNodeProperty}
+          onChange={(e) => setTextNodeProperty(e.target.value)}
+          className="mb-1"
+        />
+        {/* Button Vectorized Graph */}
+        <Button
+          key="vectorized-graph-button"
+          className="w-full bg-blue-800 mt-2"
+          disabled={isLoading || (!indexName || !nodeLabel || !textNodeProperty)}
+          onClick={() => vectorizedGraph()}
+        >
+          Vectorized Graph
+        </Button>
+        {/* Input query */}
+        <Input
+          placeholder="Enter query"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="mb-1 mt-6"
+        />
+        {/* Button Similarity Search */}
+        <Button
+          key="similarity-search-button"
+          className="w-full bg-blue-800 mt-2"
+          disabled={isLoading || (!indexName || !nodeLabel || !textNodeProperty || !query)}
+          onClick={() => similaritySearch()}
+        >
+          Similarity Search
+        </Button>
       </Card>
     </div>
     <div className="p-4 flex flex-row content-center items-center"></div>

@@ -31,6 +31,8 @@ export async function POST(req: Request) {
   const pdfFile = formData.get('pdf') as File
   const targetNodes = JSON.parse(formData.get('targetNodes') as string)
   const targetRelationships = JSON.parse(formData.get('targetRelationships') as string)
+  const fromPage = JSON.parse(formData.get('fromPage') as string)
+  const toPage = JSON.parse(formData.get('toPage') as string)
   //Blob of pdfFile
   const pdfBlob = new Blob([pdfFile], { type: pdfFile.type })
 
@@ -71,7 +73,8 @@ export async function POST(req: Request) {
     //start time lapse
     const startTime = Date.now();
     let combinedResult: GraphResult[] = []
-    for (let i = 0; i < docs.slice(50, 55).length; i++) {
+    //TODO: use Promise.all() instead
+    for (let i = fromPage; i < toPage; i++) {
       console.log('start transforming for doc', i)
       const result = await llmGraphTransformer.convertToGraphDocuments([docs[i]]);
       
@@ -106,7 +109,8 @@ export async function POST(req: Request) {
     //end time lapse
     const endTime = Date.now();
     const elapsedTime = endTime - startTime;
-    console.log(`Time taken: ${elapsedTime} ms`);
+    //in seconds
+    console.log(`Time taken: ${elapsedTime / 1000} seconds`);
     console.log({ combinedResult })
 
     return NextResponse.json({ graphResult: combinedResult }, { status: 200 })

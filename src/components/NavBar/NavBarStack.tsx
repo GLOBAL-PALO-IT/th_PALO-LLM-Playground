@@ -147,8 +147,11 @@ const NavBarStack = () => {
                         <ListItem href="/ragGraphPipeline" title="Graph RAG Pipeline">
                           showcase of Graph RAG Construction Pipeline using LangChain
                         </ListItem>
+                        <ListItem href="/ragGraphChat" title="Graph RAG Chat">
+                          showcase of Graph RAG Chat
+                        </ListItem>
                         <ListItem href="/ragAgentic" title="Agentic RAG">
-                          showcase of agentic RAG
+                          showcase of Agentic RAG
                         </ListItem>
                       </ul>
                     </NavigationMenuContent>
