@@ -29,8 +29,8 @@ interface GraphResult {
 export async function POST(req: Request) {
   const formData = await req.formData()
   const pdfFile = formData.get('pdf') as File
-  const targetNodes = JSON.parse(formData.get('targetNodes') as string)
-  const targetRelationships = JSON.parse(formData.get('targetRelationships') as string)
+  const allowedNodes: string[] | undefined = formData.get('allowedNodes') ? JSON.parse(formData.get('allowedNodes') as string) : []
+  const allowedRelationships: string[] | undefined = formData.get('allowedRelationships') ? JSON.parse(formData.get('allowedRelationships') as string) : []
   const fromPage = JSON.parse(formData.get('fromPage') as string)
   const toPage = JSON.parse(formData.get('toPage') as string)
   //Blob of pdfFile
@@ -62,11 +62,15 @@ export async function POST(req: Request) {
       model: ModelName.GPT4O,
     });
 
-    const llmGraphTransformer = new LLMGraphTransformer({
+    const llmGraphParams = {
       llm: model,
-      allowedNodes: targetNodes,
-      allowedRelationships: targetRelationships
-    });
+      allowedNodes: allowedNodes && allowedNodes?.length > 0?allowedNodes:undefined,
+      allowedRelationships: allowedRelationships && allowedRelationships?.length > 0?allowedRelationships:undefined
+    }
+
+    console.log({llmGraphParams})
+
+    const llmGraphTransformer = new LLMGraphTransformer(llmGraphParams);
 
 
     console.log('docs length', docs.length)
@@ -103,6 +107,7 @@ export async function POST(req: Request) {
           }
         })
       })
+      //TODO: use Promise.all() instead
       await graph.addGraphDocuments(result);
     }
 

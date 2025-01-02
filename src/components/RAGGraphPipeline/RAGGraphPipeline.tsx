@@ -30,9 +30,9 @@ const RAGGraphPipeline = () => {
   const [fromPage, setFromPage] = useState<number>(50)
   const [toPage, setToPage] = useState<number>(55)
   //Person, Title, Experience, Certification, Skills
-  const [targetNodesItems, setTargetNodesItems] = useState<string[]>(['Person', 'Title', 'Experience', 'Certification', 'Skills'])
+  const [allowedNodesItems, setAllowedNodesItems] = useState<string[]>(['Person', 'Title', 'Experience', 'Certification', 'Skills'])
   //'Obtain, Has Title, Has Skill, Has Experience'
-  const [targetRelationshipsItems, setTargetRelationshipsItems] = useState<string[]>(['Obtain', 'Has Title', 'Has Skill', 'Has Experience'])
+  const [allowedRelationshipsItems, setAllowedRelationshipsItems] = useState<string[]>(['Obtain', 'Has Title', 'Has Skill', 'Has Experience'])
   const [neo4jConnection, setNeo4jConnection] = useState<string>('')
   //indexName
   const [indexName, setIndexName] = useState<string>('')
@@ -78,8 +78,13 @@ const RAGGraphPipeline = () => {
       formData.append('fromPage', fromPage.toString())
       formData.append('toPage', toPage.toString())
       //replace all " " with "_"
-      formData.append('targetNodes', JSON.stringify(targetNodesItems).toUpperCase().replace(/ /g, '_'))
-      formData.append('targetRelationships', JSON.stringify(targetRelationshipsItems).toUpperCase().replace(/ /g, '_'))
+      if (allowedNodesItems) {
+        formData.append('allowedNodes', JSON.stringify(allowedNodesItems))
+      }
+      if (allowedRelationshipsItems) {
+        formData.append('allowedRelationships', JSON.stringify(allowedRelationshipsItems))
+      }
+
 
       const response = await fetch(`/api/graph/pdfToGraph`, {
         method: 'POST',
@@ -102,33 +107,33 @@ const RAGGraphPipeline = () => {
 
   //Nodes
   const handleTargetNodeChange = (index: number, value: string) => {
-    const newItems = [...targetNodesItems];
+    const newItems = [...allowedNodesItems];
     newItems[index] = value.toUpperCase().replace(/ /g, '_');
-    setTargetNodesItems(newItems);
+    setAllowedNodesItems(newItems);
   };
 
   const addTargetNodeItem = () => {
-    setTargetNodesItems([...targetNodesItems, '']);
+    setAllowedNodesItems([...allowedNodesItems, '']);
   };
 
   const removeTargetNodeItem = (index: number) => {
-    const newItems = targetNodesItems.filter((_, i) => i !== index);
-    setTargetNodesItems(newItems);
+    const newItems = allowedNodesItems.filter((_, i) => i !== index);
+    setAllowedNodesItems(newItems);
   };
   //Relationships
   const handleTargetRelationshipChange = (index: number, value: string) => {
-    const newItems = [...targetRelationshipsItems];
+    const newItems = [...allowedRelationshipsItems];
     newItems[index] = value.toUpperCase().replace(/ /g, '_');
-    setTargetRelationshipsItems(newItems);
+    setAllowedRelationshipsItems(newItems);
   };
 
   const addTargetRelationshipItem = () => {
-    setTargetRelationshipsItems([...targetRelationshipsItems, '']);
+    setAllowedRelationshipsItems([...allowedRelationshipsItems, '']);
   };
 
   const removeTargetRelationshipItem = (index: number) => {
-    const newItems = targetRelationshipsItems.filter((_, i) => i !== index);
-    setTargetRelationshipsItems(newItems);
+    const newItems = allowedRelationshipsItems.filter((_, i) => i !== index);
+    setAllowedRelationshipsItems(newItems);
   };
 
   const vectorizedGraph = async () => {
@@ -152,7 +157,7 @@ const RAGGraphPipeline = () => {
 
   }
 
-  const similaritySearch = async() => {
+  const similaritySearch = async () => {
     setIsLoading(true)
     try {
       // similarity search by calling api endpoint /api/graph/similaritySearch
@@ -182,7 +187,7 @@ const RAGGraphPipeline = () => {
       <Card className="p-4 w-full overflow-y-auto">
         <div className="space-y-4">
           <div className="space-y-2">
-            {targetNodesItems.map((item, index) => (
+            {allowedNodesItems.map((item, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <Input
                   value={item.toUpperCase().replace(/ /g, '_')}
@@ -217,7 +222,7 @@ const RAGGraphPipeline = () => {
       <Card className="p-4 w-full overflow-y-auto">
         <div className="space-y-4">
           <div className="space-y-2">
-            {targetRelationshipsItems.map((item, index) => (
+            {allowedRelationshipsItems.map((item, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <Input
                   value={item.toUpperCase().replace(/ /g, '_')}
