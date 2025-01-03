@@ -36,6 +36,7 @@ const NavBarStack = () => {
               <NavigationMenu>
                 <NavigationMenuList>
                   <NavigationMenuItem>
+                    {/* Agents */}
                     <NavigationMenuTrigger>Agents</NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -56,8 +57,29 @@ const NavBarStack = () => {
                             </a>
                           </NavigationMenuLink>
                         </li>
+                        {/* /react */}
                         <ListItem href="/react" title="Shell Agent">
                           Shell Agent that can work with shell script and
+                          support complex query such as coding and DevOps.
+                          Reminder: This is actually execute the shell script in
+                          the server side.
+                        </ListItem>
+                        {/*  /agenticPattern1*/}
+                        <ListItem
+                          href="/agenticPattern1"
+                          title="Agent Pattern 1"
+                        >
+                          Agent Pattern 1 that can work with shell script and
+                          support complex query such as coding and DevOps.
+                          Reminder: This is actually execute the shell script in
+                          the server side.
+                        </ListItem>
+                        {/*  /agenticPattern2*/}
+                        <ListItem
+                          href="/agenticPattern2"
+                          title="Agent Pattern 2"
+                        >
+                          Agent Pattern 2 that can work with shell script and
                           support complex query such as coding and DevOps.
                           Reminder: This is actually execute the shell script in
                           the server side.
@@ -65,6 +87,7 @@ const NavBarStack = () => {
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
+                  {/* Chat */}
                   <NavigationMenuItem>
                     <NavigationMenuTrigger>Chat</NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -108,6 +131,7 @@ const NavBarStack = () => {
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
+                  {/* RAG */}
                   <NavigationMenuItem>
                     <NavigationMenuTrigger>RAG</NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -147,13 +171,58 @@ const NavBarStack = () => {
                         <ListItem href="/ragGraphPipeline" title="Graph RAG Pipeline">
                           showcase of Graph RAG Construction Pipeline using LangChain
                         </ListItem>
-                        <ListItem href="/ragGraphChat" title="Graph RAG Chat">
+                        <ListItem href="/ragChatGraph" title="Graph RAG Chat">
                           showcase of Graph RAG Chat
                         </ListItem>
                         <ListItem href="/ragAgentic" title="Agentic RAG">
                           showcase of Agentic RAG
                         </ListItem>
                       </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  {/* Evaluation */}
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Evaluation</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                        <li className="row-span-3">
+                          <NavigationMenuLink asChild>
+                            <a
+                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                              href="/chat"
+                            >
+                              {/* <Icons.logo className="h-6 w-6" /> */}
+                              <div className="mb-2 text-lg font-medium">
+                                Evaluation
+                              </div>
+                              <p className="text-sm leading-tight text-muted-foreground">
+                                Example of how to evaluate the performance of LLM Application
+                              </p>
+                            </a>
+                          </NavigationMenuLink>
+                        </li>
+                        {/* /eval */}
+                        <ListItem href="/eval" title="Evaluation Fundamentals">
+                          Evaluation of LLM Application
+                        </ListItem>
+                        {/* /eval rag */}
+                        <ListItem href="/evalRag" title="Evaluation RAG">
+                          Evaluation of RAG Application
+                        </ListItem>
+                        {/* /eval pipeline */}
+                        <ListItem href="/evalPipeline" title="Evaluation Pipeline">
+                          Evaluation of Pipeline Application
+                        </ListItem>
+                        {/* /eval dataset */}
+                        <ListItem href="/evalDataset" title="Evaluation Dataset">
+                          Evaluation Dataset Creation
+                        </ListItem>
+                        {/* /eval model */}
+                        <ListItem href="/evalModel" title="Evaluation Model">
+                          Evaluation Model Creation
+                        </ListItem>
+                      </ul>
+
                     </NavigationMenuContent>
                   </NavigationMenuItem>
                 </NavigationMenuList>

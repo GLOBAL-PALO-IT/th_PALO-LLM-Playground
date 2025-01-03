@@ -14,6 +14,7 @@ import {
 } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
 import { Plus, X } from "lucide-react";
+import { Textarea } from '@/components/ui/textarea'
 interface GraphDocument {
   nodes: Node[];
   relationships: Relationship[];
@@ -46,6 +47,9 @@ const RAGGraphPipeline = () => {
   const [searchResult, setSearchResult] = useState<Document<Record<string, any>>[]>(
     []
   )
+
+  //filterText
+  const [filterText, setFilterText] = useState<string>('')
 
   const connectNeo4j = useCallback(async () => {
     const URI = 'neo4j://localhost:7687'
@@ -81,6 +85,7 @@ const RAGGraphPipeline = () => {
       formData.append('pdf', selectedFile)
       formData.append('fromPage', fromPage.toString())
       formData.append('toPage', toPage.toString())
+      formData.append('filterText', filterText)
       //replace all " " with "_"
       if (allowedNodesItems) {
         formData.append('allowedNodes', JSON.stringify(allowedNodesItems))
@@ -286,6 +291,16 @@ const RAGGraphPipeline = () => {
                 setToPage(parseInt(e.target.value))
               }}
             />
+            <h4 className="text-xl font-bold mb-4">Filter Text</h4>
+            {/* Text that needed filterout */}
+            <Textarea
+              placeholder="Enter filter text"
+              className="mb-4"
+              value={filterText}
+              onChange={(e) => {
+                setFilterText(e.target.value)
+              }}
+            />
             <Button
               type="submit"
               key="run-search-and-construct-graph-button"
@@ -320,7 +335,7 @@ const RAGGraphPipeline = () => {
           placeholder="Enter index name"
           value={indexName}
           onChange={(e) => setIndexName(e.target.value)}
-          className="mb-2"
+          className="mb-1"
         />
         {/* Input nodeLabel */}
         <Input

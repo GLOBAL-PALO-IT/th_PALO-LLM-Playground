@@ -7,7 +7,6 @@ import { ModelName } from '@/lib/utils';
 import "neo4j-driver";
 import { Neo4jGraph } from "@langchain/community/graphs/neo4j_graph";
 import { consolidateResults, docsToSource } from './consolidate';
-
 interface Node {
   id: string | number;
   type: string;
@@ -37,6 +36,7 @@ export async function POST(req: Request) {
   const allowedRelationships: string[] | undefined = formData.get('allowedRelationships') ? JSON.parse(formData.get('allowedRelationships') as string) : []
   const fromPage = JSON.parse(formData.get('fromPage') as string)
   const toPage = JSON.parse(formData.get('toPage') as string)
+  const filterText = formData.get('filterText') as string
   //Blob of pdfFile
   const pdfBlob = new Blob([pdfFile], { type: pdfFile.type })
 
@@ -50,6 +50,13 @@ export async function POST(req: Request) {
     //Load PDF
     const loader = new PDFLoader(pdfBlob)
     let docs: Document<Record<string, any>>[] = await loader.load()
+    // delete "filterText" found in pageContent using regex
+    if (filterText) {
+      docs = docs.map((doc) => {
+        doc.pageContent = doc.pageContent.replace(new RegExp(filterText, 'g'), '')
+        return doc
+      })
+    }
     //Initialize Graph
     const url = process.env.NEO4J_URI;
     const username = process.env.NEO4J_USER;
