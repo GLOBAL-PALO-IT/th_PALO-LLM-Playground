@@ -22,7 +22,7 @@ export const menuItems: MenuCategory[] = [
     },
     {
         categoryId: "2",
-        category: "ไลฟ์สไตล์ของผู้ใช้รถ",
+        category: "Car Lifestyle",
         items: [
             { id: "1", title: "ออโต้ คลับ", description: "Auto Club", sampleChatQueryThai:["อ่านข่าว ออโต้ คลับ"] },
             { id: "2", title: "ค้นหาสถานีชาร์จรถไฟฟ้า", description: "EV charging station locator", sampleChatQueryThai:["ค้นหาสถานีชาร์จรถไฟฟ้า"] },
@@ -36,7 +36,7 @@ export const menuItems: MenuCategory[] = [
     },
     {
         categoryId: "3",
-        category: "ประกัน",
+        category: "Insurance",
         items: [
             { id: "1", title: "ประกันรถ", description: "Car insurance", sampleChatQueryThai:["ประกันรถ"] },
             { id: "2", title: "พ.ร.บ. รถยนต์", description: "Motor vehicle compulsory insurance", sampleChatQueryThai:["พ.ร.บ. รถยนต์"] },
@@ -49,7 +49,7 @@ export const menuItems: MenuCategory[] = [
     },
     {
         categoryId: "4",
-        category: "อื่นๆ",
+        category: "Others",
         items: [
             // chat
             {id: "1", title: "Chat", path: "/chat", description: "Basic OpenAI Chat API usage example", sampleChatQueryThai:["Chat"]},

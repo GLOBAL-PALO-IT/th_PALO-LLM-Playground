@@ -27,23 +27,23 @@ import { MenuItemsListParamsType } from '@/app/api/runChatMenu/tools'
 import { MenuBox } from './MenuBox'
 import { isJsonParsable } from '@/lib/jsonHelpers'
 import { isPathExistInMenuItemsFromId } from '../NavBar/mockMenu'
+import { exampleQuery } from './exampleQuery'
 const SYSTEM_PROMPT: ChatCompletionMessageParam = {
   role: 'system',
   content:
-    'Based on the user input, return a list of menu items with their corresponding links. The menu items should be in a JSON format.',
+    'Based on the user input, return a list of menu items with their corresponding links. The menu items must be in a JSON format.',
 }
 const ChatMenu = () => {
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
     SYSTEM_PROMPT,
   ])
-  const [showRaw, setShowRaw] = useState(false)
   const [input, setInput] = useState<string>(
-    'อ่านข่าว ออโต้ คลับ'
+    exampleQuery[Math.floor(Math.random() * exampleQuery.length)]
   )
   const [isLoading, setIsLoading] = useState(false)
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
-  const [menuOutput, setMenuOutput] = useState<MenuItemsListParamsType>(
-
+  const [menuOutput, setMenuOutput] = useState<MenuItemsListParamsType[]>(
+[]
   )
   const handleSendMessage = async () => {
     if (!input.trim()) return
@@ -61,7 +61,7 @@ const ChatMenu = () => {
     setIsLoading(true)
 
     try {
-      const payload: ChatCompletionMessageParam[] = [SYSTEM_PROMPT, newMessage]
+      const payload: ChatCompletionMessageParam[] = [SYSTEM_PROMPT, ...messages,newMessage]
       setMessages(payload)
       const response = await fetch('/api/runChatMenu', {
         method: 'POST',
@@ -69,12 +69,15 @@ const ChatMenu = () => {
         body: JSON.stringify({ messages: payload }),
       })
       const { output }: { output: MenuItemsListParamsType } = await response.json()
+      
+      
 
-      setMenuOutput(output)
       setMessages((prev) => [...prev, {
         role: 'assistant',
         content: JSON.stringify(output)
       }])
+      setMenuOutput((prev) => [...prev, output])
+
     } catch (error: any) {
       console.error('Error:', error.message)
     } finally {
@@ -111,9 +114,9 @@ const ChatMenu = () => {
 
         <div className="flex flex-col p-4 m-4 max-h-[50vh] h-[50vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
           {showFormattedPrompt ? (
-            messages.slice(1)?.map((message, index) => {
+            messages.filter((message) => message.role !== 'system')?.map((message, index) => {
               const isJson = isJsonParsable(message.content as string)
-              
+
               let shownComponent = null
 
               if (message.role === 'user') {
@@ -121,22 +124,7 @@ const ChatMenu = () => {
                   <ReactMarkdown>{message.content as string}</ReactMarkdown>
                 )
               } else {
-                if (showRaw) {
-                  if (isJson) {
-                    shownComponent = (
-                      <JsonView
-                        data={isJson}
-                        shouldExpandNode={allExpanded}
-                        style={darkStyles}
-                      />
-                    )
-                  } else {
-                    shownComponent = <ReactMarkdown>{JSON.stringify(message)}</ReactMarkdown>
-                  }
-                }
-                else {
-                  shownComponent = menuOutput ? <MenuBox selectedMenu={menuOutput.selectedMenu} /> : <ReactMarkdown>{JSON.stringify(message)}</ReactMarkdown>
-                }
+                shownComponent = isJson ? <MenuBox selectedMenu={JSON.parse(message.content as string).selectedMenu} /> : <ReactMarkdown>{JSON.stringify(message)}</ReactMarkdown>
               }
 
 
