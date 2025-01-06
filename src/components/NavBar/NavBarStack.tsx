@@ -14,6 +14,7 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 import { cn } from '@/lib/utils'
+import { menuItems } from './mockMenu'
 
 const NavBarStack = () => {
   const pathName = usePathname()
@@ -122,6 +123,12 @@ const NavBarStack = () => {
                           calling insurance API(clients, claims, policies,
                           payments). Agent is connecting to real world.
                         </ListItem>
+                        <ListItem
+                          href="/chatMenu"
+                          title="Chat that suggest menus"
+                        >
+                          Chat that can suggest menus
+                        </ListItem>
                         <ListItem href="/chatVoice" title="Chat Voice">
                           calling Realtime Voice Chat.
                         </ListItem>
@@ -223,6 +230,26 @@ const NavBarStack = () => {
                         </ListItem>
                       </ul>
 
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  {/* Menus */}
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Menus</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[400px] gap-3 p-4 lg:w-[500px] md:w-[400px] md:grid-cols-2 lg:grid-cols-3">
+                        {menuItems.map((category) => (
+                          <li key={category.categoryId}>
+                            <h3 className="font-bold mb-2">{category.category}</h3>
+                            <ul className="space-y-2">
+                              {category.items.map((item) => (
+                                <ListItem key={item.id} href={`/menu${category.categoryId}/item${item.id}`} title={item.title}>
+                                  {item.description}
+                                </ListItem>
+                              ))}
+                            </ul>
+                          </li>
+                        ))}
+                      </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
                 </NavigationMenuList>
