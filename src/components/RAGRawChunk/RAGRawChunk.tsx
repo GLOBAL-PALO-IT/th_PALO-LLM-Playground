@@ -15,7 +15,7 @@ import { calculateCosineSimilarity } from '@/lib/utils'
 import { set } from 'zod'
 import ExamplesDocsDropDown from './ExamplesDocsDropDown'
 import ExamplesQuestionDropDown from './ExamplesQuestionDropDown'
-const RAGOne = () => {
+const RAGRawChunk = () => {
   const [sourceDocument, setSourceDocument] = useState<string>('')
   const [query, setQuery] = useState<string>('')
   const [chunks, setChunks] = useState<string[]>([])
@@ -129,6 +129,7 @@ const RAGOne = () => {
 
   return (
     <div className="flex flex-col">
+      <h1 className="text-xl font-bold mb-2 mr-2">RAG Raw Chunking and Prompting</h1>
       <div className="p-4 flex flex-row content-center items-center">
         <h3 className="text-sm font-bold mb-2 mr-2">TopK</h3>
         <Input
@@ -299,4 +300,4 @@ const RAGOne = () => {
   )
 }
 
-export default RAGOne
+export default RAGRawChunk

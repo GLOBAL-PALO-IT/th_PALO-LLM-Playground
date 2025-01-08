@@ -44,6 +44,27 @@ const RAGQdrant = () => {
     OpenAI.Embeddings.Embedding[]
   >([])
   const [searchResult, setSearchResult] = useState<SearchResult>()
+  const [qdrantConnection, setQdrantConnection] = useState<string>('')
+
+  const checkQdrantConnection = async () => {
+    try {
+      const response = await fetch('http://localhost:6333', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+      setQdrantConnection(`${response.ok?'OK': 'NOT OK'} ${JSON.stringify(data)}`)
+    } catch (e) {
+      setQdrantConnection(`Error checkQdrantConnection: ${e}`)
+      console.error('Error checkQdrantConnection:', e)
+    }
+  }
+
+  useEffect(() => {
+    checkQdrantConnection()
+  }, [])
 
   useEffect(() => {
     getCollectionList()
@@ -246,7 +267,9 @@ const RAGQdrant = () => {
   }
   return (
     <div className="flex flex-col">
-      <div className="p-4 flex flex-row content-center items-center"></div>
+      <div className={`p-4 flex flex-row content-center items-center ${qdrantConnection ? 'text-green-500' : 'text-gray-500'}`}>
+        Qdrant Connection: {qdrantConnection}
+      </div>
       <div className="h-[95vh] p-4 flex flex-row overflow-x-auto whitespace-nowrap space-x-4">
         <Card className="p-4 w-full overflow-y-auto">
           <div className="space-y-4">

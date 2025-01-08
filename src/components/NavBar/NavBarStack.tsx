@@ -161,7 +161,7 @@ const NavBarStack = () => {
                             </a>
                           </NavigationMenuLink>
                         </li>
-                        <ListItem href="/ragOne" title="RAG Chunking Raw Text">
+                        <ListItem href="/ragRawChunk" title="RAG Chunking Raw Text">
                           shows how to chunk raw text into smaller pieces and
                           embedding them
                         </ListItem>

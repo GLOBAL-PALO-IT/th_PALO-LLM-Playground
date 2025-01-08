@@ -60,7 +60,7 @@ export const menuItems: MenuCategory[] = [
             //chatVoice
             {id: "4", title: "ChatVoice", path: "/chatVoice", description: "OpenAI Chat API using realtime speech to speech API Voice to demonstrate realtime capability using Live Kit", sampleChatQueryThai:["ChatVoice"]},
             //ragOne
-            {id: "5", title: "RAGOne", path: "/ragOne", description: "RAG Chunking Raw Text to demonstrate how to Chunking in RAG works at basic level", sampleChatQueryThai:["RAGOne"]},
+            {id: "5", title: "RAGRawChunk", path: "/ragRawChunk", description: "RAG Chunking Raw Text to demonstrate how to Chunking in RAG works at basic level", sampleChatQueryThai:["RAGOne"]},
             //ragQdrant
             {id: "6", title: "RAGQdrant", path: "/ragQdrant", description: "RAG Qdrant: demonstrate how RAG works with Qdrant vector database and use to upload data into Qdrant", sampleChatQueryThai:["RAGQdrant"]},
             //ragChat

@@ -33,6 +33,27 @@ const RAGChat = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
   const [collections, setCollections] = useState<string[]>([])
+  const [qdrantConnection, setQdrantConnection] = useState<string>('')
+
+  const checkQdrantConnection = async () => {
+    try {
+      const response = await fetch('http://localhost:6333', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+      setQdrantConnection(`${response.ok?'OK': 'NOT OK'} ${JSON.stringify(data)}`)
+    } catch (e) {
+      setQdrantConnection(`Error checkQdrantConnection: ${e}`)
+      console.error('Error checkQdrantConnection:', e)
+    }
+  }
+
+  useEffect(() => {
+    checkQdrantConnection()
+  }, [])
 
   const getCollectionList = async () => {
     try {
@@ -106,6 +127,9 @@ const RAGChat = () => {
 
   return (
     <div className="flex flex-col">
+      <div className={`p-4 flex flex-row content-center items-center ${qdrantConnection ? 'text-green-500' : 'text-gray-500'}`}>
+        Qdrant Connection: {qdrantConnection}
+      </div>
       <div className="p-4 flex flex-row content-center items-center">
         {collections.length > 0 && <IndexesDropDown setInput={setSearchIndex} collections={collections} />}
         <div className="ml-5 flex flex-row space-x-2"><span>Search Knowledge:</span> <span className="font-bold">{searchIndex}</span></div>

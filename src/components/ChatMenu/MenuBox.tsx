@@ -36,7 +36,7 @@ export const MenuBox = ({ selectedMenu }: MenuItemsListParamsType) => {
             className={`px-3 py-2`}
             aria-current="page"
           >
-            {title}
+            {title}-{description}
           </Link>
         </div>
         <div className="pl-2 items-center flex">{showDetails ? (
