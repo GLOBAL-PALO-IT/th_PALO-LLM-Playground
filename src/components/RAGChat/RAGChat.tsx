@@ -127,6 +127,7 @@ const RAGChat = () => {
 
   return (
     <div className="flex flex-col">
+      <h1 className="text-2xl font-bold">RAG Chat with {searchIndex}</h1>
       <div className={`p-4 flex flex-row content-center items-center ${qdrantConnection ? 'text-green-500' : 'text-gray-500'}`}>
         Qdrant Connection: {qdrantConnection}
       </div>
@@ -137,7 +138,6 @@ const RAGChat = () => {
       <div className="flex flex-col">
         {/* Chat history */}
         <div className="p-4 flex flex-row">
-          <h1 className="text-2xl font-bold">RAG Chat with {searchIndex}</h1>
           {showFormattedPrompt ? (
             <button onClick={() => setShowFormattedPrompt(false)}>
               <FaMagic className="m-1" />
