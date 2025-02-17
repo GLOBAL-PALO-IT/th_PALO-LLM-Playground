@@ -1,7 +1,7 @@
-import RAGChat from '@/components/RAGChat/RAGChat'
+import RAGAgentic from '@/components/RAGAgentic/RAGAgentic'
 
 const Page = () => {
-  return <RAGChat />
+  return <RAGAgentic />
 }
 
 export default Page

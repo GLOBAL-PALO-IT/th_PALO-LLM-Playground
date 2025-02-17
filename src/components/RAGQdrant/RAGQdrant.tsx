@@ -34,7 +34,7 @@ const RAGQdrant = () => {
   const [collectionName, setCollectionName] = useState<string>('')
   const [targetCollectionName, setTargetCollectionName] = useState<string>('')
   const [collections, setCollections] = useState<string[]>([])
-  const [chunkAPIs, setChunkAPIs] = useState<string[]>(['/uploadPDF','/uploadPDFByToken'])
+  const [chunkAPIs, setChunkAPIs] = useState<string[]>(['/uploadPDF', '/uploadPDFByToken'])
   const [selectedChunkAPI, setSelectedChunkAPI] = useState<string>('/uploadPDF')
 
   const [embeddingsSourceDocuments, setEmbeddingsSourceDocuments] = useState<
@@ -45,6 +45,7 @@ const RAGQdrant = () => {
   >([])
   const [searchResult, setSearchResult] = useState<SearchResult>()
   const [qdrantConnection, setQdrantConnection] = useState<string>('')
+  const [operationInfoList, setOperationInfoList] = useState<OperationInfo[]>()
 
   const checkQdrantConnection = async () => {
     try {
@@ -55,7 +56,7 @@ const RAGQdrant = () => {
         },
       })
       const data = await response.json()
-      setQdrantConnection(`${response.ok?'OK': 'NOT OK'} ${JSON.stringify(data)}`)
+      setQdrantConnection(`${response.ok ? 'OK' : 'NOT OK'} ${JSON.stringify(data)}`)
     } catch (e) {
       setQdrantConnection(`Error checkQdrantConnection: ${e}`)
       console.error('Error checkQdrantConnection:', e)
@@ -92,9 +93,8 @@ const RAGQdrant = () => {
         }),
       })
 
-      const { data }: { data: OperationInfo } = await response.json()
-
-      console.log({ insertEmbeddings: data })
+      const { data }: { data: OperationInfo[] } = await response.json()
+      setOperationInfoList(data)
     } catch (e) {
       console.error('Error insertEmbeddingsSourceDocumentsToVectorDatabase:', e)
     } finally {
@@ -113,6 +113,7 @@ const RAGQdrant = () => {
         body: JSON.stringify({
           collectionName,
           vector: embeddingsQuery[0].embedding,
+          topK: 8,
         }),
       })
 
@@ -270,6 +271,13 @@ const RAGQdrant = () => {
       <div className={`p-4 flex flex-row content-center items-center ${qdrantConnection ? 'text-green-500' : 'text-gray-500'}`}>
         Qdrant Connection: {qdrantConnection}
       </div>
+      {operationInfoList && <div className={`p-4 flex flex-row content-center items-center`}>
+        <JsonView
+          data={JSON.stringify(operationInfoList)}
+          shouldExpandNode={collapseAllNested}
+          style={darkStyles}
+        />
+      </div>}
       <div className="h-[95vh] p-4 flex flex-row overflow-x-auto whitespace-nowrap space-x-4">
         <Card className="p-4 w-full overflow-y-auto">
           <div className="space-y-4">
@@ -303,7 +311,7 @@ const RAGQdrant = () => {
 
             {pdfContent && (
               <div className="mt-6">
-                <h2>Documents Chunk Size {pdfContent.length}</h2>
+                <h2 className="mb-2">Documents Chunk Size {pdfContent.length}</h2>
                 {pdfContent.map((doc, index) => (
                   <div key={index}>
                     <h3>{doc.id}</h3>
@@ -385,51 +393,51 @@ const RAGQdrant = () => {
         </Card>
         <Card className="p-4 w-full overflow-y-auto flex flex-col">
           <h3 className="text-xl font-bold mb-4">Collection Management</h3>
-          
-            <>
-              <Input
-                placeholder="Enter collection name"
-                className="mb-4"
-                value={collectionName}
-                onChange={(e) => {
-                  setCollectionName(e.target.value)
-                }}
-              />
-              <div className="w-full flex">
-                <Button
-                  key="run-create"
-                  onClick={async () => {
-                    const source = embeddingsSourceDocuments
-                    const query = embeddingsQuery
-                    const isSourceEmpty = source.length === 0
-                    const isQueryEmpty = query.length === 0
-                    // If both source and query are empty, return
-                    if (isSourceEmpty && isQueryEmpty) return
-                    // If source is not empty, use source dimension, else use query dimension
-                    const dimension = !isSourceEmpty
-                      ? source[0].embedding.length
-                      : query[0].embedding.length
 
-                    createCollection(collectionName, dimension)
-                  }}
-                  className="w-full bg-blue-800 mb-6 mr-4"
-                  disabled={isLoading}
-                >
-                  Create Collection
-                </Button>
-                <Button
-                  key="run-create"
-                  onClick={async () => {
-                    deleteCollection(collectionName)
-                  }}
-                  className="w-full bg-red-800 mb-6"
-                  disabled={isLoading}
-                >
-                  Delete Collection
-                </Button>
-              </div>
-            </>
-          
+          <>
+            <Input
+              placeholder="Enter collection name"
+              className="mb-4"
+              value={collectionName}
+              onChange={(e) => {
+                setCollectionName(e.target.value)
+              }}
+            />
+            <div className="w-full flex">
+              <Button
+                key="run-create"
+                onClick={async () => {
+                  const source = embeddingsSourceDocuments
+                  const query = embeddingsQuery
+                  const isSourceEmpty = source.length === 0
+                  const isQueryEmpty = query.length === 0
+                  // If both source and query are empty, return
+                  if (isSourceEmpty && isQueryEmpty) return
+                  // If source is not empty, use source dimension, else use query dimension
+                  const dimension = !isSourceEmpty
+                    ? source[0].embedding.length
+                    : query[0].embedding.length
+
+                  createCollection(collectionName, dimension)
+                }}
+                className="w-full bg-blue-800 mb-6 mr-4"
+                disabled={isLoading}
+              >
+                Create Collection
+              </Button>
+              <Button
+                key="run-create"
+                onClick={async () => {
+                  deleteCollection(collectionName)
+                }}
+                className="w-full bg-red-800 mb-6"
+                disabled={isLoading}
+              >
+                Delete Collection
+              </Button>
+            </div>
+          </>
+
 
           <h3 className="text-xl font-bold mb-4">List</h3>
           <Button
@@ -443,7 +451,7 @@ const RAGQdrant = () => {
             Get Collection List
           </Button>
           {collections?.map((collection, index) => (
-            <div className="cursor-pointer"  key={index} onClick={() => setTargetCollectionName(collection)}>
+            <div className="cursor-pointer" key={index} onClick={() => setTargetCollectionName(collection)}>
               <span className="text-sm text-gray-500 whitespace-pre-wrap w-full mb-6">
                 {collection}
               </span>

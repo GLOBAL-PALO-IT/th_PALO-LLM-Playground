@@ -104,13 +104,24 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ```bash
 docker pull qdrant/qdrant
-docker run \
+docker run -d \
     --name qdrant \
     --restart always \
     -p 6333:6333 -p 6334:6334 \
     -v $(pwd)/qdrant_storage:/qdrant/storage:z \
     qdrant/qdrant
 ```
+
+### Config Volume
+
+The -v flag mounts the qdrant_storage directory as a volume, which is where the Qdrant data will be stored.
+and you need to configure docker to have permission to access the volume, by Going to Setting > Resources > File Sharing and adding the qdrant_storage directory or parent directory to the list.
+
+### Check if Qdrant run
+
+- If you’ve set up a deployment locally with the Qdrant Quickstart, navigate to http://localhost:6333/dashboard.
+
+- If you’ve set up a deployment in a cloud cluster, find your Cluster URL in your cloud dashboard, at https://cloud.qdrant.io. Add :6333/dashboard to the end of the URL.
 
 ## Setup Neo4j Graph Database
 

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     if (typeof question !== 'string' || question.length === 0) {
       return NextResponse.json({ output: 'Please enter a valid text' }, { status: 400 })
     }
-    const prompt = await getPromptWithContext(question, searchIndex)
+    const {prompt, searchResult} = await getPromptWithContext(question, searchIndex)
     const openai = new OpenAI()
     let llm = openai
     const completion = await llm.chat.completions.create({
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     console.log(completion.choices[0])
     const message = completion.choices[0].message
-    return NextResponse.json({ message })
+    return NextResponse.json({ message, prompt, searchResult })
   } catch (error: any) {
     return NextResponse.json({ output: error.message }, { status: 500 })
   }
@@ -51,7 +51,7 @@ const getPromptWithContext=async(question: string, searchIndex: string)=>{
   const searchResultText = searchResult.points.map((point) => point.payload?.pageContent as string)
   const prompt = await ragChatPromptBuilder(searchResultText, question)
   // console.log({prompt})
-  return prompt
+  return {prompt,searchResult}
 }
 
 const getEmbedding = async (text: string) => {

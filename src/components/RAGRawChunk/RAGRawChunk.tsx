@@ -129,7 +129,7 @@ const RAGRawChunk = () => {
 
   return (
     <div className="flex flex-col">
-      <h1 className="text-xl font-bold mb-2 mr-2">RAG Raw Chunking and Prompting</h1>
+      <h1 className="text-xl font-bold mb-2 mr-2 p-4">RAG Raw Chunking and Prompting</h1>
       <div className="p-4 flex flex-row content-center items-center">
         <h3 className="text-sm font-bold mb-2 mr-2">TopK</h3>
         <Input

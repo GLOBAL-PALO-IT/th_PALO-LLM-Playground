@@ -49,23 +49,40 @@ export async function POST(request: Request) {
 const insertEmbeddings = async (
   collectionName: string,
   embeddings: EmbeddingQdrant[]
-): Promise<OperationInfo> => {
+): Promise<OperationInfo[]> => {
   try {
-    const client = new QdrantClient({ host: 'localhost', port: 6333 })
-    const points = embeddings.map((embedding, index) => ({
-      id: index,
-      vector: embedding.embedding,
-      payload: {
-        pageContent: embedding.pageContent,
-        ...embedding.metadata,
-      },
-    }))
+    const chunkSize = 100
+    const splits = [];
+    let start_idx = 0;
+    while (start_idx < embeddings.length) {
+      const end_idx = Math.min(start_idx + chunkSize, embeddings.length);
+      const chunk = embeddings.slice(start_idx, end_idx);
+      splits.push(chunk);
 
-    const operationInfo = await client.upsert(collectionName, {
-      points,
-      wait: true,
-    })
-    return operationInfo
+      start_idx = end_idx;
+    }
+    console.log({ splitsSize: splits.length })
+    const client = new QdrantClient({ host: 'localhost', port: 6333 })
+    const operationResults = await Promise.all(
+      splits.map(async(embeddings) => {
+        const points = embeddings.map((embedding, index) => ({
+          id: index,
+          vector: embedding.embedding,
+          payload: {
+            pageContent: embedding.pageContent,
+            ...embedding.metadata,
+          },
+        }))
+    
+        const operationInfo = await client.upsert(collectionName, {
+          points,
+          wait: true,
+        })
+        return operationInfo
+      })
+    )
+    
+    return operationResults
   } catch (error) {
     console.error('Error insertEmbeddings:', error)
     throw new Error(`Error insertEmbeddings: ${error}`)

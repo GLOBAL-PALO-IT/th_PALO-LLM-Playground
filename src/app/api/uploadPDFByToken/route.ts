@@ -19,11 +19,11 @@ export async function POST(req: Request) {
     const docs: Document<Record<string, any>>[] = await loader.load()
     const textSplitter = new TokenTextSplitter({
       chunkSize: 5000,
-      chunkOverlap: 100,
+      chunkOverlap: 1000,
     });
     const docsToText = docs.map((doc) => {
       return doc.pageContent
-    }).join('[end of page]')
+    }).join('\n\n\n\n')
 
     const docsSplit = await textSplitter.createDocuments([docsToText])
 
