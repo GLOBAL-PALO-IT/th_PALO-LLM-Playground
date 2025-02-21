@@ -11,6 +11,7 @@ export enum ModelName {
   GPT4O = 'gpt-4o-2024-08-06',
   GPT4O_MINI = 'gpt-4o-mini-2024-07-18',
   Llama3 = 'llama3-70b-8192',
+  TEXTEMBEDDING3_LARGE='text-embedding-3-large'
 }
 
 export const generateShortUUID = (): string => {

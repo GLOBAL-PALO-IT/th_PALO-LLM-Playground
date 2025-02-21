@@ -21,14 +21,30 @@ export async function POST(req: Request) {
       chunkSize: 5000,
       chunkOverlap: 1000,
     });
+    // console.log({ doc: docs[0].metadata })
+    // doc.metadata: {
+    //   source: 'blob',
+    //   blobType: 'application/pdf',
+    //   pdf: {
+    //     version: '1.10.100',
+    //     info: [Object],
+    //     metadata: null,
+    //     totalPages: 9
+    //   },
+    //   loc: { pageNumber: 1 }
+    // }
     const docsToText = docs.map((doc) => {
-      return doc.pageContent
+      const pageNumber: number = doc.metadata.loc.pageNumber
+// to string
+      const pageNumberStr = pageNumber.toString()
+      const xmlTag = `page-${pageNumberStr}`
+      return `<${xmlTag}> ${doc.pageContent}</${xmlTag}>`
     }).join('\n\n\n\n')
 
     const docsSplit = await textSplitter.createDocuments([docsToText])
 
     // const docsSplit = textSplitter.splitText(docsToText)
-    console.log({ docsSplit })
+    // console.log({ docsSplit })
 
     return NextResponse.json({ content: docsSplit }, { status: 200 })
   } catch (error) {

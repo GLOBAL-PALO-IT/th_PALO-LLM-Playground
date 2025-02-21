@@ -38,6 +38,7 @@ const RAGAgentic = () => {
   const [collections, setCollections] = useState<string[]>([])
   const [debugPrompt, setDebugPrompt] = useState<string>('')
   const [debugSearchResult, setDebugSearchResult] = useState()
+  const [intermediateSteps, setIntermediateSteps] = useState()
   const getCollectionList = async () => {
     try {
       setIsLoading(true)
@@ -83,10 +84,17 @@ const RAGAgentic = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [newMessage], searchIndex }),
       })
-      const { message, prompt, searchResult }: { message: ChatCompletionMessageParam, prompt: string, searchResult: any } = await response.json()
+      const { message, prompt, searchResult, intermediateSteps }:
+        {
+          message: ChatCompletionMessageParam,
+          prompt: string,
+          searchResult: any,
+          intermediateSteps: any
+        } = await response.json()
       setDebugPrompt(prompt)
       setDebugSearchResult(searchResult)
       setOutput(message.content as string)
+      setIntermediateSteps(intermediateSteps)
     } catch (error: any) {
       console.error('Error:', error.message)
     } finally {
@@ -139,20 +147,30 @@ const RAGAgentic = () => {
           </div>
 
         </Card>
-        <Card className="p-4 w-full overflow-y-auto">
+        {/* <Card className="p-4 w-full overflow-y-auto">
           <h3 className="text-xl font-bold mb-4">Context</h3>
           <div className='whitespace-pre-wrap'>
             <ReactMarkdown>
               {debugPrompt}
             </ReactMarkdown>
           </div>
-        </Card>
+        </Card> */}
         <Card className="p-4 w-full overflow-y-auto">
+          <h3 className="text-xl font-bold mb-4">Intermediate Steps</h3>
+          {intermediateSteps && <JsonView
+            data={intermediateSteps}
+            shouldExpandNode={collapseAllNested}
+            style={darkStyles}
+          />}
+        </Card>
+        {/* <Card className="p-4 w-full overflow-y-auto">
+        <h3 className="text-xl font-bold mb-4">Search Result</h3>
           {debugSearchResult && <JsonView
             data={debugSearchResult}
             shouldExpandNode={collapseAllNested}
             style={darkStyles}
-          />}</Card>
+          />}
+        </Card> */}
       </div>
 
     </div>
