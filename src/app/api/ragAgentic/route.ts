@@ -137,7 +137,7 @@ const getPromptWithContext = async (question: string, searchIndex: string) => {
   // if (validContexts.length === 0) {
   //   return null
   // }
-  const prompt = await ragChatPromptBuilder(selectedContextText, question)
+  const prompt = await ragChatPromptBuilder(selectedContextText, rephrasedQuestion?rephrasedQuestion:question)
   // console.log({selectedContextText})
   return { prompt, searchResult, intermediateSteps: [{selectedContext,selectedContextText,rephrasedQuestion}] }
   
