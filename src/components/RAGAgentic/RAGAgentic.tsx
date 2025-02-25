@@ -8,16 +8,11 @@ import { Spinner } from '@/components/ui/spinner'
 import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 
-import './chat.css'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React from 'react'
 import {
-  FaEye,
-  FaEyeSlash,
-  FaFileDownload,
-  FaInfoCircle,
-  FaMagic,
-  FaRegClipboard,
+  FaSearch,
+  FaRegStickyNote
 } from 'react-icons/fa'
 import {
   JsonView,
@@ -39,6 +34,8 @@ const RAGAgentic = () => {
   const [debugPrompt, setDebugPrompt] = useState<string>('')
   const [debugSearchResult, setDebugSearchResult] = useState()
   const [intermediateSteps, setIntermediateSteps] = useState()
+  const [toggleSearch, setToggleSearch] = useState(false)
+  const [toggleIntermediateSteps, setToggleIntermediateSteps] = useState(false)
   const getCollectionList = async () => {
     try {
       setIsLoading(true)
@@ -86,14 +83,14 @@ const RAGAgentic = () => {
       })
       const { message, prompt, searchResult, intermediateSteps }:
         {
-          message: ChatCompletionMessageParam,
+          message: string,
           prompt: string,
           searchResult: any,
           intermediateSteps: any
         } = await response.json()
       setDebugPrompt(prompt)
       setDebugSearchResult(searchResult)
-      setOutput(message.content as string)
+      setOutput(typeof message === 'string' ? message : '')
       setIntermediateSteps(intermediateSteps)
     } catch (error: any) {
       console.error('Error:', error.message)
@@ -120,6 +117,15 @@ const RAGAgentic = () => {
         {collections.length > 0 && <IndexesDropDown setInput={setSearchIndex} collections={collections} />}
         <div className="ml-5 flex flex-row space-x-2"><span>Search Knowledge:</span> <span className="font-bold">{searchIndex}</span></div>
       </div>
+      <div className='flex flex-row'>
+        <button className='pl-4 ' onClick={() => setToggleSearch(!toggleSearch)}>
+          <FaSearch className="m-1 " color="blue-500" />
+        </button>
+        <button className='pl-4 ' onClick={() => setToggleIntermediateSteps(!toggleIntermediateSteps)}>
+          <FaRegStickyNote className="m-1 " color="blue-500" />
+        </button>
+      </div>
+
       <div className="h-[95vh] p-4 flex flex-row overflow-x-auto whitespace-nowrap space-x-4">
         <Card className="p-4 w-full overflow-y-auto">
           <h3 className="text-xl font-bold mb-4">Question</h3>
@@ -155,22 +161,22 @@ const RAGAgentic = () => {
             </ReactMarkdown>
           </div>
         </Card> */}
-        <Card className="p-4 w-full overflow-y-auto">
+        {toggleIntermediateSteps && <Card className="p-4 w-full overflow-y-auto">
           <h3 className="text-xl font-bold mb-4">Intermediate Steps</h3>
           {intermediateSteps && <JsonView
             data={intermediateSteps}
             shouldExpandNode={collapseAllNested}
             style={darkStyles}
           />}
-        </Card>
-        {/* <Card className="p-4 w-full overflow-y-auto">
-        <h3 className="text-xl font-bold mb-4">Search Result</h3>
+        </Card>}
+        {toggleSearch && <Card className="p-4 w-full overflow-y-auto">
+          <h3 className="text-xl font-bold mb-4">Search Result</h3>
           {debugSearchResult && <JsonView
             data={debugSearchResult}
             shouldExpandNode={collapseAllNested}
             style={darkStyles}
           />}
-        </Card> */}
+        </Card>}
       </div>
 
     </div>

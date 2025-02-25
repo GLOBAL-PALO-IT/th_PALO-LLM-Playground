@@ -3,8 +3,11 @@ import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { observeOpenAI } from "langfuse";
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { searchQuery } from '../qdrant/searchEmbeddings/route'
-import { chooseTheBestContextPrompt, ragChatPromptBuilder, rephraseQuestionPrompt, rewriteTextToKnowledgePrompt } from './prompt'
+import { searchQuery, SearchResult } from '../qdrant/searchEmbeddings/route'
+import { chooseTheBestContextPrompt, evaluateAnswerPrompt, ragChatPromptBuilder, rawRagChatPromptBuilder, rephraseQuestionPrompt, rewriteTextToKnowledgePrompt } from './prompt'
+import { answerQuestion, chooseTheBestContext, evaluateAnswer, extractDocumentIndexID, rephraseQuestion, rewriteQuery, rewriteTextToKnowledge } from './agents';
+import { serperSearch } from './serper';
+
 // const openai = new OpenAI()
 const openai = observeOpenAI(new OpenAI());
 export async function POST(request: Request) {
@@ -21,34 +24,34 @@ export async function POST(request: Request) {
     if (typeof question !== 'string' || question.length === 0) {
       return NextResponse.json({ output: 'Please enter a valid text' }, { status: 400 })
     }
-    
 
+    const keepQuery = true
     if (searchIndex && searchIndex !== '') {
+      // let count = 0
+      // while(keepQuery && count < 3){
+
+      // }
       const result = await getPromptWithContext(question, searchIndex)
-      
+
       if (!result) {
-        return NextResponse.json({ output: 'Could not generate context for the question' }, { status: 400 })
+        console.log('Could not generate context for the question')
+        return NextResponse.json({ message: 'Could not generate context for the question' }, { status: 400 })
       }
+      const { prompt, rephrasedQuestion, searchResult, selectedContext } = result
+      console.log('Answering.....')
+      console.log({ prompt })
+      const message = await answerQuestion(prompt)
+      console.log('Evaluating.....')
+      const evaluationText = await evaluateAnswer(message, rephrasedQuestion)
+      // count++
 
-      const { prompt, searchResult,intermediateSteps } = result
-
-      const completion = await openai.chat.completions.create({
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        model: ModelName.GPT4O,
-        temperature: 0.2,
-        top_p: 0.2,
-        frequency_penalty: 0,
-        presence_penalty: 0,
+      return NextResponse.json({
+        message, prompt, searchResult, intermediateSteps: {
+          rephrasedQuestion,
+          evaluationText,
+          selectedContext
+        }
       })
-
-      // console.log(completion.choices[0])
-      const message = completion.choices[0].message
-      return NextResponse.json({ message, prompt, searchResult, intermediateSteps })
     } else {
       const completion = await openai.chat.completions.create({
         messages: [
@@ -63,7 +66,6 @@ export async function POST(request: Request) {
         frequency_penalty: 0,
         presence_penalty: 0,
       })
-      // console.log(completion.choices[0])
       const message = completion.choices[0].message
       return NextResponse.json({ message })
     }
@@ -72,75 +74,106 @@ export async function POST(request: Request) {
     return NextResponse.json({ output: error.message }, { status: 500 })
   }
 }
-const rewriteTextToKnowledge = async(text:string) => {
-  // rewriteTextToKnowledgePrompt
-  const completion = await openai.chat.completions.create({
-    messages: [
-      {
-        role: 'user',
-        content: rewriteTextToKnowledgePrompt(text),
-      },
-    ],
-    model: ModelName.GPT4O,
-    temperature: 0.2,
-    top_p: 0.2,
-  })
-  return completion.choices[0].message.content
+
+const selectedContextWithLLM = async (question: string, searchIndex: string) => {
+
+  const embeddings = await getEmbedding(question)
+  const searchResult = await searchQuery(searchIndex, embeddings, 7)
+  const selectedContext = await chooseTheBestContext(searchResult, question)
+  const result = await extractDocumentIndexID(selectedContext)
+  const selectedIndexList = result?.selectedIndex || []
+  return { selectedContext, searchResult, selectedIndexList }
 }
 
-const chooseTheBestContext = async (context: string[], question: string) => {
-  const completion = await openai.chat.completions.create({
-    messages: [
-      {
-        role: 'user',
-        content: chooseTheBestContextPrompt(context, question),
-      },
-    ],
-    model: ModelName.GPT4O,
-    temperature: 0.2,
-    top_p: 0.2,
-  })
-  return completion.choices[0].message.content
-}
-// rephraseQuestionPrompt
-const rephraseQuestion = async (question: string) => {
-  const completion = await openai.chat.completions.create({
-    messages: [
-      {
-        role: 'user',
-        content: rephraseQuestionPrompt(question),
-      },
-    ],
-    model: ModelName.GPT4O,
-    temperature: 0.2,
-    top_p: 0.2,
-  })
-  return completion.choices[0].message.content
-}
+// const selectedWebContextWithLLM = async (question: string, searchIndex: string) => {
+
+//   const embeddings = await getEmbedding(question)
+//   const searchResult = await searchQuery(searchIndex, embeddings, 7)
+//   const selectedContext = await chooseTheBestContext(searchResult, question)
+//   return { selectedContext, searchResult }
+// }
 
 const getPromptWithContext = async (question: string, searchIndex: string) => {
+
+  let selectedContext: string;
+  let searchResult: SearchResult;
+  let selectedIndexList: number[];
   const rephrasedQuestion = await rephraseQuestion(question)
-  const embeddings = await getEmbedding(rephrasedQuestion?rephrasedQuestion:question)
-  const searchResult = await searchQuery(searchIndex, embeddings, 5)
-  const searchResultText = searchResult.points.map((point) => point.payload?.pageContent as string)
-  const selectedContext = await chooseTheBestContext(searchResultText, question)
-  // parse selectedContext to int
-  const selectedContextInt = selectedContext?.split(',').map((item) => parseInt(item))
-  if (!selectedContextInt) {
-    return null
+  const selectedContextValue = await selectedContextWithLLM(rephrasedQuestion, searchIndex)
+  selectedContext = selectedContextValue.selectedContext
+  searchResult = selectedContextValue.searchResult
+  selectedIndexList = selectedContextValue.selectedIndexList
+
+
+  if (selectedIndexList.length === 0) {
+    console.log('First Search doesn not work. Try HyDE')
+    const hydeDoc = await rewriteQuery(question)
+    console.log(`hydeDoc: ${hydeDoc}`)
+    const selectedContextValue = await selectedContextWithLLM(hydeDoc, searchIndex)
+    selectedContext = selectedContextValue.selectedContext
+    searchResult = selectedContextValue.searchResult
+    selectedIndexList = selectedContextValue.selectedIndexList
+    
+    if (selectedIndexList.length === 0) {
+      console.log('Second Search doesn not work. Try Serper')
+      const result = await serperSearch(`I am an owner of Isuzu D-Max Maxforce 2025\n\n${rephrasedQuestion}`)
+      if (result) {
+        const { searchResults } = result
+        if (searchResults && searchResults.organic) {
+          const rawContext = searchResults.organic.map((organic, index) => {
+            return (organic?.title || '') + ' ' + (organic?.snippet || '')
+          }).join('\n\n')
+          const prompt = rawRagChatPromptBuilder(rawContext, rephrasedQuestion ? rephrasedQuestion : question)
+          return {
+            prompt,
+            rephrasedQuestion,
+            searchResult: searchResults.organic.map((organic, index) => {
+              return {
+                id: index,
+                payload: (organic?.title || '') + ' ' + (organic?.snippet || '')
+              }
+            }),
+            selectedContext
+          }
+        }
+      } else {
+        return null
+      }
+
+    }
   }
-  // filter searchResultText with selectedContextInt
-  const selectedContextText = searchResultText.filter((_, i) => selectedContextInt.includes(i))
-  // console.log(`Rewriting Length: ${selectedContextText.length}`)
-  // const rewriteSelectedContextText = await Promise.all(selectedContextText.map(text => rewriteTextToKnowledge(text)))
-  // const validContexts = rewriteSelectedContextText.filter((text): text is string => text !== null)
-  // if (validContexts.length === 0) {
-  //   return null
-  // }
-  const prompt = await ragChatPromptBuilder(selectedContextText, rephrasedQuestion?rephrasedQuestion:question)
-  // console.log({selectedContextText})
-  return { prompt, searchResult, intermediateSteps: [{selectedContext,selectedContextText,rephrasedQuestion}] }
-  
+  searchResult.points = searchResult.points.filter((point, i) => {
+    console.log(`filtering....` + point.id)
+    return selectedIndexList.includes(Number(point.id))
+  })
+  console.log(`rewriting....` + searchResult.points.length)
+  searchResult.points = await Promise.all(searchResult.points.map(async (point) => {
+    const newPayload = await rewriteTextToKnowledge(point.payload?.pageContent as string, rephrasedQuestion ? rephrasedQuestion : question)
+    return {
+      ...point,
+      payload: {
+        ...point.payload,
+        pageContent: newPayload
+      }
+    }
+  }))
+
+  const prompt = ragChatPromptBuilder(searchResult, rephrasedQuestion ? rephrasedQuestion : question)
+
+  return {
+    prompt,
+    rephrasedQuestion,
+    searchResult: searchResult.points.map((point) => {
+      return {
+        id: point.id,
+        payload: point.payload
+      }
+    }),
+    selectedContext
+  }
+
+
+
 }
 
 const getEmbedding = async (text: string) => {
