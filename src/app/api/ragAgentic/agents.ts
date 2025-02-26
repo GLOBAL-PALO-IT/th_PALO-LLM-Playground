@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { observeOpenAI } from "langfuse";
 import { ModelName } from "@/lib/utils";
-import { chooseTheBestContextPrompt, evaluateAnswerPrompt, rephraseQuestionPrompt, rewriteQueryPrompt, rewriteTextToKnowledgePrompt } from "./prompt";
+import { chooseTheBestContextPrompt, evaluateAnswerPrompt, improveQuestionPrompt as improveQueryPrompt, rephraseQuestionPrompt, rewriteQueryPrompt, rewriteTextToKnowledgePrompt } from "./prompt";
 import { SearchResult } from "../qdrant/searchEmbeddings/route";
 const openai = observeOpenAI(new OpenAI());
 const SelectedIndex = z.object({
@@ -60,7 +60,7 @@ export const chooseTheBestContext = async (context: SearchResult, question: stri
         top_p: 0.2,
     })
     const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
-    console.log('chooseTheBestContext: '+output)
+    // console.log('chooseTheBestContext: '+output)
     return output
 }
 export const rewriteQuery = async (question: string) => {
@@ -85,6 +85,22 @@ export const rephraseQuestion = async (question: string) => {
             {
                 role: 'user',
                 content: rephraseQuestionPrompt(question),
+            },
+        ],
+        model: ModelName.GPT4O,
+        temperature: 0.2,
+        top_p: 0.2,
+    })
+    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
+    return output
+}
+
+export const improveQuery = async (question: string) => {
+    const completion = await openai.chat.completions.create({
+        messages: [
+            {
+                role: 'user',
+                content: improveQueryPrompt(question),
             },
         ],
         model: ModelName.GPT4O,

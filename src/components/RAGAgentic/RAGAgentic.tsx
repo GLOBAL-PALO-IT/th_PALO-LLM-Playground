@@ -12,7 +12,8 @@ import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React from 'react'
 import {
   FaSearch,
-  FaRegStickyNote
+  FaRegStickyNote,
+  FaQuoteLeft
 } from 'react-icons/fa'
 import {
   JsonView,
@@ -26,6 +27,7 @@ import { Input } from '@/components/ui/input'
 import IndexesDropDown from './IndexesDropDown'
 
 const RAGAgentic = () => {
+  const [pretext, setPretext] = useState<string>('I am the owner of Isuzu D-Max Maxforce 2025 model.')
   const [input, setInput] = useState<string>('')
   const [output, setOutput] = useState<string>('')
   const [searchIndex, setSearchIndex] = useState<string>('')
@@ -36,6 +38,7 @@ const RAGAgentic = () => {
   const [intermediateSteps, setIntermediateSteps] = useState()
   const [toggleSearch, setToggleSearch] = useState(false)
   const [toggleIntermediateSteps, setToggleIntermediateSteps] = useState(false)
+  const [togglePrompt, setTogglePrompt] = useState(false)
   const getCollectionList = async () => {
     try {
       setIsLoading(true)
@@ -70,7 +73,7 @@ const RAGAgentic = () => {
     // Add the user's message to the chat
     const newMessage: ChatCompletionMessageParam = {
       role: 'user',
-      content: input,
+      content: `${pretext} ${input}`,
     }
 
     setIsLoading(true)
@@ -117,12 +120,24 @@ const RAGAgentic = () => {
         {collections.length > 0 && <IndexesDropDown setInput={setSearchIndex} collections={collections} />}
         <div className="ml-5 flex flex-row space-x-2"><span>Search Knowledge:</span> <span className="font-bold">{searchIndex}</span></div>
       </div>
+      <div className='pl-4' >
+        <Input
+          placeholder="Enter your pretext"
+          value={pretext}
+          onChange={(e) => setPretext(e.target.value)}
+          className="pl-4 mb-4"
+        />
+      </div>
       <div className='flex flex-row'>
-        <button className='pl-4 ' onClick={() => setToggleSearch(!toggleSearch)}>
-          <FaSearch className="m-1 " color="blue-500" />
+        <button className='pl-4' onClick={() => setToggleSearch(!toggleSearch)}>
+          <FaSearch className="m-1" color="blue-500" />
         </button>
-        <button className='pl-4 ' onClick={() => setToggleIntermediateSteps(!toggleIntermediateSteps)}>
-          <FaRegStickyNote className="m-1 " color="blue-500" />
+        <button className='pl-2' onClick={() => setToggleIntermediateSteps(!toggleIntermediateSteps)}>
+          <FaRegStickyNote className="m-1" color="blue-500" />
+        </button>
+        {/* FaQuoteLeft */}
+        <button className='pl-2' onClick={() => setTogglePrompt(!togglePrompt)}>
+          <FaQuoteLeft className="m-1" color="blue-500" />
         </button>
       </div>
 
@@ -153,14 +168,7 @@ const RAGAgentic = () => {
           </div>
 
         </Card>
-        {/* <Card className="p-4 w-full overflow-y-auto">
-          <h3 className="text-xl font-bold mb-4">Context</h3>
-          <div className='whitespace-pre-wrap'>
-            <ReactMarkdown>
-              {debugPrompt}
-            </ReactMarkdown>
-          </div>
-        </Card> */}
+
         {toggleIntermediateSteps && <Card className="p-4 w-full overflow-y-auto">
           <h3 className="text-xl font-bold mb-4">Intermediate Steps</h3>
           {intermediateSteps && <JsonView
@@ -176,6 +184,14 @@ const RAGAgentic = () => {
             shouldExpandNode={collapseAllNested}
             style={darkStyles}
           />}
+        </Card>}
+        {togglePrompt && <Card className="p-4 w-full overflow-y-auto">
+          <h3 className="text-xl font-bold mb-4">Prompt</h3>
+          <div className='whitespace-pre-wrap'>
+            <ReactMarkdown>
+              {debugPrompt}
+            </ReactMarkdown>
+          </div>
         </Card>}
       </div>
 
