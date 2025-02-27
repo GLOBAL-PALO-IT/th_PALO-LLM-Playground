@@ -14,12 +14,14 @@ export async function POST(request: Request) {
     messages,
     searchIndex,
     webSearch,
-    topK
+    topK,
+    expandCorrectContext
   }:
     {
       messages: ChatCompletionMessageParam[];
       searchIndex: string,
       webSearch: boolean,
+      expandCorrectContext: boolean,
       topK: number
     } =
     await request.json()

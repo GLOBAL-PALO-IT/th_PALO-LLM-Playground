@@ -45,6 +45,7 @@ const RAGAgentic = () => {
   const [togglePrompt, setTogglePrompt] = useState(false)
   const [webSearch, setWebSearch] = useState(false)
   const [topK, setTopK] = useState(10)
+  const [expandCorrectContext, setExpandCorrectContext] = useState(false)
   const getCollectionList = async () => {
     try {
       setIsLoading(true)
@@ -88,7 +89,7 @@ const RAGAgentic = () => {
       const response = await fetch('/api/ragAgentic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [newMessage], searchIndex, webSearch, topK }),
+        body: JSON.stringify({ messages: [newMessage], searchIndex, webSearch, topK, expandCorrectContext }),
       })
       const { message, prompt, searchResult, totalScore,intermediateSteps }:
         {
@@ -137,7 +138,15 @@ const RAGAgentic = () => {
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             Web Search
-            {/* {webSearch.toString()} */}
+          </label>
+        </div>
+        <div className="flex items-center space-x-2 ml-4">
+          <Checkbox id="expand-context" onCheckedChange={(checked) => setExpandCorrectContext(checked ? true : false)} />
+          <label
+            htmlFor="expand-context"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Expand Correct Context
           </label>
         </div>
         <div className="flex items-center space-x-2 ml-4 content-center items-center">

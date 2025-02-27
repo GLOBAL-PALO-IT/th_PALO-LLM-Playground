@@ -68,6 +68,19 @@ export const rewriteTextToKnowledge = async (text: string, question: string) => 
     console.log('rewrite: ' + output)
     return output
 }
+export const rewriteAll = async (points: SearchResultPoint[], question: string) => {
+    const newPoints = await Promise.all(points.map(async (point) => {
+        const newPayload = await rewriteTextToKnowledge(point.payload?.pageContent as string, question)
+        return {
+            ...point,
+            payload: {
+                ...point.payload,
+                pageContent: newPayload
+            }
+        }
+    }))
+    return newPoints
+}
 
 export const chooseTheBestContext = async (context: SearchResult, question: string) => {
     const completion = await openai.chat.completions.create({

@@ -1,6 +1,6 @@
 import { getEmbedding } from "@/lib/embedding"
 import { searchQuery, SearchResult, SearchResultPoint } from "../qdrant/searchEmbeddings/route"
-import { checkIfContextRelevantAll, chooseTheBestContext, extractDocumentIndexID, improveQuery, qaPlanner, rephraseQuestion, rewriteQuery, rewriteTextToKnowledge } from "./agents"
+import { checkIfContextRelevantAll, chooseTheBestContext, extractDocumentIndexID, improveQuery, qaPlanner, rephraseQuestion, rewriteAll, rewriteQuery, rewriteTextToKnowledge } from "./agents"
 import { ragChatPromptBuilder } from "./prompt"
 import { serperSearch } from "./serper"
 interface SelectedContextParams {
@@ -70,21 +70,15 @@ const selectedContextWithLLM = async ({
     const selectedIndexList = pointsWithRelevantAndSupport.map((point) => Number(point.id))
     return { selectedContext: '', searchResult, selectedIndexList, query }
 }
-const rewriteAll = async (points: SearchResultPoint[], question: string) => {
-    const newPoints = await Promise.all(points.map(async (point) => {
-        const newPayload = await rewriteTextToKnowledge(point.payload?.pageContent as string, question)
-        return {
-            ...point,
-            payload: {
-                ...point.payload,
-                pageContent: newPayload
-            }
-        }
-    }))
-    return newPoints
-}
 
-export const getPromptWithContext = async (question: string, searchIndex: string, webSearch: boolean, topK: number) => {
+
+export const getPromptWithContext = async (
+    question: string,
+    searchIndex: string,
+    webSearch: boolean,
+    topK: number,
+    expandCorrectContext: boolean = false
+) => {
 
     let selectedContext: string = '';
     let searchResult: SearchResult = { points: [] };
@@ -149,32 +143,34 @@ export const getPromptWithContext = async (question: string, searchIndex: string
     }
     const rawSearchResult: SearchResult = JSON.parse(JSON.stringify(searchResult))
     if (selectedIndexList.length > 0) {
-        // iterate selectedIndexList
-        const additionalSelectedIndexList = []
-        for (let i = 0; i < selectedIndexList.length; i++) {
-            const pointsId = selectedIndexList[0]
-            const nextPoint = pointsId + 1
-            const prevPoint = pointsId - 1
-            if (pointsId === 0) {
-                additionalSelectedIndexList.push(nextPoint)
-            } else {
-                // make sure nextpoint is not more thant searchResult.length
-                if (nextPoint < searchResult.points.length) {
-                    additionalSelectedIndexList.push(nextPoint);
-                }
-                if (prevPoint >= 0) {
-                    additionalSelectedIndexList.push(prevPoint);
+        console.log(`got context....point ids: ${JSON.stringify(selectedIndexList)}`)
+        if(expandCorrectContext){
+            console.log(`expanding context....from point ids: ${JSON.stringify(selectedIndexList)}...to`)
+            const additionalSelectedIndexList = []
+            for (let i = 0; i < selectedIndexList.length; i++) {
+                const pointsId = selectedIndexList[0]
+                const nextPoint = pointsId + 1
+                const prevPoint = pointsId - 1
+                if (pointsId === 0) {
+                    additionalSelectedIndexList.push(nextPoint)
+                } else {
+                    // make sure nextpoint is not more thant searchResult.length
+                    if (nextPoint < searchResult.points.length) {
+                        additionalSelectedIndexList.push(nextPoint);
+                    }
+                    if (prevPoint >= 0) {
+                        additionalSelectedIndexList.push(prevPoint);
+                    }
                 }
             }
+            selectedIndexList = [...selectedIndexList, ...additionalSelectedIndexList]
         }
-        selectedIndexList = [...selectedIndexList, ...additionalSelectedIndexList]
+        
         searchResult.points = searchResult.points.filter((point, i) => {
-
             return selectedIndexList.includes(Number(point.id))
         })
-        console.log(`filtering....point ids: ${JSON.stringify(selectedIndexList)}`)
+        console.log(`filtered....point ids: ${JSON.stringify(selectedIndexList)}`)
         console.log(`rewriting....${searchResult.points.length} docs`)
-        // searchQueryByIds
         searchResult.points = await rewriteAll(searchResult.points, question)
     }
 
