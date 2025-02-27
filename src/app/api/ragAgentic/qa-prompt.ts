@@ -1,25 +1,33 @@
 import { getEmbedding } from "@/lib/embedding"
 import { searchQuery, SearchResult, SearchResultPoint } from "../qdrant/searchEmbeddings/route"
-import { chooseTheBestContext, extractDocumentIndexID, improveQuery, rephraseQuestion, rewriteQuery, rewriteTextToKnowledge } from "./agents"
+import { checkIfContextRelevantAll, chooseTheBestContext, extractDocumentIndexID, improveQuery, qaPlanner, rephraseQuestion, rewriteQuery, rewriteTextToKnowledge } from "./agents"
 import { ragChatPromptBuilder } from "./prompt"
 import { serperSearch } from "./serper"
 interface SelectedContextParams {
     question: string;
     searchIndex: string;
     searchType?: 'vectordb' | 'serper';
-    rephraseType?: 'normal' | 'hyde' |'improve'| 'none';
+    rephraseType?: 'normal' | 'hyde' | 'improve' | 'none';
+    metadata?: Record<string, any>;
+    topK?: number
 }
 const selectedContextWithLLM = async ({
     question,
     searchIndex,
     searchType = 'vectordb',
     rephraseType = 'none',
-}: SelectedContextParams):Promise<{
+    metadata,
+    topK = 10
+}: SelectedContextParams): Promise<{
     selectedContext: string,
     searchResult: SearchResult,
     selectedIndexList: number[],
-    query: string
+    query: string,
 }> => {
+    // question can't be empty
+    if (question === '') {
+        throw new Error('selectedContextWithLLM question can not be empty')
+    }
 
     let query = question
     let searchResult: SearchResult = {
@@ -34,18 +42,33 @@ const selectedContextWithLLM = async ({
     else if (rephraseType === 'improve') {
         query = await improveQuery(question)
     }
-    console.log({ question, query, searchType, rephraseType })
+
+    // query can't be empty
+    if (query === '') {
+        throw new Error('selectedContextWithLLM query can not be empty')
+    }
     if (searchType === 'vectordb') {
         const embeddings = await getEmbedding(query)
-        searchResult = await searchQuery(searchIndex, embeddings, 7)
+        searchResult = await searchQuery(searchIndex, embeddings, topK)
     } else if (searchType === 'serper') {
-        searchResult = await serperSearch(query, 10)
+        query = await improveQuery(question)
+        searchResult = await serperSearch(query, topK)
     }
+    console.log({ question, query, topK, searchType, rephraseType, metadata })
+    console.log('choosing context....')
+    // const selectedContext = await chooseTheBestContext(searchResult, question)
 
-    const selectedContext = await chooseTheBestContext(searchResult, question)
-    const result = await extractDocumentIndexID(selectedContext)
-    const selectedIndexList = result?.selectedIndex || []
-    return { selectedContext, searchResult, selectedIndexList, query }
+    // console.log('extracting context....')
+    // const result = await extractDocumentIndexID(selectedContext)
+    // const selectedIndexList = result?.selectedIndex || []
+
+
+    const points = await checkIfContextRelevantAll(searchResult, question, true)
+    const pointsWithRelevantAndSupport = points.filter((point) => {
+        return ['RELEVANT', 'SUPPORT'].includes(point.payload?.relevantClassification as string)
+    })
+    const selectedIndexList = pointsWithRelevantAndSupport.map((point) => Number(point.id))
+    return { selectedContext: '', searchResult, selectedIndexList, query }
 }
 const rewriteAll = async (points: SearchResultPoint[], question: string) => {
     const newPoints = await Promise.all(points.map(async (point) => {
@@ -61,7 +84,7 @@ const rewriteAll = async (points: SearchResultPoint[], question: string) => {
     return newPoints
 }
 
-export const getPromptWithContext = async (question: string, searchIndex: string) => {
+export const getPromptWithContext = async (question: string, searchIndex: string, webSearch: boolean, topK: number) => {
 
     let selectedContext: string = '';
     let searchResult: SearchResult = { points: [] };
@@ -78,50 +101,42 @@ export const getPromptWithContext = async (question: string, searchIndex: string
         selectedIndexList: selectedIndexList,
         query: ''
     }
-    let countImprove = 0
-    let query = ''
-    rephrasedQuestion = await rephraseQuestion(question)
-    while (selectedIndexList.length === 0 && countImprove < 3) {
-        console.log(`Count improve: ${countImprove}`)
 
-        if (countImprove > 0) {
-            selectedContextValue = await selectedContextWithLLM({
-                question: query,
-                searchIndex,
-                rephraseType:'improve'
-            })
-        } {
-            selectedContextValue = await selectedContextWithLLM({
-                question: rephrasedQuestion,
-                searchIndex
-            })
-        }
-        
-        selectedContext = selectedContextValue.selectedContext
-        searchResult = selectedContextValue.searchResult
-        selectedIndexList = selectedContextValue.selectedIndexList
-        query = selectedContextValue.query
-        countImprove++
-    }
+    rephrasedQuestion = await rephraseQuestion(question)
+    selectedContextValue = await selectedContextWithLLM({
+        question: rephrasedQuestion,
+        searchIndex,
+        topK
+        // rephraseType: 'improve'
+    })
+
+    selectedContext = selectedContextValue.selectedContext
+    searchResult = selectedContextValue.searchResult
+    selectedIndexList = selectedContextValue.selectedIndexList
+
+
+
 
     if (selectedIndexList.length === 0) {
-        console.log('First Search doesn not work. Try HyDE')
+        console.log('First Search does not work. Try HyDE')
         const selectedContextValue = await selectedContextWithLLM({
             question: rephrasedQuestion,
             searchIndex,
             searchType: 'vectordb',
-            rephraseType: 'hyde'
+            rephraseType: 'hyde',
+            topK
         })
         selectedContext = selectedContextValue.selectedContext
         searchResult = selectedContextValue.searchResult
         selectedIndexList = selectedContextValue.selectedIndexList
 
-        if (selectedIndexList.length === 0) {
-            console.log('Second Search doesn not work. Try Serper')
+        if (selectedIndexList.length === 0 && webSearch) {
+            console.log('Second Search does not work. Try Serper')
             const selectedContextValue = await selectedContextWithLLM({
                 question: rephrasedQuestion,
                 searchIndex,
-                searchType: 'serper'
+                searchType: 'serper',
+                topK
             })
             selectedContext = selectedContextValue.selectedContext
             searchResult = selectedContextValue.searchResult
@@ -133,30 +148,45 @@ export const getPromptWithContext = async (question: string, searchIndex: string
         }
     }
     const rawSearchResult: SearchResult = JSON.parse(JSON.stringify(searchResult))
-    searchResult.points = searchResult.points.filter((point, i) => {
-        console.log(`filtering....` + point.id)
-        return selectedIndexList.includes(Number(point.id))
-    })
-    console.log(`rewriting....` + searchResult.points.length)
-    searchResult.points = await rewriteAll(searchResult.points, question)
+    if (selectedIndexList.length > 0) {
+        // iterate selectedIndexList
+        const additionalSelectedIndexList = []
+        for (let i = 0; i < selectedIndexList.length; i++) {
+            const pointsId = selectedIndexList[0]
+            const nextPoint = pointsId + 1
+            const prevPoint = pointsId - 1
+            if (pointsId === 0) {
+                additionalSelectedIndexList.push(nextPoint)
+            } else {
+                // make sure nextpoint is not more thant searchResult.length
+                if (nextPoint < searchResult.points.length) {
+                    additionalSelectedIndexList.push(nextPoint);
+                }
+                if (prevPoint >= 0) {
+                    additionalSelectedIndexList.push(prevPoint);
+                }
+            }
+        }
+        selectedIndexList = [...selectedIndexList, ...additionalSelectedIndexList]
+        searchResult.points = searchResult.points.filter((point, i) => {
+
+            return selectedIndexList.includes(Number(point.id))
+        })
+        console.log(`filtering....point ids: ${JSON.stringify(selectedIndexList)}`)
+        console.log(`rewriting....${searchResult.points.length} docs`)
+        // searchQueryByIds
+        searchResult.points = await rewriteAll(searchResult.points, question)
+    }
+
 
     const prompt = ragChatPromptBuilder(searchResult, rephrasedQuestion ? rephrasedQuestion : question)
 
     return {
         prompt,
         rephrasedQuestion,
-        searchResult: rawSearchResult.points.map((point) => {
-            return {
-                id: point.id,
-                payload: point.payload
-            }
-        }),
-        filterdSearchResult: searchResult.points.map((point) => {
-            return {
-                id: point.id,
-                payload: point.payload
-            }
-        }),
-        selectedContext
+        searchResult: rawSearchResult.points,
+        filterdSearchResult: searchResult.points,
+        selectedContext,
+        // plan
     }
 }

@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { Document } from '@langchain/core/documents'
-import { TokenTextSplitter } from "@langchain/textsplitters";
+import { CharacterTextSplitter, TokenTextSplitter,RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 export async function POST(req: Request) {
   
   const formData = await req.formData()
   const pdfFile = formData.get('pdf') as File
+  const splitter = formData.get('splitter') as string
   //Blob of pdfFile
   const pdfBlob = new Blob([pdfFile], { type: pdfFile.type })
 
@@ -17,10 +18,21 @@ export async function POST(req: Request) {
   try {
     const loader = new PDFLoader(pdfBlob)
     const docs: Document<Record<string, any>>[] = await loader.load()
-    const textSplitter = new TokenTextSplitter({
-      chunkSize: 5000,
-      chunkOverlap: 1000,
-    });
+    let textSplitterMethod = null
+    
+    if (splitter === 'token') {
+      textSplitterMethod = new TokenTextSplitter({
+        chunkSize: 5000,
+        chunkOverlap: 1000,
+      });
+    }else if(splitter === 'character'){
+      textSplitterMethod = new RecursiveCharacterTextSplitter({
+        
+        chunkSize: 500,
+        chunkOverlap: 50,
+      });
+    }
+    
     // console.log({ doc: docs[0].metadata })
     // doc.metadata: {
     //   source: 'blob',
@@ -35,18 +47,24 @@ export async function POST(req: Request) {
     // }
     const docsToText = docs.map((doc) => {
       const pageNumber: number = doc.metadata.loc.pageNumber
-// to string
+
       const pageNumberStr = pageNumber.toString()
       const xmlTag = `page-${pageNumberStr}`
       return `<${xmlTag}> ${doc.pageContent}</${xmlTag}>`
-    }).join('\n\n\n\n')
-
-    const docsSplit = await textSplitter.createDocuments([docsToText])
+    }).join(`\n`)
+    console.log({ splitter,textSplitterMethod })
+    if(textSplitterMethod !== null){
+      const docsSplit = await textSplitterMethod.createDocuments([docsToText])
+      return NextResponse.json({ content: docsSplit }, { status: 200 })
+    }else{
+      return NextResponse.json({ content: docs }, { status: 200 })
+    }
+    
 
     // const docsSplit = textSplitter.splitText(docsToText)
     // console.log({ docsSplit })
 
-    return NextResponse.json({ content: docsSplit }, { status: 200 })
+    
   } catch (error) {
     console.log('error', error)
     return NextResponse.json({ error: 'Failed to parse PDF' }, { status: 500 })

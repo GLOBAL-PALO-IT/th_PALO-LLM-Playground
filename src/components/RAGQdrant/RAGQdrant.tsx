@@ -23,6 +23,7 @@ import {
 } from '@/app/api/qdrant/insertEmbeddings/route'
 import { SearchResult } from '@/app/api/qdrant/searchEmbeddings/route'
 import IndexesDropDown from './IndexesDropDown'
+import SplitterDropDown from './SplitterDropDown'
 
 const RAGQdrant = () => {
   const [query, setQuery] = useState<string>('')
@@ -34,8 +35,6 @@ const RAGQdrant = () => {
   const [collectionName, setCollectionName] = useState<string>('')
   const [targetCollectionName, setTargetCollectionName] = useState<string>('')
   const [collections, setCollections] = useState<string[]>([])
-  const [chunkAPIs, setChunkAPIs] = useState<string[]>(['/uploadPDF', '/uploadPDFByToken'])
-  const [selectedChunkAPI, setSelectedChunkAPI] = useState<string>('/uploadPDF')
 
   const [embeddingsSourceDocuments, setEmbeddingsSourceDocuments] = useState<
     OpenAI.Embeddings.Embedding[]
@@ -46,7 +45,7 @@ const RAGQdrant = () => {
   const [searchResult, setSearchResult] = useState<SearchResult>()
   const [qdrantConnection, setQdrantConnection] = useState<string>('')
   const [operationInfoList, setOperationInfoList] = useState<OperationInfo[]>()
-
+  const [splitter, setSplitter] = useState<string>('token')
   const checkQdrantConnection = async () => {
     try {
       const response = await fetch('http://localhost:6333', {
@@ -252,14 +251,15 @@ const RAGQdrant = () => {
 
       const formData = new FormData()
       formData.append('pdf', selectedFile)
+      formData.append('splitter', splitter)
 
-      const response = await fetch(`/api${selectedChunkAPI}`, {
+      const response = await fetch(`/api/uploadPDFByToken`, {
         method: 'POST',
         body: formData,
       })
 
-      const data = await response.json()
-      setPdfContent(data.content)
+      const { content }: { content: Document<Record<string, any>>[] } = await response.json()
+      setPdfContent(content)
     } catch (e) {
       console.error(e)
     } finally {
@@ -298,7 +298,13 @@ const RAGQdrant = () => {
                 accept="application/pdf"
                 onChange={handleFileChange}
               />
+
+            </form>
+            <div className='flex flex-col space-y-2'>
+              {/* {chunkAPIs.length > 0 && <IndexesDropDown setInput={setSelectedChunkAPI} collections={chunkAPIs} selectedCollection={selectedChunkAPI} />} */}
+              <SplitterDropDown setInput={setSplitter} selectedSplitter={splitter} />
               <Button
+                onClick={handleSubmit}
                 type="submit"
                 key="run-search"
                 className="w-full bg-blue-800 mt-4"
@@ -306,8 +312,7 @@ const RAGQdrant = () => {
               >
                 Upload PDF
               </Button>
-            </form>
-            {chunkAPIs.length > 0 && <IndexesDropDown setInput={setSelectedChunkAPI} collections={chunkAPIs} selectedCollection={selectedChunkAPI} />}
+            </div>
 
             {pdfContent && (
               <div className="mt-6">
@@ -317,6 +322,7 @@ const RAGQdrant = () => {
                     <h3>{doc.id}</h3>
                     <pre className="p-4 bg-gray-100 rounded whitespace-pre-wrap max-h-[20vh] overflow-auto">
                       {doc.pageContent}
+                      {/* {JSON.stringify(doc.metadata)} */}
                     </pre>
                     {/* <JsonView
                       data={doc.metadata}

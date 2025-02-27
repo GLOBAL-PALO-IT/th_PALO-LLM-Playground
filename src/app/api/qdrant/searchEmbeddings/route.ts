@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server'
 
 export interface SearchResultPoint {
   id: string | number
-  version: number
-  score: number
+  version?: number
+  score?: number
   payload?:
     | Record<string, unknown>
     | {
@@ -42,26 +42,7 @@ export interface SearchResultPoint {
 export interface SearchResult {
   points: SearchResultPoint[]
 }
-/*
-====FE Code====
-fetch('/api/qdrant/query', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        collectionName,
-        embeddings: embeddingsSourceDocuments.map((embedding, index) => ({
-          // id: embedding.id,
-          embedding: embedding.embedding,
-          pageContent: pdfContent[index].pageContent,
-          metadata: pdfContent[index].metadata,
-        })),
-      }),
-    })
 
-*/
-//Next JS API Route POST
 export async function POST(request: Request) {
   const {
     collectionName,
@@ -91,7 +72,7 @@ export const searchQuery = async (
     let searchResult = await client.query(collectionName, {
       query: vector,
       limit: topK,
-      with_vector: true,
+      with_vector: false,
       with_payload: true,
     })
 

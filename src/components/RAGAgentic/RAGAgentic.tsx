@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from "@/components/ui/checkbox"
 
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React from 'react'
@@ -25,6 +26,8 @@ import {
 import 'react-json-view-lite/dist/index.css'
 import { Input } from '@/components/ui/input'
 import IndexesDropDown from './IndexesDropDown'
+import QuestionDropDown from './QuestionDropDown'
+import { questions } from './questions'
 
 const RAGAgentic = () => {
   const [pretext, setPretext] = useState<string>('I am the owner of Isuzu D-Max Maxforce 2025 model.')
@@ -34,11 +37,14 @@ const RAGAgentic = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [collections, setCollections] = useState<string[]>([])
   const [debugPrompt, setDebugPrompt] = useState<string>('')
+  const [totalScore,setTotalScore] = useState<number>(0)
   const [debugSearchResult, setDebugSearchResult] = useState()
   const [intermediateSteps, setIntermediateSteps] = useState()
   const [toggleSearch, setToggleSearch] = useState(false)
   const [toggleIntermediateSteps, setToggleIntermediateSteps] = useState(false)
   const [togglePrompt, setTogglePrompt] = useState(false)
+  const [webSearch, setWebSearch] = useState(false)
+  const [topK, setTopK] = useState(10)
   const getCollectionList = async () => {
     try {
       setIsLoading(true)
@@ -82,15 +88,17 @@ const RAGAgentic = () => {
       const response = await fetch('/api/ragAgentic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [newMessage], searchIndex }),
+        body: JSON.stringify({ messages: [newMessage], searchIndex, webSearch, topK }),
       })
-      const { message, prompt, searchResult, intermediateSteps }:
+      const { message, prompt, searchResult, totalScore,intermediateSteps }:
         {
           message: string,
           prompt: string,
           searchResult: any,
-          intermediateSteps: any
+          intermediateSteps: any,
+          totalScore: number
         } = await response.json()
+      setTotalScore(totalScore)
       setDebugPrompt(prompt)
       setDebugSearchResult(searchResult)
       setOutput(typeof message === 'string' ? message : '')
@@ -120,7 +128,32 @@ const RAGAgentic = () => {
         {collections.length > 0 && <IndexesDropDown setInput={setSearchIndex} collections={collections} />}
         <div className="ml-5 flex flex-row space-x-2"><span>Search Knowledge:</span> <span className="font-bold">{searchIndex}</span></div>
       </div>
-      <div className='pl-4' >
+      <div className="p-4 flex flex-row content-center items-center">
+        {questions.length > 0 && <QuestionDropDown setInput={setInput} />}
+        <div className="flex items-center space-x-2 ml-4">
+          <Checkbox id="web-search" onCheckedChange={(checked) => setWebSearch(checked ? true : false)} />
+          <label
+            htmlFor="web-search"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Web Search
+            {/* {webSearch.toString()} */}
+          </label>
+        </div>
+        <div className="flex items-center space-x-2 ml-4 content-center items-center">
+          <h3 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Top K</h3>
+          <Input
+            placeholder="Enter your TopK"
+            type="number"
+            value={topK}
+            onChange={(e) => setTopK(Number(e.target.value))}
+            className="w-[100px]"
+          />
+        </div>
+
+      </div>
+      <div className='pl-4 flex flex-row content-center items-center' >
+        <h3 className="text-sm mb-4 mr-4">Pretext</h3>
         <Input
           placeholder="Enter your pretext"
           value={pretext}
@@ -160,8 +193,8 @@ const RAGAgentic = () => {
             Generate Answer
             {isLoading && <Spinner className="flex ml-1" />}
           </Button>
-          <h3 className="text-xl font-bold mt-8">Answer</h3>
-          <div className='whitespace-pre-wrap'>
+          <h3 className="text-xl font-bold mt-8">Answer (Total Score: {totalScore})</h3>
+          <div className='whitespace-pre-wrap bg-blue-100 p-3'>
             <ReactMarkdown>
               {output}
             </ReactMarkdown>
