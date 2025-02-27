@@ -3,6 +3,7 @@ import { searchQuery, SearchResult, SearchResultPoint } from "../qdrant/searchEm
 import { checkIfContextRelevantAll, chooseTheBestContext, extractDocumentIndexID, improveQuery, qaPlanner, rephraseQuestion, rewriteAll, rewriteQuery, rewriteTextToKnowledge } from "./agents"
 import { ragChatPromptBuilder } from "./prompt"
 import { serperSearch } from "./serper"
+import { searchQueryByIds } from "./qdrant"
 interface SelectedContextParams {
     question: string;
     searchIndex: string;
@@ -163,7 +164,10 @@ export const getPromptWithContext = async (
                     }
                 }
             }
+            const additionalSearchResult = await searchQueryByIds(searchIndex, additionalSelectedIndexList)
+            
             selectedIndexList = [...selectedIndexList, ...additionalSelectedIndexList]
+            searchResult.points = [...searchResult.points, ...additionalSearchResult]
         }
         
         searchResult.points = searchResult.points.filter((point, i) => {
