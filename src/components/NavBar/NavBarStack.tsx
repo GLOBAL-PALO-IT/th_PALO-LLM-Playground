@@ -184,6 +184,9 @@ const NavBarStack = () => {
                         <ListItem href="/ragAgentic" title="Agentic RAG">
                           showcase of Agentic RAG
                         </ListItem>
+                        <ListItem href="/sentenceSim" title="Sentence Similarity">
+                          showcase of Sentence Similarity
+                        </ListItem>
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>

@@ -1,9 +1,9 @@
-import BashScriptGenerator from '@/components/BashScriptGenerator/BashScriptGenerator'
+import ReActShell from '@/components/ReActShell/ReActShell'
 
 export default function Home() {
   return (
     <main className="">
-      <BashScriptGenerator />
+      <ReActShell />
     </main>
   )
 }

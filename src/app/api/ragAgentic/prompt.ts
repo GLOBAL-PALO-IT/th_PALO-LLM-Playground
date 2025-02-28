@@ -1,4 +1,4 @@
-import { SearchResult } from "../qdrant/searchEmbeddings/route"
+import { SearchResult, SearchResultPoint } from "@/types/qdrant";
 export const qaPlannerPrompt = (question: string) => {
     const prompt = `You are a strategic AI research assistant specializing in breaking down complex problems into actionable steps. For the given question, generate a detailed step-by-step plan that would help someone systematically solve the problem.
 
@@ -56,10 +56,11 @@ ${contextString}
 </context>
 
 You are a helpful assistant that answers the user's question strictly based on the information provided within the \`<context>\` XML tags above.
-Question:${question}
-
 If you don't know the answer just say you don't know.
-Let's think step by step in English first and answer the question in Thai.
+Make sure you always output in English.
+
+Question:${question}
+Let's think step by step
 `
 
     return prompt
@@ -132,12 +133,16 @@ Analyze each context step by step and find the relevant context at the end outpu
 }
 
 export const rewriteTextToKnowledgePrompt = (text: string, question: string): string => {
-    const prompt = `You are an AI assistant. Given the question, you must rewrite the given text into list of bullet points of knowledge that
-relevant to the question.
+    const prompt = `You are an AI assistant. Your task is to transform the given text into relevant knowledge that directly answers or aligns with the provided question.  
 
-Question: ${question}
-Text: ${text}
-List of knowledge:`
+### Question:  
+${question}  
+
+### Given Text:  
+${text}  
+
+### Refined Knowledge:  
+`
     return prompt
 }
 
@@ -150,21 +155,34 @@ Rephrased Question:`;
     return prompt;
 }
 export const improveQuestionPrompt = (question: string) => {
-    const prompt = `You are an AI assistant. 
-You must improve the given current web query because the current web query is not effective enough to answer the question.
-The improve web query must be keywords from the current web query.
-Only output the keywords, no prefix or suffix or explanation.
+    const prompt = `You are an AI assistant specializing in search query optimization.  
+Your task is to improve the given web search query to make it more effective while retaining its original intent.  
 
-Current Web Query: ${question}
-Improve Web Query:`
+**Instructions:**  
+- Extract only the most relevant keywords from the given query.  
+- Remove unnecessary words, filler words, and ambiguous terms.  
+- Do **not** add any extra words beyond those found in the original query.  
+- Output only the refined keywords—no explanations, prefixes, or suffixes.  
+
+**Current Web Query:** ${question}  
+**Improved Web Query:**  
+`
     return prompt
 }
 export const rewriteQueryPrompt = (question: string) => {
-    const prompt = `You are an AI assistant. Your task is to generate a hypothetical document that would likely be used to answer the given question. 
-Ensure the document is relevant, detailed, and written in the same language as the question.
+    const prompt = `You are an AI assistant tasked with generating a hypothetical document that would effectively answer the given question. The document should be:
 
-Question: ${question}
-Hypothetical Document:`;
+1. **Relevant**: Directly address the question and provide information that would logically answer it.
+2. **Detailed**: Include sufficient context, examples, or explanations to make the document comprehensive and informative.
+3. **Professional Tone**: Use a formal and clear writing style, unless the question suggests otherwise.
+4. **Language Consistency**: Write the document in the same language as the question.
+5. **Structured**: Organize the content logically, using headings, bullet points, or paragraphs as appropriate.
+
+Ensure the hypothetical document is realistic and resembles a credible source that could be used to answer the question.
+
+**Question**: ${question}
+
+**Hypothetical Document**:`;
     return prompt;
 };
 

@@ -37,14 +37,17 @@ const RAGAgentic = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [collections, setCollections] = useState<string[]>([])
   const [debugPrompt, setDebugPrompt] = useState<string>('')
-  const [totalScore,setTotalScore] = useState<number>(0)
+  const [totalScore, setTotalScore] = useState<number>(0)
   const [debugSearchResult, setDebugSearchResult] = useState()
   const [intermediateSteps, setIntermediateSteps] = useState()
   const [toggleSearch, setToggleSearch] = useState(false)
   const [toggleIntermediateSteps, setToggleIntermediateSteps] = useState(false)
   const [togglePrompt, setTogglePrompt] = useState(false)
   const [webSearch, setWebSearch] = useState(false)
+  const [ligthMode, setLightMode] = useState(false)
   const [topK, setTopK] = useState(10)
+  const [improveLimit, setImproveLimit] = useState(3)
+  const [expandCorrectContextLength, setExpandCorrectContextLength] = useState(2)
   const [expandCorrectContext, setExpandCorrectContext] = useState(false)
   const getCollectionList = async () => {
     try {
@@ -89,9 +92,18 @@ const RAGAgentic = () => {
       const response = await fetch('/api/ragAgentic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [newMessage], searchIndex, webSearch, topK, expandCorrectContext }),
+        body: JSON.stringify({
+          messages: [newMessage],
+          searchIndex,
+          webSearch,
+          topK,
+          ligthMode,
+          expandCorrectContext,
+          expandCorrectContextLength,
+          improveLimit
+        }),
       })
-      const { message, prompt, searchResult, totalScore,intermediateSteps }:
+      const { message, prompt, searchResult, totalScore, intermediateSteps }:
         {
           message: string,
           prompt: string,
@@ -129,37 +141,69 @@ const RAGAgentic = () => {
         {collections.length > 0 && <IndexesDropDown setInput={setSearchIndex} collections={collections} />}
         <div className="ml-5 flex flex-row space-x-2"><span>Search Knowledge:</span> <span className="font-bold">{searchIndex}</span></div>
       </div>
-      <div className="p-4 flex flex-row content-center items-center">
-        {questions.length > 0 && <QuestionDropDown setInput={setInput} />}
-        <div className="flex items-center space-x-2 ml-4">
-          <Checkbox id="web-search" onCheckedChange={(checked) => setWebSearch(checked ? true : false)} />
-          <label
-            htmlFor="web-search"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Web Search
-          </label>
+      <div className="pl-4 flex flex-col content-center items-left">
+        <div className="flex flex-row content-center items-center">
+          {questions.length > 0 && <QuestionDropDown setInput={setInput} />}
+          <div className="flex items-center space-x-2 ml-4">
+            <Checkbox id="web-search" onCheckedChange={(checked) => setWebSearch(checked ? true : false)} />
+            <label
+              htmlFor="web-search"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Web Search
+            </label>
+          </div>
+          <div className="flex items-center space-x-2 ml-4">
+            <Checkbox id="light-mode" onCheckedChange={(checked) => setLightMode(checked ? true : false)} />
+            <label
+              htmlFor="light-mode"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Light Mode
+            </label>
+          </div>
+          <div className="flex items-center space-x-2 ml-4">
+            <Checkbox id="expand-context" onCheckedChange={(checked) => setExpandCorrectContext(checked ? true : false)} />
+            <label
+              htmlFor="expand-context"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Expand Correct Context
+            </label>
+          </div>
         </div>
-        <div className="flex items-center space-x-2 ml-4">
-          <Checkbox id="expand-context" onCheckedChange={(checked) => setExpandCorrectContext(checked ? true : false)} />
-          <label
-            htmlFor="expand-context"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Expand Correct Context
-          </label>
+        <div className="pt-4 pb-4 flex flex-row content-center items-center">
+          <div className="flex items-center space-x-2 content-center items-center">
+            <h3 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Expand Length</h3>
+            <Input
+              placeholder="Enter your expand context length"
+              type="number"
+              value={expandCorrectContextLength}
+              onChange={(e) => setExpandCorrectContextLength(Number(e.target.value))}
+              className="w-[60px]"
+            />
+          </div>
+          <div className="flex items-center space-x-2 ml-4 content-center items-center">
+            <h3 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Top K</h3>
+            <Input
+              placeholder="Enter your TopK"
+              type="number"
+              value={topK}
+              onChange={(e) => setTopK(Number(e.target.value))}
+              className="w-[60px]"
+            />
+          </div>
+          <div className="flex items-center space-x-2 ml-4 content-center items-center">
+            <h3 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Improve Limit</h3>
+            <Input
+              placeholder="Enter your Improve Limit"
+              type="number"
+              value={improveLimit}
+              onChange={(e) => setImproveLimit(Number(e.target.value))}
+              className="w-[60px]"
+            />
+          </div>
         </div>
-        <div className="flex items-center space-x-2 ml-4 content-center items-center">
-          <h3 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Top K</h3>
-          <Input
-            placeholder="Enter your TopK"
-            type="number"
-            value={topK}
-            onChange={(e) => setTopK(Number(e.target.value))}
-            className="w-[100px]"
-          />
-        </div>
-
       </div>
       <div className='pl-4 flex flex-row content-center items-center' >
         <h3 className="text-sm mb-4 mr-4">Pretext</h3>

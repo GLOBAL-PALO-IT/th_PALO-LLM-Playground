@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { observeOpenAI } from "langfuse";
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { answerQuestion, evaluateAnswer } from './agents';
+import { answerQuestion, evaluateAnswer, extractFinalAnswer } from './agents';
 import { getPromptWithContext } from './qa-prompt';
 import { extractEval } from './extract-eval';
 
@@ -15,14 +15,20 @@ export async function POST(request: Request) {
     searchIndex,
     webSearch,
     topK,
-    expandCorrectContext
+    ligthMode,
+    expandCorrectContext,
+    expandCorrectContextLength,
+    improveLimit
   }:
     {
       messages: ChatCompletionMessageParam[];
       searchIndex: string,
       webSearch: boolean,
+      ligthMode: boolean,
       expandCorrectContext: boolean,
-      topK: number
+      topK: number,
+      expandCorrectContextLength: number
+      improveLimit: number
     } =
     await request.json()
   // console.log(messages)
@@ -38,15 +44,25 @@ export async function POST(request: Request) {
     }
 
     if (searchIndex && searchIndex !== '') {
-      const result = await getPromptWithContext(question, searchIndex, webSearch,topK)
+      const result = await getPromptWithContext(
+        question, 
+        searchIndex, 
+        webSearch,
+        topK,
+        expandCorrectContext, 
+        expandCorrectContextLength,
+        ligthMode,
+        improveLimit
+      )
 
       if (!result) {
         console.log('Could not generate context for the question')
         return NextResponse.json({ message: 'Could not generate context for the question' }, { status: 400 })
       }
-      const { prompt, rephrasedQuestion, searchResult, filterdSearchResult, selectedContext } = result
+      const { prompt, rephrasedQuestion, searchResult, filterdSearchResult } = result
       console.log('Answering.....')
-      const message = await answerQuestion(prompt)
+      const cotAnswer = await answerQuestion(prompt)
+      const message = await extractFinalAnswer(cotAnswer)
       console.log('Evaluating.....')
       const evaluationText = await evaluateAnswer(message, rephrasedQuestion)
       const totalScore = extractEval(evaluationText)
@@ -58,9 +74,9 @@ export async function POST(request: Request) {
         searchResult,
         totalScore,
         intermediateSteps: {
+          cotAnswer,
           rephrasedQuestion,
           evaluationText,
-          selectedContext,
           filterdSearchResult
         }
       })

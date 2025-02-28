@@ -38,7 +38,7 @@ const DiagramState = {
   bashScriptProcessed: `${coreFunctionMermaid}\nclass K green`,
 }
 
-const BashScriptGenerator = () => {
+const ReActShell = () => {
   const [query, setQuery] = useState('')
   const [bashScript, setBashScript] = useState('')
   const [ChildProcessMode, setChildProcessMode] = useState('')
@@ -611,4 +611,4 @@ const BashScriptGenerator = () => {
   )
 }
 
-export default BashScriptGenerator
+export default ReActShell

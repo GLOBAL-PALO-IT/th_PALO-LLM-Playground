@@ -21,8 +21,7 @@ import {
   EmbeddingQdrant,
   OperationInfo,
 } from '@/app/api/qdrant/insertEmbeddings/route'
-import { SearchResult } from '@/app/api/qdrant/searchEmbeddings/route'
-import IndexesDropDown from './IndexesDropDown'
+import { SearchResult } from '@/types/qdrant'
 import SplitterDropDown from './SplitterDropDown'
 
 const RAGQdrant = () => {

@@ -12,19 +12,6 @@ export async function POST(request: Request) {
       return text
     })
     .filter((text) => text.length > 0) //filter out empty strings
-/*
-let start_idx = 0;
-        while (start_idx < input_ids.length) {
-            if (start_idx > 0) {
-                start_idx -= this.chunkOverlap;
-            }
-            const end_idx = Math.min(start_idx + this.chunkSize, input_ids.length);
-            const chunk_ids = input_ids.slice(start_idx, end_idx);
-            splits.push(this.tokenizer.decode(chunk_ids));
-            start_idx = end_idx;
-        }
-        return splits;
-*/
   const chunkSize = 100
   const splits = [];
   let start_idx = 0;
