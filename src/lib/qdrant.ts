@@ -28,6 +28,7 @@ export const searchQuery = async (
   excludeIds?: number[]
 ): Promise<SearchResult> => {
   try {
+    console.log({ topK })
     const client = new QdrantClient({ host: 'localhost', port: 6333 })
     let searchResult = await client.query(collectionName, {
       query: vector,

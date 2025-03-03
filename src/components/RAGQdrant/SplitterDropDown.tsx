@@ -24,7 +24,7 @@ const SplitterDropDown: React.FC<SplitterDropDownProps> = ({
   setInput,  
   selectedSplitter
 }) => {
-  const splitters = ['token', 'character','page']
+  const splitters = ['token', 'character','page', 'pageToken']
   const handleSelectExample = (example: string) => {
     setInput(example)
   }

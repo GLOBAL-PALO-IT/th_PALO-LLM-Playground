@@ -137,13 +137,12 @@ const RAGAgentic = () => {
   return (
     <div className="flex flex-col">
       <h1 className="text-xl font-bold p-4">Agentic RAG with {searchIndex}</h1>
-      <div className="p-4 flex flex-row content-center items-center">
+      <div className="p-4 flex flex-row content-center items-center space-x-4">
         {collections.length > 0 && <IndexesDropDown setInput={setSearchIndex} collections={collections} />}
-        <div className="ml-5 flex flex-row space-x-2"><span>Search Knowledge:</span> <span className="font-bold">{searchIndex}</span></div>
+        {questions.length > 0 && <QuestionDropDown setInput={setInput} />}
       </div>
       <div className="pl-4 flex flex-col content-center items-left">
         <div className="flex flex-row content-center items-center">
-          {questions.length > 0 && <QuestionDropDown setInput={setInput} />}
           <div className="flex items-center space-x-2 ml-4">
             <Checkbox id="web-search" onCheckedChange={(checked) => setWebSearch(checked ? true : false)} />
             <label
@@ -247,7 +246,7 @@ const RAGAgentic = () => {
             {isLoading && <Spinner className="flex ml-1" />}
           </Button>
           <h3 className="text-xl font-bold mt-8">Answer (Total Score: {totalScore})</h3>
-          <div className='whitespace-pre-wrap bg-blue-100 p-3'>
+          <div className='whitespace-pre-wrap bg-blue-100 p-3 prose'>
             <ReactMarkdown>
               {output}
             </ReactMarkdown>

@@ -6,8 +6,15 @@ import { MainSentence } from "./MainSentence"
 import { SentenceList } from "./SentenceList"
 import OpenAI from 'openai'
 import { calculateCosineSimilarity } from '@/lib/utils'
-
-
+import { QueryShowCases } from "./types"
+import { exampleOfQuery } from "./exampleOfQuery"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 export const SentenceSimilarityPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [mainSentence, setMainSentence] = useState("");
@@ -16,48 +23,77 @@ export const SentenceSimilarityPage = () => {
   const [embeddings, setEmbeddings] = useState<(number[] | null)[]>([]);
   const [similarities, setSimilarities] = useState<(number | null)[]>([null]);
 
-// Placeholder functions as per requirements
-const getEmbeddings = async(mainSentence: string, sentences: string[]) => {
-  setIsLoading(true)
-  try {
-    const allQuery = [mainSentence, ...sentences]
-    if (!allQuery || allQuery.length === 0) return
-    const response = await fetch('/api/runEmbedding', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        texts: [mainSentence, ...sentences],
-      }),
-    })
-    const { embeddings }: { embeddings: OpenAI.Embeddings.Embedding[] } =
-      await response.json()
-    if (!embeddings || embeddings.length === 0) return []
-    return embeddings.map(embedding => embedding.embedding)
-  } catch (error: any) {
-    console.error('Error:', error.message)
-    return []
-  } finally {
-    setIsLoading(false)
-  }
-}
+  const handleCopyState = () => {
+    const state: QueryShowCases = {
+      mainSentence,
+      sentences,
+      // mainEmbedding,
+      // embeddings,
+      similarities
+    };
+    navigator.clipboard.writeText(JSON.stringify(state, null, 2));
+  };
 
-const getCosineSimilarity = (main: number[], compare: number[]) => {
-  if (!mainEmbedding || !embeddings) return -1
-  const similarities = embeddings?.map((embedding, index) => {
-    return {
-      similarity: calculateCosineSimilarity(
-        embedding?embedding:[],
-        mainEmbedding?mainEmbedding:[]
-      ),
-      index,
+  const handleExampleSelect = (value: string) => {
+    const selectedExample = exampleOfQuery.find(
+      (example) => example.mainSentence === value
+    );
+    if (selectedExample) {
+      setMainSentence(selectedExample.mainSentence);
+      setSentences(selectedExample.sentences);
+      // Reset embeddings and similarities when selecting new example
+      setMainEmbedding([]);
+      setEmbeddings([]);
+      setSimilarities([null]);
     }
-  })
-  //sort from highest to lowest
-  const sortedSimilarities = similarities
-    .slice()
-    .sort((a, b) => b.similarity - a.similarity)
-  return sortedSimilarities
-}
+  };
+
+  // Add the Select component at the top of the form
+  const ExampleSelect = () => (
+    <div className="w-full max-w-sm mb-4">
+      <Select onValueChange={handleExampleSelect}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select an example" />
+        </SelectTrigger>
+        <SelectContent>
+          {exampleOfQuery.map((example) => (
+            <SelectItem 
+              key={example.mainSentence} 
+              value={example.mainSentence}
+            >
+              {example.mainSentence}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  // Placeholder functions as per requirements
+  const getEmbeddings = async (mainSentence: string, sentences: string[]) => {
+    setIsLoading(true)
+    try {
+      const allQuery = [mainSentence, ...sentences]
+      if (!allQuery || allQuery.length === 0) return
+      const response = await fetch('/api/runEmbedding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          texts: [mainSentence, ...sentences],
+        }),
+      })
+      const { embeddings }: { embeddings: OpenAI.Embeddings.Embedding[] } =
+        await response.json()
+      if (!embeddings || embeddings.length === 0) return []
+      return embeddings.map(embedding => embedding.embedding)
+    } catch (error: any) {
+      console.error('Error:', error.message)
+      return []
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleAddSentence = () => {
     setSentences([...sentences, ""]);
     setEmbeddings([...embeddings, null]);
@@ -78,18 +114,30 @@ const getCosineSimilarity = (main: number[], compare: number[]) => {
 
   const handleGetEmbeddings = async () => {
     const allEmbeddings = await getEmbeddings(mainSentence, sentences);
-    setMainEmbedding(allEmbeddings?allEmbeddings[0]:[]);
-    setEmbeddings(allEmbeddings?allEmbeddings.slice(1):[]);
-    setSimilarities(sentences.map(() => null));
-    // delay 0.5 sec
-    await new Promise(resolve => setTimeout(resolve, 500));
-    handleCalculateSimilarity()
+    if (!allEmbeddings) {
+      setMainEmbedding([]);
+      setEmbeddings([]);
+      setSimilarities(sentences.map(() => null));
+      return;
+    }
+    
+    const newMainEmbedding = allEmbeddings[0];
+    const newEmbeddings = allEmbeddings.slice(1);
+    
+    // Calculate similarities directly with the new embeddings
+    const newSimilarities = newEmbeddings.map(embedding =>
+      embedding ? calculateCosineSimilarity(newMainEmbedding, embedding) : null
+    );
+    
+    setMainEmbedding(newMainEmbedding);
+    setEmbeddings(newEmbeddings);
+    setSimilarities(newSimilarities);
   };
 
   const handleCalculateSimilarity = () => {
     if (!mainEmbedding || embeddings.includes(null)) return;
-    
-    const newSimilarities = embeddings.map(embedding => 
+
+    const newSimilarities = embeddings.map(embedding =>
       embedding ? calculateCosineSimilarity(mainEmbedding, embedding) : null
     );
     setSimilarities(newSimilarities);
@@ -97,12 +145,13 @@ const getCosineSimilarity = (main: number[], compare: number[]) => {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
+      <ExampleSelect />
       <MainSentence
         value={mainSentence}
         onChange={setMainSentence}
         embedding={mainEmbedding}
       />
-      
+
       <SentenceList
         sentences={sentences}
         embeddings={embeddings}
@@ -113,11 +162,17 @@ const getCosineSimilarity = (main: number[], compare: number[]) => {
       />
 
       <div className="flex gap-4">
-        <Button 
+        <Button
           onClick={handleGetEmbeddings}
           disabled={!mainSentence || sentences.every(s => !s) || isLoading}
         >
           Get Embeddings and Similarity
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleCopyState}
+        >
+          Copy State
         </Button>
       </div>
     </div>

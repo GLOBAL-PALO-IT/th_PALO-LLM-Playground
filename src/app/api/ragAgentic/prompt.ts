@@ -114,10 +114,14 @@ export const checkIfContextRelevantPrompt = (context: string, question: string):
 
 ### Output Format:
 First, provide a structured step-by-step reasoning process explaining your analysis.  
-Then, on a new line, output one of the following final labels in uppercase:  
-- **RELEVANT**: The context directly answers or provides crucial information for the question.  
-- **SUPPORT**: The context contains useful background information but does not fully answer the question.  
-- **NOT RELEVANT**: The context does not help in answering the question.`;
+Then, output your final classification as follows:
+
+#Result
+* **RELEVANT**: The context directly answers or provides crucial information for the question.
+OR
+* **SUPPORT**: The context contains useful background information but does not fully answer the question.
+OR
+* **NOT RELEVANT**: The context does not help in answering the question.`;
 };
 
 export const chooseTheBestContextPrompt = (context: SearchResult, question: string): string => {
@@ -172,17 +176,18 @@ Your task is to improve the given web search query to make it more effective whi
 export const rewriteQueryPrompt = (question: string) => {
     const prompt = `You are an AI assistant tasked with generating a hypothetical document that would effectively answer the given question. The document should be:
 
-1. **Relevant**: Directly address the question and provide information that would logically answer it.
-2. **Detailed**: Include sufficient context, examples, or explanations to make the document comprehensive and informative.
-3. **Professional Tone**: Use a formal and clear writing style, unless the question suggests otherwise.
-4. **Language Consistency**: Write the document in the same language as the question.
-5. **Structured**: Organize the content logically, using headings, bullet points, or paragraphs as appropriate.
+1. Relevant: Directly address the question and provide information that would logically answer it.
+2. Detailed: Include sufficient context, examples, or explanations to make the document comprehensive and informative.
+3. Professional Tone: Use a formal and clear writing style, unless the question suggests otherwise.
+4. Language Consistency: Write the document in the same language as the question.
+
+Important: Generate your response in plain text format only. Do not use markdown formatting, bullet points, or any special formatting characters.
 
 Ensure the hypothetical document is realistic and resembles a credible source that could be used to answer the question.
 
-**Question**: ${question}
+Question: ${question}
 
-**Hypothetical Document**:`;
+Hypothetical Document:`;
     return prompt;
 };
 

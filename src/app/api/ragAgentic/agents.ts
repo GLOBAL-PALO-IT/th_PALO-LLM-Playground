@@ -69,7 +69,7 @@ export const rewriteTextToKnowledge = async (text: string, question: string) => 
                 content: rewriteTextToKnowledgePrompt(text, question),
             },
         ],
-        model: ModelName.GPT4O_MINI,
+        model: ModelName.GPT4O,
         temperature: 0.2,
         top_p: 0.2,
         store: true,
@@ -159,7 +159,7 @@ export const checkIfContextRelevant = async (context: string, question: string, 
                     checkIfContextRelevantCOTPrompt(context, question),
             },
         ],
-        model: ModelName.GPT4O_MINI,
+        model: ModelName.GPT4O,
         temperature: 0.2,
         top_p: 0.2,
         store: true,
@@ -169,10 +169,10 @@ export const checkIfContextRelevant = async (context: string, question: string, 
         }
     })
     const analysisText = completion.choices[0].message.content ? completion.choices[0].message.content : ''
-    console.log('\x1b[32m%s\x1b[0m', 'checkIfContextRelevant analysisText: ' + analysisText)
+    // console.log('\x1b[32m%s\x1b[0m', 'checkIfContextRelevant analysisText: ' + analysisText)
     try {
         const completion = await openai.beta.chat.completions.parse({
-            model: ModelName.GPT4O_MINI,
+            model: ModelName.GPT4O,
             messages: [
                 { role: "system", content: "Extract the final answer of given analyze text either RELEVANT, SUPPORT, NOT RELEVANT" },
                 { role: "user", content: `Analysis: ${analysisText}\n Final Classification:` },
@@ -184,7 +184,7 @@ export const checkIfContextRelevant = async (context: string, question: string, 
                 function: "checkIfContextRelevant Structure"
             }
         });
-        console.log('extractRel checkIfContextRelevant: ' + JSON.stringify(completion.choices[0].message.parsed?.classification))
+        // console.log('extractRel checkIfContextRelevant: ' + JSON.stringify(completion.choices[0].message.parsed?.classification))
         return { output: completion.choices[0].message.parsed, metadata: { analysisText } };
     } catch (error) {
         console.log('error extractRel checkIfContextRelevant: ' + error)
@@ -286,7 +286,7 @@ Text: ${text}
 Thai:`,
             },
         ],
-        model: ModelName.GPT4O_MINI,
+        model: ModelName.GPT4O,
         temperature: 0.2,
         top_p: 0.2,
         store: true,

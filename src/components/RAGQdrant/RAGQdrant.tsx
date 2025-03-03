@@ -45,6 +45,7 @@ const RAGQdrant = () => {
   const [qdrantConnection, setQdrantConnection] = useState<string>('')
   const [operationInfoList, setOperationInfoList] = useState<OperationInfo[]>()
   const [splitter, setSplitter] = useState<string>('token')
+  const [chunkSize, setChunkSize] = useState<number>(128)
   const checkQdrantConnection = async () => {
     try {
       const response = await fetch('http://localhost:6333', {
@@ -251,6 +252,7 @@ const RAGQdrant = () => {
       const formData = new FormData()
       formData.append('pdf', selectedFile)
       formData.append('splitter', splitter)
+      formData.append('chunkSize', chunkSize.toString())
 
       const response = await fetch(`/api/uploadPDFByToken`, {
         method: 'POST',
@@ -297,10 +299,15 @@ const RAGQdrant = () => {
                 accept="application/pdf"
                 onChange={handleFileChange}
               />
-
+              <Input
+                type="number"
+                value={chunkSize}
+                onChange={(e) => { setChunkSize(parseInt(e.target.value)) }}
+                placeholder="Enter chunk size"
+                className='mt-4'
+              />
             </form>
             <div className='flex flex-col space-y-2'>
-              {/* {chunkAPIs.length > 0 && <IndexesDropDown setInput={setSelectedChunkAPI} collections={chunkAPIs} selectedCollection={selectedChunkAPI} />} */}
               <SplitterDropDown setInput={setSplitter} selectedSplitter={splitter} />
               <Button
                 onClick={handleSubmit}

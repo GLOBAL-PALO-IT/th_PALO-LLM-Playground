@@ -62,9 +62,11 @@ const selectedContextWithLLM = async ({
         query = await improveQuery(question)
         searchResult = await serperSearch(query, topK)
     }
-    console.log({ question, query, topK, searchType, rephraseType, metadata })
+    console.log({ question, query, topK, searchType, rephraseType, searchResult, searchResultIds })
     console.log('choosing context....')
-
+    if (searchResult.points.length !== topK) {
+        console.error('Woahhhhh ')
+    }
 
     const points = await checkIfContextRelevantAll(searchResult, question, ligthMode)
     const pointsWithRelevantAndSupport = points.filter((point) => {

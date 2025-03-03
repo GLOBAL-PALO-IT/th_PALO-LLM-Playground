@@ -1,12 +1,21 @@
 import { NextResponse } from 'next/server'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { Document } from '@langchain/core/documents'
-import { CharacterTextSplitter, TokenTextSplitter,RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { TokenTextSplitter, RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+// splitter enum
+export enum Splitter {
+  Token = 'token',
+  Character = 'character',
+  Page = 'page',
+  None = 'none',
+  PageToken = 'pageToken',
+}
 export async function POST(req: Request) {
-  
+
   const formData = await req.formData()
   const pdfFile = formData.get('pdf') as File
   const splitter = formData.get('splitter') as string
+  const chunkSize = parseInt(formData.get('chunkSize') as string)
   //Blob of pdfFile
   const pdfBlob = new Blob([pdfFile], { type: pdfFile.type })
 
@@ -19,20 +28,20 @@ export async function POST(req: Request) {
     const loader = new PDFLoader(pdfBlob)
     const docs: Document<Record<string, any>>[] = await loader.load()
     let textSplitterMethod = null
-    
-    if (splitter === 'token') {
+
+    if (splitter === Splitter.Token || splitter === Splitter.PageToken) {
       textSplitterMethod = new TokenTextSplitter({
-        chunkSize: 5000,
-        chunkOverlap: 1000,
+        encodingName: 'gpt2',
+        chunkSize: chunkSize ?? 500,
+        chunkOverlap: 50,
       });
-    }else if(splitter === 'character'){
+    } else if (splitter === Splitter.Character) {
       textSplitterMethod = new RecursiveCharacterTextSplitter({
-        
-        chunkSize: 500,
+        chunkSize: chunkSize && 500,
         chunkOverlap: 50,
       });
     }
-    
+
     // console.log({ doc: docs[0].metadata })
     // doc.metadata: {
     //   source: 'blob',
@@ -45,26 +54,28 @@ export async function POST(req: Request) {
     //   },
     //   loc: { pageNumber: 1 }
     // }
-    const docsToText = docs.map((doc) => {
-      const pageNumber: number = doc.metadata.loc.pageNumber
 
-      const pageNumberStr = pageNumber.toString()
-      const xmlTag = `page-${pageNumberStr}`
-      return `<${xmlTag}> ${doc.pageContent}</${xmlTag}>`
-    }).join(`\n`)
-    console.log({ splitter,textSplitterMethod })
-    if(textSplitterMethod !== null){
+
+
+    if (textSplitterMethod !== null && !splitter.startsWith('page')) {
+      const docsToText = docs.map((doc) => {
+        const pageNumber: number = doc.metadata.loc.pageNumber
+
+        const pageNumberStr = pageNumber.toString()
+        const xmlTag = `page-${pageNumberStr}`
+        return `<${xmlTag}> ${doc.pageContent}</${xmlTag}>`
+      }).join(`\n`)
       const docsSplit = await textSplitterMethod.createDocuments([docsToText])
       return NextResponse.json({ content: docsSplit }, { status: 200 })
-    }else{
-      return NextResponse.json({ content: docs }, { status: 200 })
+    } else {
+      if(splitter === Splitter.PageToken){
+        const splitDocs = await textSplitterMethod?.splitDocuments(docs)
+        return NextResponse.json({ content: splitDocs }, { status: 200 })
+      }else{
+        return NextResponse.json({ content: docs }, { status: 200 })
+      }
     }
-    
 
-    // const docsSplit = textSplitter.splitText(docsToText)
-    // console.log({ docsSplit })
-
-    
   } catch (error) {
     console.log('error', error)
     return NextResponse.json({ error: 'Failed to parse PDF' }, { status: 500 })
