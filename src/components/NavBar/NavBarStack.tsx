@@ -212,8 +212,8 @@ const NavBarStack = () => {
                           </NavigationMenuLink>
                         </li>
                         {/* /eval */}
-                        <ListItem href="/eval" title="Evaluation Fundamentals">
-                          Evaluation of LLM Application
+                        <ListItem href="/documentPipeline" title="Document Pipeline">
+                          Document Pipeline
                         </ListItem>
                         {/* /eval rag */}
                         <ListItem href="/evalRag" title="Evaluation RAG">

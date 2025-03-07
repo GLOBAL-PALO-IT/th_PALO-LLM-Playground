@@ -5,11 +5,76 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// Data pipeline - Documents
+model DocumentPipeline {
+  id        String   @id @default(uuid())
+  fileName  String
+  content   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  metadata  Json?
+
+  TranslationPipeline TranslationPipeline[]
+
+  EnrichmentPipeline EnrichmentPipeline[]
+
+  EvaluationPipeline EvaluationPipeline[]
 }
 
-// Define your models here
+// Data pipeline - Translation Pipeline
+model TranslationPipeline {
+  id        String   @id @default(uuid())
+  docId     String
+  fileName  String
+  page      Int?
+  input     String
+  output    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  metadata  Json?
+
+  document DocumentPipeline @relation(fields: [docId], references: [id])
+}
+
+// Data pipeline - Enrichment Pipeline
+model EnrichmentPipeline {
+  id        String   @id @default(uuid())
+  docId     String
+  fileName  String
+  page      Int?
+  input     String
+  output    Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  metadata  Json?
+
+  document DocumentPipeline @relation(fields: [docId], references: [id])
+}
+
+// Data pipeline - Evaluation Pipeline
+model EvaluationPipeline {
+  id        String   @id @default(uuid())
+  docId     String
+  fileName  String
+  page      Int?
+  input     String
+  output    String
+  question  String?  
+  grounded_context String?
+  grounded_answer  String?
+  llm_answer    String?
+  llm_score     Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  metadata  Json?
+
+  document DocumentPipeline @relation(fields: [docId], references: [id])
+}
+
+// Client model
 model Client {
   id        String   @id @default(uuid())
   name      String

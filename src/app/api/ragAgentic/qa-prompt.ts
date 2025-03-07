@@ -160,9 +160,10 @@ export const getPromptWithContext = async (
     const rawSearchResult: SearchResult = JSON.parse(JSON.stringify(searchResult))
     if (selectedIndexList.length > 0) {
         console.log(`got context....point ids: ${JSON.stringify(selectedIndexList)}`)
-        if (expandCorrectContext) {
+        if (expandCorrectContext && expandCorrectContextLength > 0 && !webSearch) {
             console.log(`expanding context....from point ids: ${JSON.stringify(selectedIndexList)}...to`)
             const additionalSelectedIndexList = []
+            // TODO: implement expand this doesn't really works
             for (let i = 0; i < selectedIndexList.length; i++) {
                 const pointsId = selectedIndexList[i]
                 // Add points within the expandCorrectContextLength range
