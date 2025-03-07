@@ -2,11 +2,20 @@ import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { searchQuery } from '../qdrant/searchEmbeddings/route'
+import { searchQuery } from '@/lib/qdrant'
 import { ragChatPromptBuilder } from './prompt'
 
 export async function POST(request: Request) {
-  const { messages, searchIndex }: { messages: ChatCompletionMessageParam[]; searchIndex: string } =
+  const { 
+    messages, 
+    searchIndex, 
+    topK = 10 
+  }:
+    {
+      messages: ChatCompletionMessageParam[];
+      searchIndex: string
+      topK: number
+    } =
     await request.json()
   console.log(messages)
   try {
@@ -19,10 +28,10 @@ export async function POST(request: Request) {
     if (typeof question !== 'string' || question.length === 0) {
       return NextResponse.json({ output: 'Please enter a valid text' }, { status: 400 })
     }
-    const {prompt, searchResult} = await getPromptWithContext(question, searchIndex)
+    const { prompt, searchResult } = await getPromptWithContext(question, searchIndex, topK)
     const openai = new OpenAI()
-    let llm = openai
-    const completion = await llm.chat.completions.create({
+    
+    const completion = await openai.chat.completions.create({
       messages: [
         {
           role: 'user',
@@ -45,17 +54,18 @@ export async function POST(request: Request) {
   }
 }
 
-const getPromptWithContext=async(question: string, searchIndex: string)=>{
+const getPromptWithContext = async (question: string, searchIndex: string, topK: number) => {
   const embeddings = await getEmbedding(question)
-  const searchResult = await searchQuery(searchIndex, embeddings,10)
+  const searchResult = await searchQuery(searchIndex, embeddings, topK)
   const searchResultText = searchResult.points.map((point) => point.payload?.pageContent as string)
+  console.log({ searchResultText })
   const prompt = await ragChatPromptBuilder(searchResultText, question)
   // console.log({prompt})
-  return {prompt,searchResult}
+  return { prompt, searchResult }
 }
 
 const getEmbedding = async (text: string) => {
-  if(text.length > 0){
+  if (text.length > 0) {
     text = text.replace(/\n/g, '').replace(/\t/g, '').replace(/ /g, '')
     const openai = new OpenAI()
     const result = await openai.embeddings.create({
@@ -65,8 +75,8 @@ const getEmbedding = async (text: string) => {
 
     const embeddings = result.data
     return embeddings[0].embedding
-  }else{
+  } else {
     return []
   }
-  
+
 }

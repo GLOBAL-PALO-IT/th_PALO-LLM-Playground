@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
+import { Checkbox } from "@/components/ui/checkbox"
 import './chat.css'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React from 'react'
@@ -37,7 +38,8 @@ const RAGChat = () => {
   const [qdrantConnection, setQdrantConnection] = useState<string>('')
   const [debugPrompt, setDebugPrompt] = useState<string>('')
   const [debugSearchResult, setDebugSearchResult] = useState()
-
+  const [topK, setTopK] = useState<number>(10)
+  const [seeDebugSearchResult, setSeeDebugSearchResult] = useState<boolean>(false)
   const checkQdrantConnection = async () => {
     try {
       const response = await fetch('http://localhost:6333', {
@@ -94,7 +96,7 @@ const RAGChat = () => {
       role: 'user',
       content: input,
     }
-    setMessages((prev) => [...prev, newMessage])
+    setMessages([newMessage])
 
     // Clear the input field
     setInput('')
@@ -105,7 +107,11 @@ const RAGChat = () => {
       const response = await fetch('/api/ragChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, newMessage], searchIndex }),
+        body: JSON.stringify({
+          messages: [newMessage],
+          searchIndex,
+          topK
+        }),
       })
       const { message, prompt, searchResult } = await response.json()
       console.log({ message })
@@ -131,8 +137,8 @@ const RAGChat = () => {
   }
 
   return (
-    <div className="flex flex-row space-x-4 m-3">
-      <div className="flex flex-col">
+    <div className="flex flex-row space-x-4 m-3 w-full">
+      <div className="flex flex-col w-[90%] m-4">
         <h1 className="text-2xl font-bold">RAG Chat with {searchIndex} {showFormattedPrompt ? (
           <button onClick={() => setShowFormattedPrompt(false)}>
             <FaMagic className="m-1" />
@@ -145,13 +151,29 @@ const RAGChat = () => {
         <div className={`p-4 flex flex-row content-center items-center ${qdrantConnection ? 'text-green-500' : 'text-gray-500'}`}>
           Qdrant Connection: {qdrantConnection}
         </div>
-        <div className="p-2 flex flex-row content-center items-center">
+        <div className="p-2 flex flex-row content-center items-center space-x-2">
           {collections.length > 0 && <IndexesDropDown setInput={setSearchIndex} collections={collections} />}
-          <div className="ml-2 flex flex-row space-x-2"><span>Search Knowledge:</span> <span className="font-bold">{searchIndex}</span></div>
+
+          <Input
+            type="number"
+            defaultValue={10}
+            onChange={(e) => setTopK(parseInt(e.target.value))}
+            value={topK}
+            className='w-24'
+          />
+          <div className="flex items-center space-x-2 ml-4">
+            <Checkbox id="see-debug-search-result" onCheckedChange={(checked) => setSeeDebugSearchResult(checked ? true : false)} />
+            <label
+              htmlFor="see-debug-search-result"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              See Debug Search Result
+            </label>
+          </div>
         </div>
         <div className="flex flex-col">
           {/* Chat history */}
-          <div className="flex flex-col p-4 m-4 max-h-[50vh] h-[40vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
+          <div className=" w-full flex flex-col p-4 m-4 max-h-[50vh] h-[40vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
             {showFormattedPrompt ? (
               messages.map((message, index) => (
                 <div
@@ -196,15 +218,16 @@ const RAGChat = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col">
-        {/* {debugPrompt && <span>Debug Prompt: {debugPrompt}</span>} */}
-        {/* <span>Debug search result: {debugSearchResult}</span> */}
+      {seeDebugSearchResult && <div className="flex flex-col overflow-auto max-h-[80vh] h-[80vh] ml-4">
         {debugSearchResult && <JsonView
           data={debugSearchResult}
           shouldExpandNode={collapseAllNested}
           style={darkStyles}
         />}
-      </div>
+        {debugPrompt && <span>Debug Prompt: {debugPrompt}</span>}
+        
+        
+      </div>}
     </div>
   )
 }

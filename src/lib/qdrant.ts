@@ -25,10 +25,10 @@ export const searchQuery = async (
   collectionName: string,
   vector: number[],
   topK: number = 3,
-  excludeIds?: number[]
+  excludeIds: number[] = []
 ): Promise<SearchResult> => {
   try {
-    console.log({ topK })
+    console.log({ topK, collectionName, excludeIds })
     const client = new QdrantClient({ host: 'localhost', port: 6333 })
     let searchResult = await client.query(collectionName, {
       query: vector,
@@ -41,6 +41,7 @@ export const searchQuery = async (
         }
       }
     })
+    console.log({ searchResult })
 
     return searchResult
   } catch (e) {
