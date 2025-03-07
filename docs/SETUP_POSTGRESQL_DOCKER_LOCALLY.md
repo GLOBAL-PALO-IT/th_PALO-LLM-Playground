@@ -15,6 +15,11 @@ Run the following command to start a PostgreSQL container:
 ```sh
 docker run --name postgres-local -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydatabase -p 5432:5432 -d postgres
 ```
+or 
+```sh
+docker run --name postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=recap_db -p 5432:5432 -v postgres_data:/var/lib/postgresql/data --restart unless-stopped --health-cmd "pg_isready -U myuser -d recap_db" --health-interval=10s --health-timeout=5s --health-retries=5 -d postgres:16
+```
+
 - `--name postgres-local`: Names the container for easy reference.
 - `-e POSTGRES_USER=myuser`: Sets the PostgreSQL username.
 - `-e POSTGRES_PASSWORD=mypassword`: Sets the password.

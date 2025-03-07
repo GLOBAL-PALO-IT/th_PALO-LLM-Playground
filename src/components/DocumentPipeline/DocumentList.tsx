@@ -108,7 +108,7 @@ export default function DocumentList() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => window.open(`/api/pipeline/document/${doc.id}`, '_blank')}
+                    onClick={() => window.open(`/documentPipeline/${doc.id}`, '_blank')}
                   >
                     View Details
                   </Button>

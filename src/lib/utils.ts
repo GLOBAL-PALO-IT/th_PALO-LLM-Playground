@@ -51,3 +51,16 @@ export const calculateCosineSimilarity = (A: number[], B: number[]) => {
 
   return similarity
 }
+
+// Format date to a user-friendly string
+// Example: "2023-01-01T00:00:00.000Z" -> "Jan 1, 2023, 12:00 AM"
+export const formatDate = (dateString: string | Date): string => {
+  const date = new Date(dateString)
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
