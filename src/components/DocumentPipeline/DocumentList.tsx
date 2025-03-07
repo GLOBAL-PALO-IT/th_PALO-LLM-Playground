@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { DocumentPipelineResponse } from '@/app/api/pipeline/types'
 
 export default function DocumentList() {
+  const router = useRouter()
   const [documents, setDocuments] = useState<DocumentPipelineResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -108,7 +110,7 @@ export default function DocumentList() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => window.open(`/documentPipeline/${doc.id}`, '_blank')}
+                    onClick={() => router.push(`/documentPipeline/${doc.id}`)}
                   >
                     View Details
                   </Button>

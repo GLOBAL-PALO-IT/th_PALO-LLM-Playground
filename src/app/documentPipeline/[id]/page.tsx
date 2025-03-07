@@ -8,12 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Spinner } from '@/components/ui/spinner'
 import { DocumentPipelineResponse } from '@/app/api/pipeline/types'
 import { formatDate } from '@/lib/utils'
+import { GlobeIcon, PlusCircledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
 
 export default function DocumentDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [document, setDocument] = useState<DocumentPipelineResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isTranslating, setIsTranslating] = useState(false)
+  const [isEnriching, setIsEnriching] = useState(false)
+  const [isEvaluating, setIsEvaluating] = useState(false)
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -128,6 +132,80 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
           </div>
         </CardContent>
       </Card>
+
+      <div className="flex gap-3 mb-6">
+        <Button 
+          className="flex items-center" 
+          onClick={() => {
+            setIsTranslating(true);
+            setTimeout(() => {
+              setIsTranslating(false);
+              alert('Document translation completed!');
+            }, 1000);
+          }}
+          disabled={isTranslating}
+        >
+          {isTranslating ? (
+            <>
+              <Spinner className="mr-2 h-4 w-4" />
+              <span>Translating...</span>
+            </>
+          ) : (
+            <>
+              <GlobeIcon className="mr-2 h-4 w-4" />
+              <span>Translate</span>
+            </>
+          )}
+        </Button>
+        <Button 
+          className="flex items-center" 
+          variant="secondary"
+          onClick={() => {
+            setIsEnriching(true);
+            setTimeout(() => {
+              setIsEnriching(false);
+              alert('Document enrichment completed!');
+            }, 1000);
+          }}
+          disabled={isEnriching}
+        >
+          {isEnriching ? (
+            <>
+              <Spinner className="mr-2 h-4 w-4" />
+              <span>Enriching...</span>
+            </>
+          ) : (
+            <>
+              <PlusCircledIcon className="mr-2 h-4 w-4" />
+              <span>Enrich</span>
+            </>
+          )}
+        </Button>
+        <Button 
+          className="flex items-center" 
+          variant="outline"
+          onClick={() => {
+            setIsEvaluating(true);
+            setTimeout(() => {
+              setIsEvaluating(false);
+              alert('Document evaluation completed!');
+            }, 1000);
+          }}
+          disabled={isEvaluating}
+        >
+          {isEvaluating ? (
+            <>
+              <Spinner className="mr-2 h-4 w-4" />
+              <span>Evaluating...</span>
+            </>
+          ) : (
+            <>
+              <MagnifyingGlassIcon className="mr-2 h-4 w-4" />
+              <span>Evaluate</span>
+            </>
+          )}
+        </Button>
+      </div>
 
       <Tabs defaultValue="content" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
