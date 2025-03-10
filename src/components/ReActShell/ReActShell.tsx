@@ -17,9 +17,9 @@ import {
   FaMagic,
   FaRegClipboard,
 } from 'react-icons/fa'
-import { ExecutionSchema, ExecutionSchemaType } from '@/app/api/runOpenAI/route'
+import { ExecutionSchema, ExecutionSchemaType } from '@/app/api/runReasoningAction/route'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { systemPromptJSON } from '@/app/api/runOpenAI/systemPromptJSON'
+import { systemPromptJSON } from '@/app/api/runReasoningAction/systemPromptJSON'
 import { Input } from '../ui/input'
 import {
   JsonView,
@@ -110,7 +110,7 @@ const ReActShell = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/runOpenAI', {
+      const response = await fetch('/api/runReasoningAction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

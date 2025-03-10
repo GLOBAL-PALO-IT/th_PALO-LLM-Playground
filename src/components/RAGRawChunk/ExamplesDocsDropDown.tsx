@@ -34,7 +34,7 @@ const ExamplesDocsDropDown: React.FC<ExamplesDropDownProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="p-1 border-2 border-blue-500 bg-white text-blue-500 rounded">
-          Select an example Source Document
+          Source Documents
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2 m-2 border-2 border-blue-500 rounded-lg">

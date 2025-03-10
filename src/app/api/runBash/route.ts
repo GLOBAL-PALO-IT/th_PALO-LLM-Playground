@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import * as fs from 'fs'
 import * as path from 'path'
 import { generateShortUUID, getHomeDirectory } from '@/lib/utils'
-import { ExecutionSchemaType } from '../runOpenAI/route'
+import { ExecutionSchemaType } from '../runReasoningAction/route'
 
 // execute a shell command and return a promise
 // promisify is a utility function that converts a callback-based function to a promise-based function
