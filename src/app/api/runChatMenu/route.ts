@@ -1,17 +1,17 @@
 import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { menuItemsListParams } from './tools';
+import { openaiInstance } from '@/lib/openai';
 
 export async function POST(request: Request) {
   const { messages }: { messages: ChatCompletionMessageParam[] } =
     await request.json()
   console.log(messages)
   try {
-    const openai = new OpenAI()
-    const completion = await openai.beta.chat.completions.parse({
+  
+    const completion = await openaiInstance().beta.chat.completions.parse({
       messages,
       model: ModelName.GPT4O,
       temperature: 0.2,

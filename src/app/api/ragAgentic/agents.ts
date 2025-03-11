@@ -1,10 +1,10 @@
-import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { ModelName } from "@/lib/utils";
 import { checkIfContextRelevantLightPrompt, checkIfContextRelevantPrompt as checkIfContextRelevantCOTPrompt, chooseTheBestContextPrompt, evaluateAnswerPrompt, improveQuestionPrompt as improveQueryPrompt, qaPlannerPrompt, rephraseQuestionPrompt, rewriteQueryPrompt, rewriteTextToKnowledgePrompt } from "./prompt";
 import { SearchResult, SearchResultPoint } from "@/types/qdrant";
-const openai = new OpenAI()
+import { openaiInstance } from "@/lib/openai";
+
 const SelectedIndex = z.object({
     selectedIndex: z.array(z.number()),
 });
@@ -18,7 +18,7 @@ type FinalRelevantClassificationType = z.infer<typeof FinalRelevantClassificatio
 
 export const extractDocumentIndexID = async (document: string) => {
     try {
-        const completion = await openai.beta.chat.completions.parse({
+        const completion = await openaiInstance().beta.chat.completions.parse({
             model: ModelName.GPT4O,
             messages: [
                 { role: "system", content: "Extract the relevant context index from the document. If not relevant context found return empty" },
@@ -39,7 +39,7 @@ export const extractDocumentIndexID = async (document: string) => {
 
 }
 export const qaPlanner = async (question: string) => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -62,7 +62,7 @@ export const qaPlanner = async (question: string) => {
 
 export const rewriteTextToKnowledge = async (text: string, question: string) => {
     // rewriteTextToKnowledgePrompt
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -110,7 +110,7 @@ export const rewriteAll = async (points: SearchResultPoint[], question: string, 
 }
 
 export const chooseTheBestContext = async (context: SearchResult, question: string) => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -150,7 +150,7 @@ export const checkIfContextRelevantAll = async (searchResult: SearchResult, ques
 
 export const checkIfContextRelevant = async (context: string, question: string, light: boolean = true):
     Promise<{ output: FinalRelevantClassificationType | null, metadata: { analysisText: string } } | null | undefined> => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -171,7 +171,7 @@ export const checkIfContextRelevant = async (context: string, question: string, 
     const analysisText = completion.choices[0].message.content ? completion.choices[0].message.content : ''
     // console.log('\x1b[32m%s\x1b[0m', 'checkIfContextRelevant analysisText: ' + analysisText)
     try {
-        const completion = await openai.beta.chat.completions.parse({
+        const completion = await openaiInstance().beta.chat.completions.parse({
             model: ModelName.GPT4O,
             messages: [
                 { role: "system", content: "Extract the final answer of given analyze text either RELEVANT, SUPPORT, NOT RELEVANT" },
@@ -192,7 +192,7 @@ export const checkIfContextRelevant = async (context: string, question: string, 
     }
 }
 export const rewriteQuery = async (question: string) => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -213,7 +213,7 @@ export const rewriteQuery = async (question: string) => {
 }
 // rephraseQuestionPrompt
 export const rephraseQuestion = async (question: string) => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -234,7 +234,7 @@ export const rephraseQuestion = async (question: string) => {
 }
 
 export const improveQuery = async (question: string) => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -255,7 +255,7 @@ export const improveQuery = async (question: string) => {
 }
 
 export const answerQuestion = async (prompt: string): Promise<string> => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -277,7 +277,7 @@ export const answerQuestion = async (prompt: string): Promise<string> => {
 }
 
 export const extractFinalAnswer = async (text: string) => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',
@@ -300,7 +300,7 @@ Thai:`,
 }
 
 export const evaluateAnswer = async (answer: string, question: string) => {
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
                 role: 'user',

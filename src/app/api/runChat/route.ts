@@ -1,6 +1,6 @@
+import { openaiInstance } from '@/lib/openai'
 import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 
 export async function POST(request: Request) {
@@ -8,9 +8,8 @@ export async function POST(request: Request) {
     await request.json()
   console.log(messages)
   try {
-    const openai = new OpenAI()
-    let llm = openai
-    const completion = await llm.chat.completions.create({
+
+    const completion = await openaiInstance().chat.completions.create({
       messages,
       // model: "gpt-4o",
       model: ModelName.GPT4O,

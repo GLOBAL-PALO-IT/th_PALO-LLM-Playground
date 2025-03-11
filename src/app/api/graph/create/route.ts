@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server'
 import { OpenAI } from 'openai'
 import { queryPrompt } from './query-prompt'
 import { ModelName } from '@/lib/utils'
+import { openaiInstance } from '@/lib/openai'
 
 export async function POST(request: Request) {
-    const openai = new OpenAI()
+    
     const { name, graph } = await request.json()
     try {
-        const response = await openai.chat.completions.create({
+        const response = await openaiInstance().chat.completions.create({
             model: ModelName.GPT4O,
             messages: [
                 {

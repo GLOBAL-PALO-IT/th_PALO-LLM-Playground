@@ -6,6 +6,7 @@ import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 import { ChatCompletionMessageParam } from 'openai/resources/index.js'
 import { ModelName } from '@/lib/utils'
+import { openaiInstance } from '@/lib/openai'
 
 // const groq = new Groq()
 export const ExecutionSchema = z.object({
@@ -35,10 +36,8 @@ export async function POST(request: Request) {
   const { messages }: { messages: ChatCompletionMessageParam[] } =
     await request.json()
   console.log(messages)
-  const openai = new OpenAI()
-  let llm = openai
   try {
-    const completion = await llm.beta.chat.completions.parse({
+    const completion = await openaiInstance().beta.chat.completions.parse({
       messages,
       // model: ModelName.Llama3,
       model: ModelName.GPT4O,

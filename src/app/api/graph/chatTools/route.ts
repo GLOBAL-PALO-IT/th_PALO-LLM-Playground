@@ -7,6 +7,7 @@ import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import "neo4j-driver";
 import { Neo4jGraph } from "@langchain/community/graphs/neo4j_graph";
 import { searchNeo4Jgraph, searchNeo4JgraphFunction, similaritySearchNeo4Jgraph, similaritySearchNeo4JgraphFunction } from './tools';
+import { openaiInstance } from '@/lib/openai';
 export async function POST(request: Request) {
     const { messages }: { messages: ChatCompletionMessageParam[]; } =
         await request.json()
@@ -34,8 +35,8 @@ export async function POST(request: Request) {
     const schema = await graph.getSchema();
     // console.log({ schema: graph.getSchema() });
     try {
-        const openai = new OpenAI();
-        const runner = openai.beta.chat.completions
+        
+        const runner = openaiInstance().beta.chat.completions
             .runTools({
                 model: ModelName.GPT4O,
                 // messages: messages,

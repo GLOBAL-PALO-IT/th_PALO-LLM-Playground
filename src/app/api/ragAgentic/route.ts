@@ -1,14 +1,13 @@
 import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
-import { observeOpenAI } from "langfuse";
+
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import { answerQuestion, evaluateAnswer, extractFinalAnswer } from './agents';
 import { getPromptWithContext } from './qa-prompt';
 import { extractEval } from './extract-eval';
+import { openaiInstance } from '@/lib/openai';
 
-// const openai = new OpenAI()
-const openai = observeOpenAI(new OpenAI());
+
 export async function POST(request: Request) {
   const {
     messages,
@@ -82,7 +81,8 @@ export async function POST(request: Request) {
       })
     } else {
       console.log('No search index provided')
-      const completion = await openai.chat.completions.create({
+      
+      const completion = await openaiInstance().chat.completions.create({
         messages: [
           {
             role: 'user',

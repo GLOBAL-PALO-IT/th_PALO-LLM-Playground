@@ -1,9 +1,10 @@
+import { openaiInstance } from '@/lib/openai'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
+
 
 export async function POST(request: Request) {
   const { texts }: { texts: string[] } = await request.json()
-  const openai = new OpenAI()
+
 
   const input = texts
     .map((text) => {
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
     // Promise all
     const embeddingResults = await Promise.all(
       splits.map(async (split) => {
-        const result = await openai.embeddings.create({
+        const result = await openaiInstance().embeddings.create({
           input: split,
           model: 'text-embedding-3-large',
         })

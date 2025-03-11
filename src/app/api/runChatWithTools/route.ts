@@ -6,6 +6,7 @@ import { RunnableToolFunctionWithParse } from 'openai/lib/RunnableFunction'
 import { JSONSchema } from 'openai/lib/jsonschema'
 import { ZodSchema, z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
+import { openaiInstance } from '@/lib/openai'
 
 /**
  * A generic utility function that returns a RunnableFunction
@@ -109,8 +110,8 @@ export async function POST(request: Request) {
     await request.json()
   console.log(messages)
   try {
-    const openai = new OpenAI()
-    const runner = openai.beta.chat.completions
+    
+    const runner = openaiInstance().beta.chat.completions
       .runTools({
         model: ModelName.GPT4O,
         stream: true,

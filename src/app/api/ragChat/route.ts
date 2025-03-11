@@ -4,6 +4,7 @@ import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import { searchQuery } from '@/lib/qdrant'
 import { ragChatPromptBuilder } from './prompt'
+import { openaiInstance } from '@/lib/openai'
 
 export async function POST(request: Request) {
   const { 
@@ -29,9 +30,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ output: 'Please enter a valid text' }, { status: 400 })
     }
     const { prompt, searchResult } = await getPromptWithContext(question, searchIndex, topK)
-    const openai = new OpenAI()
     
-    const completion = await openai.chat.completions.create({
+    
+    const completion = await openaiInstance().chat.completions.create({
       messages: [
         {
           role: 'user',
@@ -67,8 +68,8 @@ const getPromptWithContext = async (question: string, searchIndex: string, topK:
 const getEmbedding = async (text: string) => {
   if (text.length > 0) {
     text = text.replace(/\n/g, '').replace(/\t/g, '').replace(/ /g, '')
-    const openai = new OpenAI()
-    const result = await openai.embeddings.create({
+
+    const result = await openaiInstance().embeddings.create({
       input: text,
       model: 'text-embedding-3-large',
     })
