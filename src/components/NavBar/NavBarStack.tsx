@@ -85,6 +85,14 @@ const NavBarStack = () => {
                           Reminder: This is actually execute the shell script in
                           the server side.
                         </ListItem>
+                        {/*  /reactUiBuilder*/}
+                        <ListItem
+                          href="/reactUiBuilder"
+                          title="UI Builder Agent"
+                        >
+                          Agent for helping to build UI with custom component
+                          library
+                        </ListItem>
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
@@ -161,7 +169,10 @@ const NavBarStack = () => {
                             </a>
                           </NavigationMenuLink>
                         </li>
-                        <ListItem href="/ragRawChunk" title="RAG Chunking Raw Text">
+                        <ListItem
+                          href="/ragRawChunk"
+                          title="RAG Chunking Raw Text"
+                        >
                           shows how to chunk raw text into smaller pieces and
                           embedding them
                         </ListItem>
@@ -175,8 +186,12 @@ const NavBarStack = () => {
                         <ListItem href="/ragGraph" title="Graph RAG">
                           showcase of Graph RAG Construction
                         </ListItem>
-                        <ListItem href="/ragGraphPipeline" title="Graph RAG Pipeline">
-                          showcase of Graph RAG Construction Pipeline using LangChain
+                        <ListItem
+                          href="/ragGraphPipeline"
+                          title="Graph RAG Pipeline"
+                        >
+                          showcase of Graph RAG Construction Pipeline using
+                          LangChain
                         </ListItem>
                         <ListItem href="/ragChatGraph" title="Graph RAG Chat">
                           showcase of Graph RAG Chat
@@ -184,7 +199,10 @@ const NavBarStack = () => {
                         <ListItem href="/ragAgentic" title="Agentic RAG">
                           showcase of Agentic RAG
                         </ListItem>
-                        <ListItem href="/sentenceSim" title="Sentence Similarity">
+                        <ListItem
+                          href="/sentenceSim"
+                          title="Sentence Similarity"
+                        >
                           showcase of Sentence Similarity
                         </ListItem>
                       </ul>
@@ -206,13 +224,17 @@ const NavBarStack = () => {
                                 Evaluation
                               </div>
                               <p className="text-sm leading-tight text-muted-foreground">
-                                Example of how to evaluate the performance of LLM Application
+                                Example of how to evaluate the performance of
+                                LLM Application
                               </p>
                             </a>
                           </NavigationMenuLink>
                         </li>
                         {/* /eval */}
-                        <ListItem href="/documentPipeline" title="Document Pipeline">
+                        <ListItem
+                          href="/documentPipeline"
+                          title="Document Pipeline"
+                        >
                           Document Pipeline
                         </ListItem>
                         {/* /eval rag */}
@@ -220,11 +242,17 @@ const NavBarStack = () => {
                           Evaluation of RAG Application
                         </ListItem>
                         {/* /eval pipeline */}
-                        <ListItem href="/evalPipeline" title="Evaluation Pipeline">
+                        <ListItem
+                          href="/evalPipeline"
+                          title="Evaluation Pipeline"
+                        >
                           Evaluation of Pipeline Application
                         </ListItem>
                         {/* /eval dataset */}
-                        <ListItem href="/evalDataset" title="Evaluation Dataset">
+                        <ListItem
+                          href="/evalDataset"
+                          title="Evaluation Dataset"
+                        >
                           Evaluation Dataset Creation
                         </ListItem>
                         {/* /eval model */}
@@ -232,7 +260,6 @@ const NavBarStack = () => {
                           Evaluation Model Creation
                         </ListItem>
                       </ul>
-
                     </NavigationMenuContent>
                   </NavigationMenuItem>
                   {/* Menus */}
@@ -242,10 +269,16 @@ const NavBarStack = () => {
                       <ul className="grid w-[400px] gap-3 p-4 lg:w-[500px] md:w-[400px] md:grid-cols-2 lg:grid-cols-3">
                         {menuItems.map((category) => (
                           <li key={category.categoryId}>
-                            <h3 className="font-bold mb-2">{category.category}</h3>
+                            <h3 className="font-bold mb-2">
+                              {category.category}
+                            </h3>
                             <ul className="space-y-2">
                               {category.items.map((item) => (
-                                <ListItem key={item.id} href={`/menu${category.categoryId}/item${item.id}`} title={item.title}>
+                                <ListItem
+                                  key={item.id}
+                                  href={`/menu${category.categoryId}/item${item.id}`}
+                                  title={item.title}
+                                >
                                   {item.description}
                                 </ListItem>
                               ))}
