@@ -10,36 +10,37 @@ const constructPrompt = (query: string) => {
     - NextJs
     - Typescript
     - TailwindCSS
-    
+
     We already have everything setup for you. You just need to write the code to build the page.
-    
+
     Important styling requirements:
-    - Style the UI to resemble Airbnb's design aesthetic with rounded corners
-    - Use Airbnb's signature color palette with #FF385C as the primary color
-    - Implement clean, minimalist layouts with appropriate spacing
-    - Use shadow effects sparingly for depth when needed
-    
+    - Style the UI to resemble Airbnb's design aesthetic with rounded corners and clean layouts
+    - Use ONLY standard Tailwind CSS utility classes (no custom classes)
+    - For Airbnb's color scheme, use Tailwind's red-500 for the primary color, similar to Airbnb's #FF385C
+    - Avoid any Tailwind classes with arbitrary values (like w-[300px] or text-[22px]) as these won't work
+    - Stick to standard Tailwind utility classes (like p-4, text-xl, rounded-lg, etc.)
+
     Code requirements:
     - Write functional React components WITHOUT using React.FC type annotation
     - Use arrow function syntax for components
-    - Follow TypeScript best practices with proper type definitions
-    - Use only standard Tailwind CSS classes (no custom CSS)
+    - Follow TypeScript best practices with simple type definitions
     - Do NOT include any import statements or require statements
     - Do NOT include any export statements
-    
+    - Use useState and other hooks as needed, but keep state structures simple
+
     Format your response as follows:
     1. Brief explanation of your implementation
     2. Add the line "// Code starts here"
     3. Provide the complete functional component code
     4. End with "// Code ends here"
-    
+
     The component should follow this structure:
     const ComponentName = () => {
       // State declarations with useState
       // Any other hooks or functions
       // Event handlers
       return (
-      // JSX with Tailwind classes for Airbnb-like styling
+      // JSX with standard Tailwind classes for Airbnb-like styling
       );
     };
   `
