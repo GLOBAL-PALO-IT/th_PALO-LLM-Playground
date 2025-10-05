@@ -19,14 +19,19 @@ test.describe('Navigation', () => {
 
   test('should have working back and forward navigation', async ({ page }) => {
     await page.goto('/chat');
+    await page.waitForURL('**/chat');
+    
     await page.goto('/ragAgentic');
+    await page.waitForURL('**/ragAgentic');
     
     // Go back to chat
     await page.goBack();
+    await page.waitForURL('**/chat');
     expect(page.url()).toContain('/chat');
     
     // Go forward to ragAgentic
     await page.goForward();
+    await page.waitForURL('**/ragAgentic');
     expect(page.url()).toContain('/ragAgentic');
   });
 });
