@@ -7,6 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "playwright:install": "playwright install --with-deps",
     "prisma:seed": "node prisma/seed.js",
     "prisma:reseed": "npx prisma db seed",
     "prisma:reset": "npx prisma db reset",
@@ -71,6 +77,7 @@
     "zod-to-json-schema": "^3.23.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.1",
     "@shadcn/ui": "^0.0.4",
     "@types/formidable": "^3.4.5",
     "@types/multer": "^1.4.12",

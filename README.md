@@ -98,6 +98,28 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Testing
+
+This project includes end-to-end tests using Playwright.
+
+### Running Tests
+
+```bash
+# Install Playwright browsers (first time only)
+npm run playwright:install
+
+# Run all tests
+npm run test:e2e
+
+# Run tests with UI mode
+npm run test:e2e:ui
+
+# View test report
+npm run test:e2e:report
+```
+
+For more details, see [tests/README.md](./tests/README.md).
+
 ## Setup Qdrant Vector Database
 
 [Qdrant](https://qdrant.tech/documentation/quickstart/)
