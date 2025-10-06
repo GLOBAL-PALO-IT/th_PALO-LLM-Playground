@@ -7,6 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
@@ -77,9 +81,11 @@
     "zod-to-json-schema": "^3.23.3"
   },
   "devDependencies": {
+    "@jest/globals": "^30.2.0",
     "@playwright/test": "^1.55.1",
     "@shadcn/ui": "^0.0.4",
     "@types/formidable": "^3.4.5",
+    "@types/jest": "^30.0.0",
     "@types/multer": "^1.4.12",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.4",
@@ -88,11 +94,13 @@
     "@types/ws": "^8.5.13",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
+    "jest": "^30.2.0",
     "micromatch": ">=4.0.8",
     "postcss": "^8",
     "prettier": "^3.3.2",
     "prisma": "^6.4.1",
     "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.4.4",
     "typescript": "^5"
   }
 }
