@@ -33,13 +33,24 @@ const ReActUIBuilder = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
       })
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`)
+      }
+      
       const { message } = await response.json()
-      console.log({ message })
+      console.log('Received message from API:', message)
 
       setLlmResponse(message.content)
       setMessages((prev) => [...prev, message])
     } catch (error: any) {
-      console.error('Error:', error.message)
+      console.error('Error sending message:', error.message)
+      // Optionally add error message to chat
+      const errorMessage: ChatCompletionMessageParam = {
+        role: 'assistant',
+        content: `Error: ${error.message}. Please try again.`,
+      }
+      setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
     }
@@ -103,7 +114,7 @@ export const exampleQueries = [
   'Please help create login form with email and password fields, and a submit button. With validation for email and password fields',
   'Please create an animated button with a loading spinner, and a success message',
   'Please create profile page, to show user details like name, email, and phone number',
-  'Plase create a landing page with a hero section, features section, and a footer for a consulting firm website',
+  'Please create a landing page with a hero section, features section, and a footer for a consulting firm website',
 ]
 
 export default ReActUIBuilder

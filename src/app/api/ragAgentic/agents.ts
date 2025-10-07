@@ -1,10 +1,21 @@
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { ModelName } from "@/lib/utils";
-import { checkIfContextRelevantLightPrompt, checkIfContextRelevantPrompt as checkIfContextRelevantCOTPrompt, chooseTheBestContextPrompt, evaluateAnswerPrompt, improveQuestionPrompt as improveQueryPrompt, qaPlannerPrompt, rephraseQuestionPrompt, rewriteQueryPrompt, rewriteTextToKnowledgePrompt } from "./prompt";
+import { 
+  checkIfContextRelevantLightPrompt, 
+  checkIfContextRelevantPrompt as checkIfContextRelevantCOTPrompt, 
+  chooseTheBestContextPrompt, 
+  evaluateAnswerPrompt, 
+  improveQuestionPrompt as improveQueryPrompt, 
+  qaPlannerPrompt, 
+  rephraseQuestionPrompt, 
+  rewriteQueryPrompt, 
+  rewriteTextToKnowledgePrompt 
+} from "./prompt";
 import { SearchResult, SearchResultPoint } from "@/types/qdrant";
 import { openaiInstance } from "@/lib/openai";
 
+// Zod schemas for structured outputs
 const SelectedIndex = z.object({
     selectedIndex: z.array(z.number()),
 });
@@ -13,9 +24,13 @@ const FinalRelevantClassification = z.object({
     classification: z.enum(["RELEVANT", "SUPPORT", "NOT RELEVANT"]),
 })
 
-// type of FinalRelevantClassification
 type FinalRelevantClassificationType = z.infer<typeof FinalRelevantClassification>
 
+/**
+ * Extracts document index IDs from a document using OpenAI
+ * @param document - The document text to analyze
+ * @returns Selected index numbers or undefined on error
+ */
 export const extractDocumentIndexID = async (document: string) => {
     try {
         const completion = await openaiInstance().beta.chat.completions.parse({
@@ -31,14 +46,19 @@ export const extractDocumentIndexID = async (document: string) => {
                 function: "extractDocumentIndexID"
             }
         });
-        console.log('extractDocumentIndexID: ' + JSON.stringify(completion.choices[0].message.parsed))
+        console.log('extractDocumentIndexID:', JSON.stringify(completion.choices[0].message.parsed))
         return completion.choices[0].message.parsed;
     } catch (error) {
-        console.log('error extractDocumentIndexID: ' + error)
+        console.error('Error in extractDocumentIndexID:', error)
+        return undefined
     }
-
 }
-export const qaPlanner = async (question: string) => {
+/**
+ * Creates a question-answering plan using OpenAI
+ * @param question - The question to create a plan for
+ * @returns The generated plan as a string
+ */
+export const qaPlanner = async (question: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -55,13 +75,18 @@ export const qaPlanner = async (question: string) => {
             function: "qaPlanner"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
-    console.log('planner: ' + output)
+    const output = completion.choices[0].message.content ?? ''
+    console.log('QA Planner output:', output)
     return output
 }
 
-export const rewriteTextToKnowledge = async (text: string, question: string) => {
-    // rewriteTextToKnowledgePrompt
+/**
+ * Rewrites text to knowledge format for better context understanding
+ * @param text - The text to rewrite
+ * @param question - The question context
+ * @returns Rewritten text as knowledge
+ */
+export const rewriteTextToKnowledge = async (text: string, question: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -78,11 +103,23 @@ export const rewriteTextToKnowledge = async (text: string, question: string) => 
             function: "rewriteTextToKnowledge"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
-    console.log('rewrite: ' + output)
+    const output = completion.choices[0].message.content ?? ''
+    console.log('Rewrite to knowledge:', output)
     return output
 }
-export const rewriteAll = async (points: SearchResultPoint[], question: string, chunkSize: number = 10) => {
+
+/**
+ * Rewrites all search result points to knowledge format in batches
+ * @param points - Array of search result points
+ * @param question - The question context
+ * @param chunkSize - Size of each batch (default: 10)
+ * @returns Array of rewritten search result points
+ */
+export const rewriteAll = async (
+    points: SearchResultPoint[], 
+    question: string, 
+    chunkSize: number = 10
+): Promise<SearchResultPoint[]> => {
     const chunks: SearchResultPoint[][] = [];
     
     // Split points array into chunks
@@ -109,7 +146,13 @@ export const rewriteAll = async (points: SearchResultPoint[], question: string, 
     return results;
 }
 
-export const chooseTheBestContext = async (context: SearchResult, question: string) => {
+/**
+ * Chooses the best context from search results for a given question
+ * @param context - Search results to choose from
+ * @param question - The question to match context against
+ * @returns The best matching context as a string
+ */
+export const chooseTheBestContext = async (context: SearchResult, question: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -126,12 +169,23 @@ export const chooseTheBestContext = async (context: SearchResult, question: stri
             function: "chooseTheBestContext"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
-    console.log('\x1b[32m%s\x1b[0m', 'chooseTheBestContext: ' + output)
+    const output = completion.choices[0].message.content ?? ''
+    console.log('\x1b[32m%s\x1b[0m', 'Best context chosen:', output)
     return output
 }
 
-export const checkIfContextRelevantAll = async (searchResult: SearchResult, question: string, light: boolean = true): Promise<SearchResultPoint[]> => {
+/**
+ * Checks relevance of all contexts in search results
+ * @param searchResult - Search results to check
+ * @param question - The question to check relevance against
+ * @param light - Whether to use light or full checking (default: true)
+ * @returns Array of search result points with relevance classification
+ */
+export const checkIfContextRelevantAll = async (
+    searchResult: SearchResult, 
+    question: string, 
+    light: boolean = true
+): Promise<SearchResultPoint[]> => {
     console.log('checkIfContextRelevantAll length: ', { length: searchResult.points.length })
     const newPoints = await Promise.all(searchResult.points.map(async (point) => {
         const result = await checkIfContextRelevant(point.payload?.pageContent as string, question, light)
@@ -148,8 +202,18 @@ export const checkIfContextRelevantAll = async (searchResult: SearchResult, ques
     return newPoints
 }
 
-export const checkIfContextRelevant = async (context: string, question: string, light: boolean = true):
-    Promise<{ output: FinalRelevantClassificationType | null, metadata: { analysisText: string } } | null | undefined> => {
+/**
+ * Checks if a single context is relevant to the question
+ * @param context - The context text to check
+ * @param question - The question to check relevance against
+ * @param light - Whether to use light or full checking (default: true)
+ * @returns Classification result with metadata or undefined on error
+ */
+export const checkIfContextRelevant = async (
+    context: string, 
+    question: string, 
+    light: boolean = true
+): Promise<{ output: FinalRelevantClassificationType | null, metadata: { analysisText: string } } | undefined> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -168,8 +232,8 @@ export const checkIfContextRelevant = async (context: string, question: string, 
             function: "checkIfContextRelevant"
         }
     })
-    const analysisText = completion.choices[0].message.content ? completion.choices[0].message.content : ''
-    // console.log('\x1b[32m%s\x1b[0m', 'checkIfContextRelevant analysisText: ' + analysisText)
+    const analysisText = completion.choices[0].message.content ?? ''
+    
     try {
         const completion = await openaiInstance().beta.chat.completions.parse({
             model: ModelName.GPT4O,
@@ -184,14 +248,19 @@ export const checkIfContextRelevant = async (context: string, question: string, 
                 function: "checkIfContextRelevant Structure"
             }
         });
-        // console.log('extractRel checkIfContextRelevant: ' + JSON.stringify(completion.choices[0].message.parsed?.classification))
         return { output: completion.choices[0].message.parsed, metadata: { analysisText } };
     } catch (error) {
-        console.log('error extractRel checkIfContextRelevant: ' + error)
+        console.error('Error in context relevance classification:', error)
         return undefined
     }
 }
-export const rewriteQuery = async (question: string) => {
+
+/**
+ * Rewrites a query for better search results
+ * @param question - The original question
+ * @returns Rewritten query
+ */
+export const rewriteQuery = async (question: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -208,11 +277,16 @@ export const rewriteQuery = async (question: string) => {
             function: "rewriteQuery"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
+    const output = completion.choices[0].message.content ?? ''
     return output
 }
-// rephraseQuestionPrompt
-export const rephraseQuestion = async (question: string) => {
+
+/**
+ * Rephrases a question for better understanding
+ * @param question - The original question
+ * @returns Rephrased question
+ */
+export const rephraseQuestion = async (question: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -229,11 +303,16 @@ export const rephraseQuestion = async (question: string) => {
             function: "rephraseQuestion"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
+    const output = completion.choices[0].message.content ?? ''
     return output
 }
 
-export const improveQuery = async (question: string) => {
+/**
+ * Improves a query for better results
+ * @param question - The original question
+ * @returns Improved query
+ */
+export const improveQuery = async (question: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -250,10 +329,15 @@ export const improveQuery = async (question: string) => {
             function: "improveQuery"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
+    const output = completion.choices[0].message.content ?? ''
     return output
 }
 
+/**
+ * Answers a question using the provided prompt
+ * @param prompt - The prompt containing context and question
+ * @returns The answer to the question
+ */
 export const answerQuestion = async (prompt: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
@@ -271,12 +355,17 @@ export const answerQuestion = async (prompt: string): Promise<string> => {
             function: "answerQuestion"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
-    console.log('answer: ' + output)
+    const output = completion.choices[0].message.content ?? ''
+    console.log('Answer:', output)
     return output
 }
 
-export const extractFinalAnswer = async (text: string) => {
+/**
+ * Extracts and translates the final answer to Thai
+ * @param text - The text to translate
+ * @returns Thai translation
+ */
+export const extractFinalAnswer = async (text: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -295,11 +384,17 @@ Thai:`,
             function: "extractFinalAnswer"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
+    const output = completion.choices[0].message.content ?? ''
     return output
 }
 
-export const evaluateAnswer = async (answer: string, question: string) => {
+/**
+ * Evaluates the quality of an answer for a given question
+ * @param answer - The answer to evaluate
+ * @param question - The original question
+ * @returns Evaluation result
+ */
+export const evaluateAnswer = async (answer: string, question: string): Promise<string> => {
     const completion = await openaiInstance().chat.completions.create({
         messages: [
             {
@@ -316,6 +411,6 @@ export const evaluateAnswer = async (answer: string, question: string) => {
             function: "evaluateAnswer"
         }
     })
-    const output = completion.choices[0].message.content ? completion.choices[0].message.content : ''
+    const output = completion.choices[0].message.content ?? ''
     return output
 }
