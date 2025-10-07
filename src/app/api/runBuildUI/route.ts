@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server'
 
 const constructPrompt = (query: string) => {
   return `Instruction: ${query}
-    Instruction: ${query}
 
     From given instruction, please write code to build UI using the following tech stack:
     - NextJs
@@ -49,11 +48,6 @@ const constructPrompt = (query: string) => {
 export async function POST(request: Request) {
   const { query }: { query: string } = await request.json()
 
-  //   const messages: ChatCompletionMessageParam = {
-  //     role: 'user',
-  //     content: query,
-  //   }
-
   const prompt = constructPrompt(query)
   console.log({ prompt })
 
@@ -65,7 +59,6 @@ export async function POST(request: Request) {
           content: prompt,
         },
       ],
-      // model: "gpt-4o",
       model: ModelName.GPT4O,
       temperature: 0.2,
       max_tokens: 8192,
@@ -78,6 +71,7 @@ export async function POST(request: Request) {
     const message = completion.choices[0].message
     return NextResponse.json({ message })
   } catch (error: any) {
+    console.error('Error in POST /api/runBuildUI:', error)
     return NextResponse.json({ output: error.message }, { status: 500 })
   }
 }

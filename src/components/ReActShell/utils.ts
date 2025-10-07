@@ -1,9 +1,14 @@
-import React from 'react'
 interface InstructionStep {
   type: 'Instruction' | 'Thought' | 'ActionType' | 'Action' | 'Observation'
   content: string
   index: number
 }
+
+/**
+ * Parses instruction text into structured steps
+ * @param text - The raw instruction text to parse
+ * @returns Array of parsed instruction steps
+ */
 export const parseInstructionText = (text: string): InstructionStep[] => {
   const lines = text.split('\n')
   const steps: InstructionStep[] = []
@@ -42,15 +47,17 @@ export const parseInstructionText = (text: string): InstructionStep[] => {
   return steps
 }
 
-export const extractBashScript = (answer: string) => {
-  //If ```bash is found, extract the INSIDE bash script
-  if (answer?.includes('```bash') && answer?.includes('```')) {
-    const bashScript = answer.split('```bash')[1].split('```')[0]
-    //delete new line at the beginning and end
-    return bashScript.trim()
-  } else {
-    console.log('No bash script found')
-    console.error('extractBashScript error ...')
+/**
+ * Extracts bash script from markdown code block
+ * @param answer - The text containing bash code block
+ * @returns Extracted bash script or empty string if not found
+ */
+export const extractBashScript = (answer: string): string => {
+  if (!answer?.includes('```bash') || !answer?.includes('```')) {
+    console.warn('No bash code block found in the answer')
     return ''
   }
+
+  const bashScript = answer.split('```bash')[1].split('```')[0]
+  return bashScript.trim()
 }

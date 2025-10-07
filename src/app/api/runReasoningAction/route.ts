@@ -3,34 +3,10 @@ import OpenAI from 'openai'
 
 import { systemPromptJSON } from './systemPromptJSON'
 import { zodResponseFormat } from 'openai/helpers/zod'
-import { z } from 'zod'
 import { ChatCompletionMessageParam } from 'openai/resources/index.js'
 import { ModelName } from '@/lib/utils'
 import { openaiInstance } from '@/lib/openai'
-
-// const groq = new Groq()
-export const ExecutionSchema = z.object({
-  Thought: z.string(),
-  ActionType: z.enum(['Execute', 'Validate']),
-  Action: z.string(),
-  Status: z.enum(['Success', 'Stopped', 'Failed', 'In Progress']),
-  ChildProcess: z.enum(['spawn', 'exec']),
-})
-
-export type ExecutionSchemaType = z.infer<typeof ExecutionSchema>
-
-export const ExecutionWithObsSchema = z.object({
-  Thought: z.string(),
-  ActionType: z.string(),
-  Action: z.string(),
-  Observation: z.string(),
-})
-
-//create_react_chatbot_1721146210338.txt
-async function readFileFromDataFolder(fileName: string) {
-  const data = await fetch(`data/${fileName}`)
-  return data.text()
-}
+import { ExecutionSchema } from './types'
 
 export async function POST(request: Request) {
   const { messages }: { messages: ChatCompletionMessageParam[] } =

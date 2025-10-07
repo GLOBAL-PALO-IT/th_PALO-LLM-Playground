@@ -17,7 +17,7 @@ import {
   FaMagic,
   FaRegClipboard,
 } from 'react-icons/fa'
-import { ExecutionSchema, ExecutionSchemaType } from '@/app/api/runReasoningAction/route'
+import { ExecutionSchema, ExecutionSchemaType } from '@/app/api/runReasoningAction/types'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import { systemPromptJSON } from '@/app/api/runReasoningAction/systemPromptJSON'
 import { Input } from '../ui/input'

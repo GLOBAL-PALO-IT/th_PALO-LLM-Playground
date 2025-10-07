@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     const password = process.env.NEO4J_PASSWORD;
     // if either url, username, password is undefined throw error "Neo4j env vars are not defined"
     if (!url || !username || !password) {
-      throw new Error("Neo4j env vars are not defined");
+      return NextResponse.json({ error: "Neo4j environment variables are not configured. Please set NEO4J_URI, NEO4J_USER, and NEO4J_PASSWORD." }, { status: 500 });
     }
     const graph = await Neo4jGraph.initialize({ url, username, password });
     //Transform PDF to Graph

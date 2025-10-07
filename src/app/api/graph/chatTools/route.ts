@@ -21,9 +21,14 @@ export async function POST(request: Request) {
     const url = process.env.NEO4J_URI;
     const username = process.env.NEO4J_USER;
     const password = process.env.NEO4J_PASSWORD;
+    
     if (!url || !username || !password) {
-        throw new Error("Neo4j env vars are not defined");
+        console.error("Neo4j environment variables are not configured");
+        return NextResponse.json({ 
+            output: 'Neo4j connection is not configured. Please set NEO4J_URI, NEO4J_USER, and NEO4J_PASSWORD environment variables.' 
+        }, { status: 500 })
     }
+    
     // Configuration object for Neo4j connection and other related settings
     const config = {
         url: url, // URL for the Neo4j instance

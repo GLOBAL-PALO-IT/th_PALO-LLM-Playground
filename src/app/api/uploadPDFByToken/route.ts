@@ -2,14 +2,8 @@ import { NextResponse } from 'next/server'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { Document } from '@langchain/core/documents'
 import { TokenTextSplitter, RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-// splitter enum
-export enum Splitter {
-  Token = 'token',
-  Character = 'character',
-  Page = 'page',
-  None = 'none',
-  PageToken = 'pageToken',
-}
+import { Splitter } from './types'
+
 export async function POST(req: Request) {
 
   const formData = await req.formData()
