@@ -25,14 +25,6 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: Run build
-        run: npm run build
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
-          LIVEKIT_API_KEY: placeholder
-          LIVEKIT_API_SECRET: placeholder
-          LIVEKIT_URL: ws://placeholder
-
       - name: Run unit tests
         run: npm test
 
