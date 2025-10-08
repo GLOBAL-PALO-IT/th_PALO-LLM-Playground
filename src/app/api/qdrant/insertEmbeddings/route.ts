@@ -1,15 +1,7 @@
 import { generateShortUUID } from '@/lib/utils'
 import { QdrantClient } from '@qdrant/js-client-rest'
 import { NextResponse } from 'next/server'
-export interface EmbeddingQdrant {
-  embedding: number[]
-  pageContent: string
-  metadata: Record<string, any>
-}
-export interface OperationInfo {
-  operation_id?: number | null | undefined
-  status: 'acknowledged' | 'completed'
-}
+import { EmbeddingQdrant, OperationInfo } from './types'
 /*
 ====FE Code====
 fetch('/api/qdrant/insertEmbeddings', {

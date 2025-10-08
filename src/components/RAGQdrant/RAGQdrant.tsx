@@ -20,7 +20,7 @@ import { set } from 'zod'
 import {
   EmbeddingQdrant,
   OperationInfo,
-} from '@/app/api/qdrant/insertEmbeddings/route'
+} from '@/app/api/qdrant/insertEmbeddings/types'
 import { SearchResult } from '@/types/qdrant'
 import SplitterDropDown from './SplitterDropDown'
 

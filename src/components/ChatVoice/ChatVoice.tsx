@@ -21,7 +21,7 @@ import {
   TrackPublication,
   TranscriptionSegment,
 } from 'livekit-client'
-import type { ConnectionDetails } from '../../app/api/connection-details/route'
+import type { ConnectionDetails } from '@/app/api/connection-details/types'
 import { NoAgentNotification } from '@/components/NoAgentNotification'
 import '@livekit/components-styles'
 import './livekit.css'

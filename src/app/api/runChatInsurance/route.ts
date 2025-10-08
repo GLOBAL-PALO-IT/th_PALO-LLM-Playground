@@ -2,10 +2,7 @@ import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { RunnableToolFunctionWithParse } from 'openai/lib/RunnableFunction'
-import { JSONSchema } from 'openai/lib/jsonschema'
-import { ZodSchema, z } from 'zod'
-import { zodToJsonSchema } from 'zod-to-json-schema'
+import { z } from 'zod'
 import {
   getClientList,
   ClientListParams,
@@ -22,39 +19,7 @@ import {
   getIndividualPayment,
 } from './tools'
 import { openaiInstance } from '@/lib/openai'
-// import { zodFunction } from 'openai/helpers/zod';
-/**
- * A generic utility function that returns a RunnableFunction
- * you can pass to `.runTools()`,
- * with a fully validated, typesafe parameters schema.
- *
- * You are encouraged to copy/paste this into your codebase!
- */
-function zodFunction<T extends object>({
-  function: fn,
-  schema,
-  description = '',
-  name,
-}: {
-  function: (args: T) => Promise<object>
-  schema: ZodSchema<T>
-  description?: string
-  name?: string
-}): RunnableToolFunctionWithParse<T> {
-  return {
-    type: 'function',
-    function: {
-      function: fn,
-      name: name ?? fn.name,
-      description: description,
-      parameters: zodToJsonSchema(schema) as JSONSchema,
-      parse(input: string): T {
-        const obj = JSON.parse(input)
-        return schema.parse(obj)
-      },
-    },
-  }
-}
+import { zodFunction } from '@/lib/zodFunction'
 
 export async function POST(request: Request) {
   const { messages }: { messages: ChatCompletionMessageParam[] } =
