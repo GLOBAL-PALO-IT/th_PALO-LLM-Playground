@@ -4,6 +4,7 @@ import {
   generateShortUUID,
   calculateCosineSimilarity,
   formatDate,
+  getHomeDirectory,
 } from '@/lib/utils';
 
 describe('Utils', () => {
@@ -104,6 +105,22 @@ describe('Utils', () => {
       const formatted = formatDate(dateString);
       // Should include time component
       expect(formatted).toMatch(/\d{1,2}:\d{2}\s*(AM|PM)/);
+    });
+  });
+
+  describe('getHomeDirectory', () => {
+    it('should return a non-empty string', () => {
+      const homeDir = getHomeDirectory();
+      expect(homeDir).toBeTruthy();
+      expect(typeof homeDir).toBe('string');
+      expect(homeDir.length).toBeGreaterThan(0);
+    });
+
+    it('should return an absolute path', () => {
+      const homeDir = getHomeDirectory();
+      // Home directory should start with / on Unix-like systems or contain : on Windows
+      const isAbsolute = homeDir.startsWith('/') || homeDir.includes(':');
+      expect(isAbsolute).toBe(true);
     });
   });
 });
