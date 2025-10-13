@@ -4,6 +4,13 @@
 
 This project is used for training developer to understand the numbers of core concepts of LLM at software development level.
 
+## 🚀 Quick Links
+
+- **[Getting Started Guide](GETTING_STARTED.md)** - New to this project? Start here!
+- **[Next Steps](NEXT_STEPS.md)** - What to do next with this repository
+- **[Recommendations](RECOMMENDATIONS.md)** - Comprehensive improvement roadmap
+- **[Contributing](CONTRIBUTING.md)** - How to contribute to this project
+
 ## List of Examples
 
 ### Developer Agent
@@ -64,7 +71,29 @@ An advanced RAG implementation using Qdrant vector database:
 
 https://github.com/user-attachments/assets/b9be1ad1-f23b-4f83-ae9d-16af1f6661bd
 
+## 📖 Documentation
+
+### For Users
+- **[Getting Started](GETTING_STARTED.md)** - Complete setup guide with troubleshooting
+- **[Testing Guide](tests/README.md)** - How to run and write tests
+
+### For Contributors
+- **[Contributing Guide](CONTRIBUTING.md)** - Code style, PR guidelines, development workflow
+- **[Recommendations](RECOMMENDATIONS.md)** - Future improvements and roadmap
+- **[Next Steps](NEXT_STEPS.md)** - Immediate action items
+
+### Feature Documentation
+- **[Developer Agent](docs/DeveloperAgent.md)** - LLM-powered shell agent
+- **[ReAct with Tavily](docs/REACT_TAVILY_SEARCH.md)** - Internet-connected AI agent
+- **[Prisma Guide](docs/PRISMA_Guide.md)** - Database setup and usage
+- **[Pipeline API](docs/PIPELINE_API_Guide.md)** - Document processing pipeline
+- **[PostgreSQL Setup](docs/SETUP_POSTGRESQL_DOCKER_LOCALLY.md)** - Database configuration
+
 ## Getting Started
+
+> 💡 **New here?** Check out the **[Complete Getting Started Guide](GETTING_STARTED.md)** for detailed setup instructions with troubleshooting.
+
+### Quick Start (5 minutes)
 
 Set up Key Globally:
 
@@ -203,3 +232,40 @@ When Prisma Studio opens, you should see:
 - Real-time updates as you modify the data
 
 The database file is located at `prisma/dev.db` by default.
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+1. **Report bugs** - [Open a bug report](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues/new?template=bug_report.md)
+2. **Suggest features** - [Request a feature](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues/new?template=feature_request.md)
+3. **Improve docs** - [Suggest documentation improvements](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues/new?template=documentation.md)
+4. **Add examples** - Create new LLM integration patterns
+5. **Write tests** - Increase test coverage
+
+See our **[Contributing Guide](CONTRIBUTING.md)** for detailed guidelines.
+
+## 📊 Project Status
+
+- **Test Coverage**: ~5% (targeting 60-70%)
+- **Examples**: 20+ LLM integration patterns
+- **Documentation**: Comprehensive guides available
+- **CI/CD**: Playwright E2E tests configured
+
+See **[NEXT_STEPS.md](NEXT_STEPS.md)** for immediate action items and **[RECOMMENDATIONS.md](RECOMMENDATIONS.md)** for the full roadmap.
+
+## 📝 License
+
+This project is for educational purposes. Check the repository for license details.
+
+## 🙏 Acknowledgments
+
+Built with:
+- [Next.js](https://nextjs.org/)
+- [OpenAI](https://openai.com/)
+- [Langchain](https://www.langchain.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Qdrant](https://qdrant.tech/)
+- [Neo4j](https://neo4j.com/)
+- [Prisma](https://www.prisma.io/)
+
