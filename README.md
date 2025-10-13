@@ -95,11 +95,6 @@ https://github.com/user-attachments/assets/b9be1ad1-f23b-4f83-ae9d-16af1f6661bd
 
 ### Quick Start (5 minutes)
 
-Set up Key Globally:
-
-- In your `~/.bash_profile` or other type of shell profile
-- OpenAI: Add `export OPENAI_API_KEY='YOUR_KEY'`
-
 Setup the `.env` file:
 
 - Create a `.env` file in the root directory
@@ -107,6 +102,7 @@ Setup the `.env` file:
 
 ```bash
 OPENAI_API_KEY=YOUR_KEY
+DATABASE_URL="******localhost:5432/playground"
 ```
 
 Install:
@@ -194,14 +190,15 @@ docker run \
 - Password is `yourpassword`
 - URI is `neo4j://localhost:7687`
 
-## Setup Prisma SQLite
+## Setup Prisma with PostgreSQL
 
-This project uses Prisma with SQLite as the database. Here's how to set it up and interact with it:
+This project uses Prisma with PostgreSQL as the database. Here's how to set it up and interact with it:
 
 ### Initial Setup
 
-1. The database schema is defined in `prisma/schema.prisma`
-2. After any schema changes, run the following command to apply migrations:
+1. **Set up PostgreSQL locally** - Follow the **[PostgreSQL Setup Guide](docs/SETUP_POSTGRESQL_DOCKER_LOCALLY.md)** to run PostgreSQL using Docker
+2. The database schema is defined in `prisma/schema.prisma`
+3. After setting up PostgreSQL and configuring your `.env` file, run migrations:
 
 ```bash
 npx prisma migrate dev
@@ -211,6 +208,8 @@ This will:
 - Create a new migration file
 - Apply the migration to your database
 - Generate the Prisma Client
+
+For detailed Prisma commands and workflows, see the **[Prisma Guide](docs/PRISMA_Guide.md)**.
 
 ### Using Prisma Studio
 
@@ -230,8 +229,6 @@ When Prisma Studio opens, you should see:
 - Empty tables if this is a fresh setup
 - Ability to add, edit, and delete records directly through the interface
 - Real-time updates as you modify the data
-
-The database file is located at `prisma/dev.db` by default.
 
 ## 🤝 Contributing
 
