@@ -65,6 +65,8 @@ export const menuItems: MenuCategory[] = [
             {id: "6", title: "RAGQdrant", path: "/ragQdrant", description: "RAG Qdrant: demonstrate how RAG works with Qdrant vector database and use to upload data into Qdrant", sampleChatQueryThai:["RAGQdrant"]},
             //ragChat
             {id: "7", title: "RAGChat", path: "/ragChat", description: "RAG Chat: demonstrate how RAG works with OpenAI Chat API by fetching data from Qdrant and pass the context to Chat API", sampleChatQueryThai:["RAGChat"]},
+            //reactSearch
+            {id: "8", title: "ReAct with Internet Search", path: "/reactSearch", description: "ReAct Agent: demonstrate Reasoning and Action principle with Langchain Tavily for internet search", sampleChatQueryThai:["ReActSearch"]},
         ]
     }
 ];
