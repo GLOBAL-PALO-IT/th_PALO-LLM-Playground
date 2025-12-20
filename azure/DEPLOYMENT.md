@@ -2,6 +2,27 @@
 
 This guide explains how to deploy the PALO LLM Playground to Azure Container Apps using the provided ARM template.
 
+## Deployment Options
+
+### Option 1: Automated Deployment (Recommended)
+
+Use the interactive deployment script for the easiest deployment experience:
+
+```bash
+./azure/deploy.sh
+```
+
+The script will guide you through the entire deployment process, including:
+- Building and pushing the Docker image
+- Creating Azure resources
+- Configuring all settings interactively
+
+**This is the recommended approach for most users.**
+
+### Option 2: Manual Deployment
+
+Follow the detailed steps below for a manual deployment with full control over the process.
+
 ## Overview
 
 The ARM template deploys the following Azure resources:
@@ -17,6 +38,8 @@ The ARM template deploys the following Azure resources:
 - Azure CLI installed ([Install Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli))
 - Docker installed (for building the container image)
 - Azure Container Registry (ACR) or Docker Hub account
+
+## Manual Deployment Steps
 
 ## Step 1: Build and Push Docker Image
 

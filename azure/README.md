@@ -6,9 +6,28 @@ This directory contains Azure Resource Manager (ARM) templates and configuration
 
 - **azuredeploy.json** - Main ARM template that defines all Azure resources
 - **azuredeploy.parameters.json** - Template for deployment parameters (update with your values)
+- **deploy.sh** - Interactive deployment script that automates the entire deployment process
 - **DEPLOYMENT.md** - Comprehensive deployment guide with step-by-step instructions
 
 ## Quick Start
+
+### Option 1: Using the Automated Deployment Script (Recommended)
+
+The easiest way to deploy is using the interactive script:
+
+```bash
+./azure/deploy.sh
+```
+
+The script will:
+- Validate prerequisites (Azure CLI, Docker)
+- Prompt for all necessary configuration
+- Build and push the Docker image
+- Create the resource group
+- Deploy all Azure resources
+- Provide the application URL
+
+### Option 2: Manual Deployment
 
 1. Read the [DEPLOYMENT.md](DEPLOYMENT.md) guide for detailed instructions
 2. Copy `azuredeploy.parameters.json` to `azuredeploy.parameters.local.json`
