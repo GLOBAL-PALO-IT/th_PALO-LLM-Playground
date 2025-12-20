@@ -251,6 +251,23 @@ See our **[Contributing Guide](CONTRIBUTING.md)** for detailed guidelines.
 
 See **[NEXT_STEPS.md](NEXT_STEPS.md)** for immediate action items and **[RECOMMENDATIONS.md](RECOMMENDATIONS.md)** for the full roadmap.
 
+## 🚀 Deployment
+
+### Azure Container Apps
+
+Deploy this project to Azure Container Apps using the provided ARM template:
+
+- **[Azure Deployment Guide](azure/DEPLOYMENT.md)** - Complete guide for deploying to Azure
+- **[Azure Templates](azure/)** - ARM templates and configuration files
+
+The deployment includes:
+- Azure Container Apps (Next.js application)
+- Azure Database for PostgreSQL
+- Auto-scaling and monitoring
+- HTTPS endpoints
+
+See the [azure/DEPLOYMENT.md](azure/DEPLOYMENT.md) for detailed deployment instructions.
+
 ## 📝 License
 
 This project is for educational purposes. Check the repository for license details.
