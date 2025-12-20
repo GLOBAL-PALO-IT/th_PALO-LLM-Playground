@@ -253,6 +253,43 @@ The following environment variables are automatically configured:
 - `PORT` - Set to 3000
 - `NEXT_PUBLIC_API_URL` - Auto-generated from the container app URL
 
+## Security Considerations
+
+### Important Security Notes
+
+⚠️ **This deployment is configured for development/testing purposes.** For production deployments, review our comprehensive [SECURITY.md](SECURITY.md) guide.
+
+Key security recommendations:
+
+1. **Secrets Management**: Consider using Azure Key Vault for managing secrets instead of ARM template parameters
+   - Store API keys in Key Vault
+   - Reference secrets using Key Vault references in ARM templates
+   - Enable automatic secret rotation
+
+2. **Database Access**: The template allows Azure services to access the database. For production:
+   - Configure more restrictive firewall rules
+   - Use Azure AD authentication instead of SQL authentication
+   - Enable private endpoints for the database
+
+3. **HTTPS**: The container app is configured to use HTTPS by default ✓
+
+4. **Authentication**: Consider adding authentication to the container app:
+   - Use Azure AD for user authentication
+   - Implement role-based access control (RBAC)
+   - Add API authentication for programmatic access
+
+5. **Network Isolation**: For production:
+   - Deploy Container Apps in a Virtual Network (VNET)
+   - Use private endpoints for all Azure services
+   - Implement Network Security Groups (NSGs)
+
+6. **Monitoring & Auditing**:
+   - Enable Azure Security Center
+   - Configure alerts for security events
+   - Enable Azure Defender for Container Apps and PostgreSQL
+
+For detailed security guidance, see [SECURITY.md](SECURITY.md).
+
 ## Additional Services
 
 This deployment includes only the core application and PostgreSQL database. For the full functionality, you may need to deploy additional services separately:

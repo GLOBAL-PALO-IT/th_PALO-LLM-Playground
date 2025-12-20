@@ -8,6 +8,7 @@ This directory contains Azure Resource Manager (ARM) templates and configuration
 - **azuredeploy.parameters.json** - Template for deployment parameters (update with your values)
 - **deploy.sh** - Interactive deployment script that automates the entire deployment process
 - **DEPLOYMENT.md** - Comprehensive deployment guide with step-by-step instructions
+- **SECURITY.md** - Security best practices and recommendations for production deployments
 
 ## Quick Start
 
@@ -51,3 +52,10 @@ az deployment group create \
 ## Security Note
 
 Never commit `azuredeploy.parameters.local.json` with actual secrets to version control. The `.gitignore` file should exclude files with `.local.` in the name.
+
+**For production deployments**, review the [SECURITY.md](SECURITY.md) guide which covers:
+- Azure Key Vault integration for secrets management
+- Managed Identity configuration
+- Database security best practices
+- Network isolation recommendations
+- Monitoring and compliance requirements

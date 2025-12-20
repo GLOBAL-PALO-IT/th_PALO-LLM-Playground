@@ -92,11 +92,32 @@ print_info "Database Configuration"
 read -p "Enter PostgreSQL admin username (default: pgadmin): " POSTGRES_USER
 POSTGRES_USER=${POSTGRES_USER:-pgadmin}
 
-read -sp "Enter PostgreSQL admin password: " POSTGRES_PASSWORD
+read -sp "Enter PostgreSQL admin password (min 8 chars, must include uppercase, lowercase, number): " POSTGRES_PASSWORD
 echo ""
 
 if [ -z "$POSTGRES_PASSWORD" ]; then
     print_error "PostgreSQL password is required"
+    exit 1
+fi
+
+# Validate password strength
+if [ ${#POSTGRES_PASSWORD} -lt 8 ]; then
+    print_error "PostgreSQL password must be at least 8 characters long"
+    exit 1
+fi
+
+if ! [[ "$POSTGRES_PASSWORD" =~ [A-Z] ]]; then
+    print_error "PostgreSQL password must contain at least one uppercase letter"
+    exit 1
+fi
+
+if ! [[ "$POSTGRES_PASSWORD" =~ [a-z] ]]; then
+    print_error "PostgreSQL password must contain at least one lowercase letter"
+    exit 1
+fi
+
+if ! [[ "$POSTGRES_PASSWORD" =~ [0-9] ]]; then
+    print_error "PostgreSQL password must contain at least one number"
     exit 1
 fi
 
@@ -265,9 +286,15 @@ CONTAINER_APP_NAME="${PROJECT_NAME}-app"
 print_warning "Please run the following command manually to apply database migrations:"
 echo "  az containerapp exec --resource-group $RESOURCE_GROUP --name $CONTAINER_APP_NAME --command 'npx prisma migrate deploy'"
 
-# Clean up sensitive parameters file
+# Clean up sensitive parameters file securely
 print_info "Cleaning up temporary files..."
-rm -f "$PARAMS_FILE"
+if command_exists shred; then
+    shred -vfz -n 3 "$PARAMS_FILE" 2>/dev/null || rm -f "$PARAMS_FILE"
+else
+    # Overwrite file with random data before deleting
+    dd if=/dev/urandom of="$PARAMS_FILE" bs=1 count=$(wc -c < "$PARAMS_FILE") 2>/dev/null || true
+    rm -f "$PARAMS_FILE"
+fi
 
 # Success message
 echo ""
