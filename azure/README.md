@@ -7,8 +7,10 @@ This directory contains Azure Resource Manager (ARM) templates and configuration
 - **azuredeploy.json** - Main ARM template that defines all Azure resources
 - **azuredeploy.parameters.json** - Template for deployment parameters (update with your values)
 - **deploy.sh** - Interactive deployment script that automates the entire deployment process
+- **validate.sh** - Script to validate ARM template syntax locally
 - **DEPLOYMENT.md** - Comprehensive deployment guide with step-by-step instructions
 - **SECURITY.md** - Security best practices and recommendations for production deployments
+- **ARM_TEMPLATE_NOTES.md** - Technical notes on ARM template design decisions and limitations
 
 ## Quick Start
 
