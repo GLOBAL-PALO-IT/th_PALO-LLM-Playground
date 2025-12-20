@@ -92,7 +92,7 @@ print_info "Database Configuration"
 read -p "Enter PostgreSQL admin username (default: pgadmin): " POSTGRES_USER
 POSTGRES_USER=${POSTGRES_USER:-pgadmin}
 
-read -sp "Enter PostgreSQL admin password (min 8 chars, must include uppercase, lowercase, number): " POSTGRES_PASSWORD
+read -sp "Enter PostgreSQL admin password (min 8 chars, uppercase, lowercase, number recommended): " POSTGRES_PASSWORD
 echo ""
 
 if [ -z "$POSTGRES_PASSWORD" ]; then
@@ -119,6 +119,16 @@ fi
 if ! [[ "$POSTGRES_PASSWORD" =~ [0-9] ]]; then
     print_error "PostgreSQL password must contain at least one number"
     exit 1
+fi
+
+# Recommend special characters for better security (not required but recommended)
+if ! [[ "$POSTGRES_PASSWORD" =~ [^a-zA-Z0-9] ]]; then
+    print_warning "Recommended: Password should include special characters for better security"
+    read -p "Continue anyway? (yes/no): " CONTINUE
+    if [ "$CONTINUE" != "yes" ]; then
+        print_info "Please enter a stronger password"
+        exit 1
+    fi
 fi
 
 # OpenAI API Key
