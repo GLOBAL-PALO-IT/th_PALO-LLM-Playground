@@ -2,7 +2,7 @@
 
 ## What Was Added
 
-This implementation adds comprehensive end-to-end (e2e) testing infrastructure using Playwright to the PALO-LLM-Playground project.
+This implementation adds comprehensive end-to-end (e2e) testing infrastructure using Playwright to the Applied-LLM-Platform project.
 
 ### Files Added
 

@@ -1,6 +1,6 @@
 # Quick Start Summary - Next Steps
 
-Based on the comprehensive analysis of the PALO-LLM-Playground repository, here are your recommended next steps:
+Based on the comprehensive analysis of the Applied-LLM-Platform repository, here are your recommended next steps:
 
 ## 🎯 What We've Created
 

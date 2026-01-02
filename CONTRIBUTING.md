@@ -1,6 +1,6 @@
-# Contributing to PALO-LLM-Playground
+# Contributing to Applied-LLM-Platform
 
-First off, thank you for considering contributing to PALO-LLM-Playground! It's people like you that make this project a great learning resource for the community.
+First off, thank you for considering contributing to Applied-LLM-Platform! It's people like you that make this project a great learning resource for the community.
 
 ## 🌟 Ways to Contribute
 
@@ -21,8 +21,8 @@ There are many ways to contribute to this project:
 
 ```bash
 # Fork the repository on GitHub, then:
-git clone https://github.com/YOUR-USERNAME/th_PALO-LLM-Playground.git
-cd th_PALO-LLM-Playground
+git clone https://github.com/YOUR-USERNAME/th_Applied-LLM-Platform.git
+cd th_Applied-LLM-Platform
 ```
 
 ### 2. Set Up Development Environment
@@ -294,7 +294,7 @@ describe('Utility Functions', () => {
 ## 📁 Project Structure
 
 ```
-th_PALO-LLM-Playground/
+th_Applied-LLM-Platform/
 ├── src/
 │   ├── app/                    # Next.js app router pages
 │   │   ├── api/                # API routes
@@ -374,8 +374,8 @@ When suggesting features, please include:
 ## ❓ Questions
 
 - Check existing [documentation](docs/)
-- Search [existing issues](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues)
-- Ask in [GitHub Discussions](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/discussions)
+- Search [existing issues](https://github.com/pacozaa/Applied-LLM-Platform/issues)
+- Ask in [GitHub Discussions](https://github.com/pacozaa/Applied-LLM-Platform/discussions)
 
 ## 📜 Code of Conduct
 
@@ -403,4 +403,4 @@ By contributing, you agree that your contributions will be licensed under the sa
 
 ---
 
-Thank you for contributing to PALO-LLM-Playground! 🎉
+Thank you for contributing to Applied-LLM-Platform! 🎉

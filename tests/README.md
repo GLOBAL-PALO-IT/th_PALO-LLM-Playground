@@ -1,6 +1,6 @@
 # E2E Tests with Playwright
 
-This directory contains end-to-end tests for the PALO-LLM-Playground project using Playwright.
+This directory contains end-to-end tests for the Applied-LLM-Platform project using Playwright.
 
 ## Setup
 

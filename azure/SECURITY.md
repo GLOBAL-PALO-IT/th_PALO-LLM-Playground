@@ -1,6 +1,6 @@
 # Security Best Practices for Azure Deployment
 
-This document outlines security considerations and best practices when deploying the PALO LLM Playground to Azure.
+This document outlines security considerations and best practices when deploying the Applied LLM Platform to Azure.
 
 ## Secrets Management
 
@@ -15,7 +15,7 @@ For production deployments, consider using Azure Key Vault to store and manage s
 ```bash
 az keyvault create \
   --name mykeyvault \
-  --resource-group palo-llm-playground-rg \
+  --resource-group Applied-LLM-Platform-rg \
   --location eastus
 ```
 
@@ -55,8 +55,8 @@ The ARM template constructs the database connection string with embedded credent
 
 ```bash
 az postgres flexible-server firewall-rule create \
-  --resource-group palo-llm-playground-rg \
-  --name palo-llm-playground-postgres \
+  --resource-group Applied-LLM-Platform-rg \
+  --name Applied-LLM-Platform-postgres \
   --rule-name AllowMyIP \
   --start-ip-address YOUR_IP \
   --end-ip-address YOUR_IP

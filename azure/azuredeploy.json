@@ -4,7 +4,7 @@
   "parameters": {
     "projectName": {
       "type": "string",
-      "defaultValue": "palo-llm-playground",
+      "defaultValue": "Applied-LLM-Platform",
       "metadata": {
         "description": "Name prefix for all resources"
       }

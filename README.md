@@ -1,4 +1,4 @@
-# PALO-LLM-PLAYGROUND
+# Applied-LLM-Platform
 
 ## Description
 
@@ -234,9 +234,9 @@ When Prisma Studio opens, you should see:
 
 We welcome contributions! Here's how you can help:
 
-1. **Report bugs** - [Open a bug report](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues/new?template=bug_report.md)
-2. **Suggest features** - [Request a feature](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues/new?template=feature_request.md)
-3. **Improve docs** - [Suggest documentation improvements](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues/new?template=documentation.md)
+1. **Report bugs** - [Open a bug report](https://github.com/pacozaa/Applied-LLM-Platform/issues/new?template=bug_report.md)
+2. **Suggest features** - [Request a feature](https://github.com/pacozaa/Applied-LLM-Platform/issues/new?template=feature_request.md)
+3. **Improve docs** - [Suggest documentation improvements](https://github.com/pacozaa/Applied-LLM-Platform/issues/new?template=documentation.md)
 4. **Add examples** - Create new LLM integration patterns
 5. **Write tests** - Increase test coverage
 

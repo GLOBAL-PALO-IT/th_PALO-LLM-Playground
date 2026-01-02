@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "projectName": {
-      "value": "palo-llm-playground"
+      "value": "Applied-LLM-Platform"
     },
     "location": {
       "value": "eastus"
     },
     "containerImage": {
-      "value": "YOUR_REGISTRY.azurecr.io/palo-llm-playground:latest"
+      "value": "YOUR_REGISTRY.azurecr.io/Applied-LLM-Platform:latest"
     },
     "containerRegistry": {
       "value": "YOUR_REGISTRY.azurecr.io"

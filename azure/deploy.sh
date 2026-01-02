@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Azure Container Apps Deployment Script
-# This script simplifies the deployment process for the PALO LLM Playground
+# This script simplifies the deployment process for the Applied LLM Platform to Azure Container Apps.
 
 set -e  # Exit on error
 
@@ -50,8 +50,8 @@ print_info "Azure Container Apps Deployment Configuration"
 echo "=============================================="
 
 # Project name
-read -p "Enter project name (default: palo-llm-playground): " PROJECT_NAME
-PROJECT_NAME=${PROJECT_NAME:-palo-llm-playground}
+read -p "Enter project name (default: Applied-LLM-Platform): " PROJECT_NAME
+PROJECT_NAME=${PROJECT_NAME:-Applied-LLM-Platform}
 
 # Resource group
 read -p "Enter resource group name (default: ${PROJECT_NAME}-rg): " RESOURCE_GROUP
