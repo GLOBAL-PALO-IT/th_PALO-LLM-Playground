@@ -11,7 +11,7 @@ const response = await fetch('/api/qdrant/getCollection', {
     })
 */
 //Next JS API Route POST
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   try {
     const response = await getCollection()
     return NextResponse.json({ data: response })

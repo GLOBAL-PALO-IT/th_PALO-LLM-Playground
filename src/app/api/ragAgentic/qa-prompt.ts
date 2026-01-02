@@ -1,10 +1,10 @@
-import { getEmbedding } from "@/lib/embedding"
+import { getEmbedding } from "@/lib/embedding";
+import { searchQuery } from "@/lib/qdrant";
 import { SearchResult, SearchResultPoint } from "@/types/qdrant";
-import { searchQuery } from "@/lib/qdrant"
-import { checkIfContextRelevantAll, chooseTheBestContext, extractDocumentIndexID, improveQuery, qaPlanner, rephraseQuestion, rewriteAll, rewriteQuery, rewriteTextToKnowledge } from "./agents"
-import { ragChatPromptBuilder } from "./prompt"
-import { serperSearch } from "./serper"
-import { searchQueryByIds } from "../../../lib/qdrant"
+import { searchQueryByIds } from "../../../lib/qdrant";
+import { checkIfContextRelevantAll, improveQuery, rephraseQuestion, rewriteAll, rewriteQuery } from "./agents";
+import { ragChatPromptBuilder } from "./prompt";
+import { serperSearch } from "./serper";
 interface SelectedContextParams {
     searchResultIds?: number[],
     question: string;
@@ -21,7 +21,6 @@ const selectedContextWithLLM = async ({
     searchIndex,
     searchType = 'vectordb',
     rephraseType = 'none',
-    metadata,
     topK = 10,
     ligthMode = true
 }: SelectedContextParams): Promise<{
@@ -184,7 +183,7 @@ export const getPromptWithContext = async (
             searchResult.points = [...searchResult.points, ...additionalSearchResult]
         }
 
-        searchResult.points = searchResult.points.filter((point, i) => {
+        searchResult.points = searchResult.points.filter((point) => {
             return selectedIndexList.includes(Number(point.id))
         })
         console.log(`filtered....point ids: ${JSON.stringify(selectedIndexList)}`)

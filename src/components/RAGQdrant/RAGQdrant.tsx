@@ -1,27 +1,22 @@
 'use client'
-import React, { use, useCallback, useEffect } from 'react'
-import { useState } from 'react'
-import { Document } from '@langchain/core/documents'
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Document } from '@langchain/core/documents'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import {
-  JsonView,
-  allExpanded,
-  collapseAllNested,
-  darkStyles,
-  defaultStyles,
-} from 'react-json-view-lite'
-import 'react-json-view-lite/dist/index.css'
-import { Textarea } from '@/components/ui/textarea'
-import OpenAI from 'openai'
-import { set } from 'zod'
 import {
   EmbeddingQdrant,
   OperationInfo,
 } from '@/app/api/qdrant/insertEmbeddings/types'
+import { Textarea } from '@/components/ui/textarea'
 import { SearchResult } from '@/types/qdrant'
+import OpenAI from 'openai'
+import {
+  JsonView,
+  collapseAllNested,
+  darkStyles,
+} from 'react-json-view-lite'
 import SplitterDropDown from './SplitterDropDown'
 
 const RAGQdrant = () => {
@@ -160,7 +155,7 @@ const RAGQdrant = () => {
   ) => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/qdrant/createCollection', {
+      const _response = await fetch('/api/qdrant/createCollection', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -178,7 +173,7 @@ const RAGQdrant = () => {
   const deleteCollection = async (collectionName: string) => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/qdrant/deleteCollection', {
+      const _response = await fetch('/api/qdrant/deleteCollection', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

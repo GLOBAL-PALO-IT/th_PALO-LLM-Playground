@@ -1,11 +1,11 @@
 'use client'
-import React, { useState, useCallback, useEffect } from 'react'
-import neo4j, { Node, Relationship } from 'neo4j-driver'
-import { Document } from '@langchain/core/documents'
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Document } from '@langchain/core/documents'
+import neo4j from 'neo4j-driver'
+import React, { useCallback, useEffect, useState } from 'react'
 import IndexesDropDown from './IndexesDropDown'
 
 const RAGGraph = () => {
@@ -18,7 +18,7 @@ const RAGGraph = () => {
   const [pdfContent, setPdfContent] = useState<Document<Record<string, any>>[]>(
     []
   )
-  const [chunkAPIs, setChunkAPIs] = useState<string[]>(['/uploadPDF', '/uploadPDFByToken'])
+  const [chunkAPIs,] = useState<string[]>(['/uploadPDF', '/uploadPDFByToken'])
   const [targetNodes, setTargetNodes] = useState<string>('Person, Title, Experience, Certification, Skills')
   const [targetRelationships, setTargetRelationships] = useState<string>('Obtain, Has Title, Has Skill, Has Experience')
   const [selectedChunkAPI, setSelectedChunkAPI] = useState<string>('/uploadPDF')

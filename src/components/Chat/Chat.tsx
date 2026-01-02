@@ -9,18 +9,12 @@ import './chat.css'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React from 'react'
 import {
-  FaEye,
-  FaEyeSlash,
-  FaFileDownload,
-  FaInfoCircle,
   FaMagic,
-  FaRegClipboard,
 } from 'react-icons/fa'
 import {
   JsonView,
   allExpanded,
   darkStyles,
-  defaultStyles,
 } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
 

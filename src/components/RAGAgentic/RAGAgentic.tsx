@@ -18,10 +18,8 @@ import {
 } from 'react-icons/fa'
 import {
   JsonView,
-  allExpanded,
   collapseAllNested,
   darkStyles,
-  defaultStyles,
 } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
 import { Input } from '@/components/ui/input'

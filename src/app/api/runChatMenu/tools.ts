@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { menuItems, type MenuItem, type MenuCategory } from '@/components/NavBar/mockMenu'
+import { menuItems } from '@/components/NavBar/mockMenu'
 
 export const menuItemsListParams = () => {
   // Extract categories for the enum

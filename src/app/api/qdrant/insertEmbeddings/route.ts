@@ -1,4 +1,3 @@
-import { generateShortUUID } from '@/lib/utils'
 import { QdrantClient } from '@qdrant/js-client-rest'
 import { NextResponse } from 'next/server'
 import { EmbeddingQdrant, OperationInfo } from './types'

@@ -1,9 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-import * as React from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,13 +7,12 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 import { cn } from '@/lib/utils'
+import * as React from 'react'
 import { menuItems } from './mockMenu'
 
 const NavBarStack = () => {
-  const pathName = usePathname()
 
   return (
     <nav className="">

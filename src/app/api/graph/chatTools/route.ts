@@ -1,7 +1,5 @@
 import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai';
-import z from 'zod';
 import { zodFunction } from 'openai/helpers/zod';
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import "neo4j-driver";

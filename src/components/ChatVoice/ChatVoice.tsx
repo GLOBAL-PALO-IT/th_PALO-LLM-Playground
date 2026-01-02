@@ -1,19 +1,16 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
 import {
-  LiveKitRoom,
-  useVoiceAssistant,
-  useMaybeRoomContext,
-  BarVisualizer,
-  RoomAudioRenderer,
-  VoiceAssistantControlBar,
   AgentState,
-  DisconnectButton,
-  TrackReference,
+  LiveKitRoom,
+  RoomAudioRenderer,
+  useMaybeRoomContext,
 } from '@livekit/components-react'
 
-import { useCallback, useEffect, useState } from 'react'
+import type { ConnectionDetails } from '@/app/api/connection-details/types'
+import { NoAgentNotification } from '@/components/NoAgentNotification'
+import { Card } from '@/components/ui/card'
+import '@livekit/components-styles'
 import {
   MediaDeviceFailure,
   Participant,
@@ -21,14 +18,9 @@ import {
   TrackPublication,
   TranscriptionSegment,
 } from 'livekit-client'
-import type { ConnectionDetails } from '@/app/api/connection-details/types'
-import { NoAgentNotification } from '@/components/NoAgentNotification'
-import '@livekit/components-styles'
-import './livekit.css'
-import SimpleVoiceAssistant from './SimpleVoiceAssistant'
+import { useCallback, useEffect, useState } from 'react'
 import ControlBar from './ControlBar'
-import { Card } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
+import SimpleVoiceAssistant from './SimpleVoiceAssistant'
 interface Transcription {
   segment: TranscriptionSegment
   participant?: Participant
@@ -43,7 +35,7 @@ export default function Page() {
   const [rawSegments, setRawSegments] = useState<{
     [id: string]: Transcription
   }>({})
-  const [displayTranscriptions, setDisplayTranscriptions] = useState<
+  const [, setDisplayTranscriptions] = useState<
     Transcription[]
   >([])
 

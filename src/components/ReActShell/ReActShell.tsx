@@ -1,14 +1,16 @@
 'use client'
-import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import InstructionText from './InstructionText'
 
-import MermaidDiagrams from '@/components/MermaidDiagrams/MermaidDiagrams'
+import { systemPromptJSON } from '@/app/api/runReasoningAction/systemPromptJSON'
+import { ExecutionSchema, ExecutionSchemaType } from '@/app/api/runReasoningAction/types'
 import { Spinner } from '@/components/ui/spinner'
 import { coreFunctionMermaid } from '@/config/mermaidConfig'
+import { generateShortUUID } from '@/lib/utils'
+import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import {
   FaEye,
   FaEyeSlash,
@@ -17,16 +19,12 @@ import {
   FaMagic,
   FaRegClipboard,
 } from 'react-icons/fa'
-import { ExecutionSchema, ExecutionSchemaType } from '@/app/api/runReasoningAction/types'
-import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { systemPromptJSON } from '@/app/api/runReasoningAction/systemPromptJSON'
-import { Input } from '../ui/input'
 import {
   JsonView,
   allExpanded,
   darkStyles,
 } from 'react-json-view-lite'
-import { generateShortUUID } from '@/lib/utils'
+import { Input } from '../ui/input'
 import { examplesInstructionForShellAgent } from './examples'
 
 const DiagramState = {
@@ -43,7 +41,7 @@ const ReActShell = () => {
   const [output, setOutput] = useState<string[]>([])
   const [bashLog, setBashLog] = useState<string[]>([])
   const [openAILog, setOpenAILog] = useState<ExecutionSchemaType[]>([])
-  const [exampleInstructions, setExampleInstructions] = useState<string[]>(
+  const [exampleInstructions, _] = useState<string[]>(
     examplesInstructionForShellAgent
   )
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
@@ -65,13 +63,13 @@ const ReActShell = () => {
     useState<string>(STARTING_DIRECTORY)
   const [isClient, setIsClient] = useState(false)
 
-  const runAIRef = useRef((observation?: string) => {})
+  const runAIRef = useRef((_?: string) => {})
   const bottomRef = useRef<any>(null)
 
   // Diagram
-  const [diagramState, setDiagramState] = useState('')
+  const [, setDiagramState] = useState('')
   // Sticky action button
-  const [showStickyActionButton, setShowStickyActionButton] = useState(false)
+  const [, setShowStickyActionButton] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
   useEffect(() => {
     setIsClient(true)
@@ -118,8 +116,8 @@ const ReActShell = () => {
       // ExecutionSchemaType
       const {
         output,
-        messages: historyMessages,
-        completion,
+        messages: _historyMessages,
+        _completion,
       } = await response.json()
       const { Thought, Action, ActionType, ChildProcess, Status } =
         ExecutionSchema.parse(output)
