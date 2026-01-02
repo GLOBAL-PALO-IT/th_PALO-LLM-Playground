@@ -7,9 +7,6 @@ This project is used for training developer to understand the numbers of core co
 ## 🚀 Quick Links
 
 - **[Getting Started Guide](GETTING_STARTED.md)** - New to this project? Start here!
-- **[Next Steps](NEXT_STEPS.md)** - What to do next with this repository
-- **[Recommendations](RECOMMENDATIONS.md)** - Comprehensive improvement roadmap
-- **[Contributing](CONTRIBUTING.md)** - How to contribute to this project
 
 ## List of Examples
 
@@ -77,17 +74,13 @@ https://github.com/user-attachments/assets/b9be1ad1-f23b-4f83-ae9d-16af1f6661bd
 - **[Getting Started](GETTING_STARTED.md)** - Complete setup guide with troubleshooting
 - **[Testing Guide](tests/README.md)** - How to run and write tests
 
-### For Contributors
-- **[Contributing Guide](CONTRIBUTING.md)** - Code style, PR guidelines, development workflow
-- **[Recommendations](RECOMMENDATIONS.md)** - Future improvements and roadmap
-- **[Next Steps](NEXT_STEPS.md)** - Immediate action items
 
 ### Feature Documentation
-- **[Developer Agent](docs/DeveloperAgent.md)** - LLM-powered shell agent
-- **[ReAct with Tavily](docs/REACT_TAVILY_SEARCH.md)** - Internet-connected AI agent
-- **[Prisma Guide](docs/PRISMA_Guide.md)** - Database setup and usage
-- **[Pipeline API](docs/PIPELINE_API_Guide.md)** - Document processing pipeline
-- **[PostgreSQL Setup](docs/SETUP_POSTGRESQL_DOCKER_LOCALLY.md)** - Database configuration
+- **[Developer Agent](docs/archived//DeveloperAgent.md)** - LLM-powered shell agent
+- **[ReAct with Tavily](docs/archived//REACT_TAVILY_SEARCH.md)** - Internet-connected AI agent
+- **[Prisma Guide](docs/archived//PRISMA_Guide.md)** - Database setup and usage
+- **[Pipeline API](docs/archived//PIPELINE_API_Guide.md)** - Document processing pipeline
+- **[PostgreSQL Setup](docs/archived//SETUP_POSTGRESQL_DOCKER_LOCALLY.md)** - Database configuration
 
 ## Getting Started
 
