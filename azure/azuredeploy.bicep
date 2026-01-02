@@ -106,7 +106,7 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
 
 resource postgresServerName_postgresDatabase 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2022-12-01' = {
   parent: postgresServer
-  name: '${postgresDatabaseName}'
+  name: postgresDatabaseName
   properties: {
     charset: 'UTF8'
     collation: 'en_US.utf8'
@@ -129,8 +129,8 @@ resource environment 'Microsoft.App/managedEnvironments@2023-05-01' = {
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: reference(logAnalytics.id, '2022-10-01').customerId
-        sharedKey: listKeys(logAnalytics.id, '2022-10-01').primarySharedKey
+        customerId: logAnalytics.properties.customerId
+        sharedKey: logAnalytics.listKeys().primarySharedKey
       }
     }
   }
@@ -212,7 +212,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'NEXT_PUBLIC_API_URL'
-              value: 'https://${containerAppName}.${reference(environment.id,'2023-05-01').defaultDomain}'
+              value: 'https://${containerAppName}.${environment.properties.defaultDomain}'
             }
           ]
         }
@@ -239,8 +239,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   ]
 }
 
-output containerAppFQDN string = reference(containerApp.id, '2023-05-01').configuration.ingress.fqdn
-output containerAppUrl string = 'https://${reference(containerApp.id,'2023-05-01').configuration.ingress.fqdn}'
+output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
+output containerAppUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'
 output postgresServerName string = postgresServerName
-output postgresFQDN string = reference(postgresServer.id, '2022-12-01').fullyQualifiedDomainName
+output postgresFQDN string = postgresServer.properties.fullyQualifiedDomainName
 output databaseName string = postgresDatabaseName

@@ -5,7 +5,7 @@ This document outlines security considerations and best practices when deploying
 ## Secrets Management
 
 ### Current Implementation
-The ARM template accepts secrets as parameters (e.g., database passwords, API keys) which are marked as `securestring`. While this provides basic protection, there are more secure alternatives for production deployments.
+The Bicep template accepts secrets as parameters (e.g., database passwords, API keys) which are marked as `@secure()`. While this provides basic protection, there are more secure alternatives for production deployments.
 
 ### Recommended: Azure Key Vault Integration
 
@@ -25,17 +25,14 @@ az keyvault secret set --vault-name mykeyvault --name "openai-api-key" --value "
 az keyvault secret set --vault-name mykeyvault --name "postgres-password" --value "YOUR_PASSWORD"
 ```
 
-3. **Reference secrets in ARM template:**
+3. **Reference secrets in Bicep template:**
 Instead of passing secrets directly, reference them from Key Vault:
-```json
-{
-  "reference": {
-    "keyVault": {
-      "id": "/subscriptions/{subscription-id}/resourceGroups/{rg}/providers/Microsoft.KeyVault/vaults/{vault-name}"
-    },
-    "secretName": "openai-api-key"
-  }
+```bicep
+resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+  name: 'mykeyvault'
 }
+
+var openaiApiKey = keyVault.getSecret('openai-api-key')
 ```
 
 ### Managed Identity (Future Enhancement)
@@ -48,7 +45,7 @@ Azure Container Apps supports managed identities for accessing Azure resources w
 ## Database Security
 
 ### Connection String Security
-The ARM template constructs the database connection string with embedded credentials. For production:
+The Bicep template constructs the database connection string with embedded credentials. For production:
 
 1. **Enable SSL/TLS:** The template uses `?sslmode=require` which is good practice
 2. **Restrict Firewall Rules:** The default template allows all Azure services. Update to specific IP ranges:

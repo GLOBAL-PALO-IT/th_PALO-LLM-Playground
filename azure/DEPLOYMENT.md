@@ -1,6 +1,6 @@
 # Azure Container Apps Deployment Guide
 
-This guide explains how to deploy the Applied LLM Platform to Azure Container Apps using the provided ARM template.
+This guide explains how to deploy the Applied LLM Platform to Azure Container Apps using the provided Azure Bicep template.
 
 ## Deployment Options
 
@@ -25,7 +25,7 @@ Follow the detailed steps below for a manual deployment with full control over t
 
 ## Overview
 
-The ARM template deploys the following Azure resources:
+The Bicep template deploys the following Azure resources:
 
 1. **Azure Container Apps Environment** - Manages the container apps
 2. **Container App** - Runs the Next.js application
@@ -123,12 +123,12 @@ az group create \
   --location eastus
 ```
 
-3. Deploy the ARM template:
+3. Deploy the Bicep template:
 
 ```bash
 az deployment group create \
   --resource-group Applied-LLM-Platform-rg \
-  --template-file azure/azuredeploy.json \
+  --template-file azure/azuredeploy.bicep \
   --parameters azure/azuredeploy.parameters.local.json
 ```
 
@@ -261,9 +261,9 @@ The following environment variables are automatically configured:
 
 Key security recommendations:
 
-1. **Secrets Management**: Consider using Azure Key Vault for managing secrets instead of ARM template parameters
+1. **Secrets Management**: Consider using Azure Key Vault for managing secrets instead of Bicep template parameters
    - Store API keys in Key Vault
-   - Reference secrets using Key Vault references in ARM templates
+   - Reference secrets using Key Vault references in Bicep templates
    - Enable automatic secret rotation
 
 2. **Database Access**: The template allows Azure services to access the database. For production:
@@ -326,11 +326,11 @@ az containerapp logs show --resource-group Applied-LLM-Platform-rg --name <conta
 
 ### Out of memory errors
 
-Increase the memory allocation in the ARM template:
-```json
-"resources": {
-  "cpu": 1.0,
-  "memory": "2Gi"
+Increase the memory allocation in the Bicep template:
+```bicep
+resources: {
+  cpu: json('1.0')
+  memory: '2Gi'
 }
 ```
 
@@ -361,5 +361,6 @@ az group delete --name Applied-LLM-Platform-rg --yes --no-wait
 
 - [Azure Container Apps Documentation](https://docs.microsoft.com/en-us/azure/container-apps/)
 - [Azure Database for PostgreSQL](https://docs.microsoft.com/en-us/azure/postgresql/)
-- [ARM Template Reference](https://docs.microsoft.com/en-us/azure/templates/)
+- [Azure Bicep Documentation](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
+- [Bicep Template Reference](https://docs.microsoft.com/en-us/azure/templates/)
 - [Next.js Docker Documentation](https://nextjs.org/docs/deployment#docker-image)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Azure Container Apps Deployment Script
-# This script simplifies the deployment process for the Applied LLM Platform to Azure Container Apps.
+# Azure Container Apps Deployment Script (Bicep)
+# This script simplifies the deployment process for the Applied LLM Platform to Azure Container Apps using Azure Bicep.
 
 set -e  # Exit on error
 
@@ -274,11 +274,11 @@ cat > "$PARAMS_FILE" <<EOF
 }
 EOF
 
-# Deploy ARM template
+# Deploy Bicep template
 print_info "Deploying to Azure Container Apps..."
 az deployment group create \
     --resource-group "$RESOURCE_GROUP" \
-    --template-file azure/azuredeploy.json \
+    --template-file azure/azuredeploy.bicep \
     --parameters "$PARAMS_FILE" \
     --output table
 
