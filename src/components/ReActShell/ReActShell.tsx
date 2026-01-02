@@ -25,9 +25,7 @@ import {
   JsonView,
   allExpanded,
   darkStyles,
-  defaultStyles,
 } from 'react-json-view-lite'
-import 'react-json-view-lite/dist/index.css'
 import { generateShortUUID } from '@/lib/utils'
 import { examplesInstructionForShellAgent } from './examples'
 
