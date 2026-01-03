@@ -23,6 +23,7 @@ const Chat = () => {
   const [input, setInput] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
+  const [streamingContent, setStreamingContent] = useState<string>('')
 
   const handleSendMessage = async () => {
     if (!input.trim()) return
@@ -38,16 +39,59 @@ const Chat = () => {
     setInput('')
 
     setIsLoading(true)
+    setStreamingContent('')
 
     try {
       const response = await fetch('/api/runChat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, newMessage] }),
+        body: JSON.stringify({ messages: [...messages, newMessage], stream: true }),
       })
-      const { message } = await response.json()
-      console.log({ message })
-      setMessages((prev) => [...prev, message])
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch')
+      }
+
+      // Handle streaming response
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let accumulatedContent = ''
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value, { stream: true })
+          const lines = chunk.split('\n')
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6)
+              if (data === '[DONE]') {
+                // Finalize the message
+                const assistantMessage: ChatCompletionMessageParam = {
+                  role: 'assistant',
+                  content: accumulatedContent,
+                }
+                setMessages((prev) => [...prev, assistantMessage])
+                setStreamingContent('')
+                break
+              }
+
+              try {
+                const parsed = JSON.parse(data)
+                if (parsed.content) {
+                  accumulatedContent += parsed.content
+                  setStreamingContent(accumulatedContent)
+                }
+              } catch {
+                // Ignore parse errors
+              }
+            }
+          }
+        }
+      }
     } catch (error: any) {
       console.error('Error:', error.message)
     } finally {
@@ -81,16 +125,23 @@ const Chat = () => {
 
         <div className="flex flex-col p-4 m-4 max-h-[50vh] h-[50vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
           {showFormattedPrompt ? (
-            messages.map((message, index) => (
-              <div
-                key={index}
-                className={`message-bubble ${message.role === 'user' ? 'human-message bg-blue-200' : 'ai-message bg-green-200'} ${message.role === 'user' ? 'ml-auto' : 'mr-auto'}`}
-              >
-                <ReactMarkdown>
-                  {typeof message.content === 'string' ? message.content : ''}
-                </ReactMarkdown>
-              </div>
-            ))
+            <>
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`message-bubble ${message.role === 'user' ? 'human-message bg-blue-200' : 'ai-message bg-green-200'} ${message.role === 'user' ? 'ml-auto' : 'mr-auto'}`}
+                >
+                  <ReactMarkdown>
+                    {typeof message.content === 'string' ? message.content : ''}
+                  </ReactMarkdown>
+                </div>
+              ))}
+              {streamingContent && (
+                <div className="message-bubble ai-message bg-green-200 mr-auto">
+                  <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                </div>
+              )}
+            </>
           ) : (
             <JsonView
               data={messages}

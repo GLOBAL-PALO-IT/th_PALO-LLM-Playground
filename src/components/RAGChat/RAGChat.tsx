@@ -30,10 +30,10 @@ const RAGChat = () => {
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
   const [collections, setCollections] = useState<string[]>([])
   const [qdrantConnection, setQdrantConnection] = useState<string>('')
-  const [debugPrompt, setDebugPrompt] = useState<string>('')
   const [debugSearchResult, setDebugSearchResult] = useState()
   const [topK, setTopK] = useState<number>(10)
   const [seeDebugSearchResult, setSeeDebugSearchResult] = useState<boolean>(false)
+  const [streamingContent, setStreamingContent] = useState<string>('')
   const checkQdrantConnection = async () => {
     try {
       const response = await fetch('http://localhost:6333', {
@@ -96,6 +96,7 @@ const RAGChat = () => {
     setInput('')
 
     setIsLoading(true)
+    setStreamingContent('')
 
     try {
       const response = await fetch('/api/ragChat', {
@@ -104,14 +105,57 @@ const RAGChat = () => {
         body: JSON.stringify({
           messages: [newMessage],
           searchIndex,
-          topK
+          topK,
+          stream: true
         }),
       })
-      const { message, prompt, searchResult } = await response.json()
-      console.log({ message })
-      setMessages((prev) => [...prev, message])
-      setDebugPrompt(prompt)
-      setDebugSearchResult(searchResult)
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch')
+      }
+
+      // Handle streaming response
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let accumulatedContent = ''
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value, { stream: true })
+          const lines = chunk.split('\n')
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6)
+              if (data === '[DONE]') {
+                // Finalize the message
+                const assistantMessage: ChatCompletionMessageParam = {
+                  role: 'assistant',
+                  content: accumulatedContent,
+                }
+                setMessages((prev) => [...prev, assistantMessage])
+                setStreamingContent('')
+                break
+              }
+
+              try {
+                const parsed = JSON.parse(data)
+                if (parsed.type === 'searchResult') {
+                  setDebugSearchResult(parsed.data)
+                } else if (parsed.type === 'content' && parsed.content) {
+                  accumulatedContent += parsed.content
+                  setStreamingContent(accumulatedContent)
+                }
+              } catch {
+                // Ignore parse errors
+              }
+            }
+          }
+        }
+      }
     } catch (error: any) {
       console.error('Error:', error.message)
     } finally {
@@ -169,16 +213,23 @@ const RAGChat = () => {
           {/* Chat history */}
           <div className=" w-full flex flex-col p-4 m-4 max-h-[50vh] h-[40vh] overflow-auto mb-40 space-y-2 p-4 border-2 border-gray-300 rounded-lg">
             {showFormattedPrompt ? (
-              messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`message-bubble ${message.role === 'user' ? 'human-message bg-blue-200' : 'ai-message bg-green-200'} ${message.role === 'user' ? 'ml-auto' : 'mr-auto'}`}
-                >
-                  <ReactMarkdown>
-                    {typeof message.content === 'string' ? message.content : ''}
-                  </ReactMarkdown>
-                </div>
-              ))
+              <>
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`message-bubble ${message.role === 'user' ? 'human-message bg-blue-200' : 'ai-message bg-green-200'} ${message.role === 'user' ? 'ml-auto' : 'mr-auto'}`}
+                  >
+                    <ReactMarkdown>
+                      {typeof message.content === 'string' ? message.content : ''}
+                    </ReactMarkdown>
+                  </div>
+                ))}
+                {streamingContent && (
+                  <div className="message-bubble ai-message bg-green-200 mr-auto">
+                    <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                  </div>
+                )}
+              </>
             ) : (
               <JsonView
                 data={messages}
