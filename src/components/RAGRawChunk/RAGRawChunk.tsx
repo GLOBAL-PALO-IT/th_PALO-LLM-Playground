@@ -1,23 +1,20 @@
 'use client'
-import React, { use, useCallback, useEffect } from 'react'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { Card } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import './chat.css'
-import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import OpenAI from 'openai'
 
-import { chunk } from 'llm-chunk'
 import { calculateCosineSimilarity } from '@/lib/utils'
+import { chunk } from 'llm-chunk'
 import { toast } from "sonner"
 
 
+import { FaClipboard } from 'react-icons/fa'
 import ExamplesDocsDropDown from './ExamplesDocsDropDown'
 import ExamplesQuestionDropDown from './ExamplesQuestionDropDown'
-import { FaClipboard } from 'react-icons/fa'
 const RAGRawChunk = () => {
   const [sourceDocument, setSourceDocument] = useState<string>('')
   const [query, setQuery] = useState<string>('')
@@ -26,7 +23,6 @@ const RAGRawChunk = () => {
     `You are a helpful AI assistant that answer question based on given context in <context>. 
   If you don't know the answer, just say that you don't know.`
   )
-  const [context, setContext] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [embeddingsSourceDocuments, setEmbeddingsSourceDocuments] = useState<
     OpenAI.Embeddings.Embedding[]

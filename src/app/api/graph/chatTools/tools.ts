@@ -1,9 +1,7 @@
-import { tool } from "@langchain/core/tools";
-import { z } from "zod";
-import neo4j, { Node, Relationship } from 'neo4j-driver'
 import { Neo4jVectorStore } from "@langchain/community/vectorstores/neo4j_vector";
 import { OpenAIEmbeddings } from "@langchain/openai";
-import { Neo4jGraph } from "@langchain/community/graphs/neo4j_graph";
+import neo4j from 'neo4j-driver';
+import { z } from "zod";
 
 // Helper function to get Neo4j configuration
 const getNeo4jConfig = () => {
@@ -62,9 +60,6 @@ export const similaritySearchNeo4JgraphFunction = async (query: string) => {
         );
         const searchResults = await neo4jVectorIndex.similaritySearch(query, 20);
         console.log({ config,query, searchResults })
-        const rawText = searchResults.map((result, index) => {
-            return `<${index + 1}><text>${result.pageContent}</text><pageNumber>${result.metadata.pageNumber}</pageNumber></${index + 1}>`
-        }).join('')
         return {searchResults}
     } catch (e) {
         console.error(e)

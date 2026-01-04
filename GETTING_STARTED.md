@@ -1,6 +1,6 @@
-# Getting Started with PALO-LLM-Playground
+# Getting Started with Applied-LLM-Platform
 
-Welcome to PALO-LLM-Playground! This guide will help you get up and running quickly.
+Welcome to Applied-LLM-Platform! This guide will help you get up and running quickly.
 
 ## 📋 Prerequisites
 
@@ -23,8 +23,8 @@ git --version
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground.git
-cd th_PALO-LLM-Playground
+git clone https://github.com/pacozaa/Applied-LLM-Platform.git
+cd th_Applied-LLM-Platform
 ```
 
 ### 2. Install Dependencies
@@ -39,10 +39,10 @@ This will install all required packages (~2-3 minutes).
 
 ```bash
 # Copy the example environment file
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Open `.env` in your favorite editor and add your OpenAI API key:
+Open `.env.local` in your favorite editor and add your OpenAI API key:
 
 ```bash
 OPENAI_API_KEY=sk-your-api-key-here
@@ -258,7 +258,7 @@ npx prisma db push
 
 1. Check the [main README.md](README.md)
 2. Check specific feature docs in [docs/](docs/)
-3. Search existing [GitHub Issues](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues)
+3. Search existing [GitHub Issues](https://github.com/pacozaa/Applied-LLM-Platform/issues)
 4. Open a new issue with:
    - Your Node.js version
    - Your operating system
@@ -307,8 +307,8 @@ We welcome contributions! Before starting:
 ## 📞 Get Help
 
 - **Documentation**: Check [docs/](docs/) folder
-- **Issues**: [GitHub Issues](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/GLOBAL-PALO-IT/th_PALO-LLM-Playground/discussions)
+- **Issues**: [GitHub Issues](https://github.com/pacozaa/Applied-LLM-Platform/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/pacozaa/Applied-LLM-Platform/discussions)
 
 ---
 

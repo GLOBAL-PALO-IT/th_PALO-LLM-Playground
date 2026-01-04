@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
 
-import { systemPromptJSON } from './systemPromptJSON'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { ChatCompletionMessageParam } from 'openai/resources/index.js'
 import { ModelName } from '@/lib/utils'
@@ -11,11 +9,9 @@ import { ExecutionSchema } from './types'
 export async function POST(request: Request) {
   const { messages }: { messages: ChatCompletionMessageParam[] } =
     await request.json()
-  console.log(messages)
   try {
     const completion = await openaiInstance().beta.chat.completions.parse({
       messages,
-      // model: ModelName.Llama3,
       model: ModelName.GPT4O,
       temperature: 0.2,
       max_tokens: 3000,

@@ -1,8 +1,6 @@
 import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { z } from 'zod'
 import {
   getClientList,
   ClientListParams,

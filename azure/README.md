@@ -1,16 +1,16 @@
 # Azure Deployment Files
 
-This directory contains Azure Resource Manager (ARM) templates and configuration files for deploying the PALO LLM Playground to Azure Container Apps.
+This directory contains Azure Bicep templates and configuration files for deploying the PALO LLM Playground to Azure Container Apps.
 
 ## Files
 
-- **azuredeploy.json** - Main ARM template that defines all Azure resources
+- **azuredeploy.bicep** - Main Bicep template that defines all Azure resources
 - **azuredeploy.parameters.json** - Template for deployment parameters (update with your values)
 - **deploy.sh** - Interactive deployment script that automates the entire deployment process
-- **validate.sh** - Script to validate ARM template syntax locally
+- **validate.sh** - Script to validate Bicep template syntax locally
 - **DEPLOYMENT.md** - Comprehensive deployment guide with step-by-step instructions
 - **SECURITY.md** - Security best practices and recommendations for production deployments
-- **ARM_TEMPLATE_NOTES.md** - Technical notes on ARM template design decisions and limitations
+- **BICEP_NOTES.md** - Technical notes on Bicep features and design decisions
 
 ## Quick Start
 
@@ -40,7 +40,7 @@ The script will:
 ```bash
 az deployment group create \
   --resource-group <your-resource-group> \
-  --template-file azuredeploy.json \
+  --template-file azuredeploy.bicep \
   --parameters azuredeploy.parameters.local.json
 ```
 

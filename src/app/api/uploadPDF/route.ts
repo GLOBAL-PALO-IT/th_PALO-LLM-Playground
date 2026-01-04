@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { Document } from '@langchain/core/documents'
+import { NextResponse } from 'next/server'
 export async function POST(req: Request) {
   const formData = await req.formData()
   const pdfFile = formData.get('pdf') as File
@@ -11,9 +11,6 @@ export async function POST(req: Request) {
   if (!pdfFile) {
     return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
   }
-
-  const arrayBuffer = await pdfFile.arrayBuffer()
-  const buffer = Buffer.from(arrayBuffer)
 
   try {
     const loader = new PDFLoader(pdfBlob)

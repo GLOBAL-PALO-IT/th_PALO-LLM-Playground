@@ -7,10 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   JsonView,
-  allExpanded,
   collapseAllNested,
   darkStyles,
-  defaultStyles,
 } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
 import { Plus, X } from "lucide-react";

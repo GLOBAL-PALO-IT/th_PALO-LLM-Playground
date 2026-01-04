@@ -1,6 +1,5 @@
 //Transform Graph description to Graph Query
 import { NextResponse } from 'next/server'
-import { OpenAI } from 'openai'
 import { queryPrompt } from './query-prompt'
 import { ModelName } from '@/lib/utils'
 import { openaiInstance } from '@/lib/openai'

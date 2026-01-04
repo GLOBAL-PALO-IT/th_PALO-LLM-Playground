@@ -1,6 +1,6 @@
 # Azure Container Apps Deployment Guide
 
-This guide explains how to deploy the PALO LLM Playground to Azure Container Apps using the provided ARM template.
+This guide explains how to deploy the Applied LLM Platform to Azure Container Apps using the provided Azure Bicep template.
 
 ## Deployment Options
 
@@ -25,7 +25,7 @@ Follow the detailed steps below for a manual deployment with full control over t
 
 ## Overview
 
-The ARM template deploys the following Azure resources:
+The Bicep template deploys the following Azure resources:
 
 1. **Azure Container Apps Environment** - Manages the container apps
 2. **Container App** - Runs the Next.js application
@@ -64,10 +64,10 @@ az acr login --name <your-registry-name>
 
 ```bash
 # Build the image
-docker build -t <your-registry-name>.azurecr.io/palo-llm-playground:latest .
+docker build -t <your-registry-name>.azurecr.io/Applied-LLM-Platform:latest .
 
 # Push the image
-docker push <your-registry-name>.azurecr.io/palo-llm-playground:latest
+docker push <your-registry-name>.azurecr.io/Applied-LLM-Platform:latest
 ```
 
 ### Option B: Using Docker Hub
@@ -82,10 +82,10 @@ docker login
 
 ```bash
 # Build the image
-docker build -t <your-dockerhub-username>/palo-llm-playground:latest .
+docker build -t <your-dockerhub-username>/Applied-LLM-Platform:latest .
 
 # Push the image
-docker push <your-dockerhub-username>/palo-llm-playground:latest
+docker push <your-dockerhub-username>/Applied-LLM-Platform:latest
 ```
 
 ## Step 2: Prepare Parameters File
@@ -119,16 +119,16 @@ az login
 
 ```bash
 az group create \
-  --name palo-llm-playground-rg \
+  --name Applied-LLM-Platform-rg \
   --location eastus
 ```
 
-3. Deploy the ARM template:
+3. Deploy the Bicep template:
 
 ```bash
 az deployment group create \
-  --resource-group palo-llm-playground-rg \
-  --template-file azure/azuredeploy.json \
+  --resource-group Applied-LLM-Platform-rg \
+  --template-file azure/azuredeploy.bicep \
   --parameters azure/azuredeploy.parameters.local.json
 ```
 
@@ -142,7 +142,7 @@ After the deployment completes, you need to run Prisma migrations:
 
 ```bash
 az containerapp list \
-  --resource-group palo-llm-playground-rg \
+  --resource-group Applied-LLM-Platform-rg \
   --query "[].name" \
   --output tsv
 ```
@@ -151,7 +151,7 @@ az containerapp list \
 
 ```bash
 az containerapp exec \
-  --resource-group palo-llm-playground-rg \
+  --resource-group Applied-LLM-Platform-rg \
   --name <container-app-name> \
   --command "npx prisma migrate deploy"
 ```
@@ -172,7 +172,7 @@ npx prisma migrate deploy
 
 ```bash
 az deployment group show \
-  --resource-group palo-llm-playground-rg \
+  --resource-group Applied-LLM-Platform-rg \
   --name azuredeploy \
   --query properties.outputs.containerAppUrl.value \
   --output tsv
@@ -186,7 +186,7 @@ To view application logs:
 
 ```bash
 az containerapp logs show \
-  --resource-group palo-llm-playground-rg \
+  --resource-group Applied-LLM-Platform-rg \
   --name <container-app-name> \
   --follow
 ```
@@ -225,17 +225,17 @@ To deploy a new version:
 1. Build and push a new image with a new tag:
 
 ```bash
-docker build -t <your-registry>.azurecr.io/palo-llm-playground:v2 .
-docker push <your-registry>.azurecr.io/palo-llm-playground:v2
+docker build -t <your-registry>.azurecr.io/Applied-LLM-Platform:v2 .
+docker push <your-registry>.azurecr.io/Applied-LLM-Platform:v2
 ```
 
 2. Update the container app:
 
 ```bash
 az containerapp update \
-  --resource-group palo-llm-playground-rg \
+  --resource-group Applied-LLM-Platform-rg \
   --name <container-app-name> \
-  --image <your-registry>.azurecr.io/palo-llm-playground:v2
+  --image <your-registry>.azurecr.io/Applied-LLM-Platform:v2
 ```
 
 ## Environment Variables
@@ -261,9 +261,9 @@ The following environment variables are automatically configured:
 
 Key security recommendations:
 
-1. **Secrets Management**: Consider using Azure Key Vault for managing secrets instead of ARM template parameters
+1. **Secrets Management**: Consider using Azure Key Vault for managing secrets instead of Bicep template parameters
    - Store API keys in Key Vault
-   - Reference secrets using Key Vault references in ARM templates
+   - Reference secrets using Key Vault references in Bicep templates
    - Enable automatic secret rotation
 
 2. **Database Access**: The template allows Azure services to access the database. For production:
@@ -311,7 +311,7 @@ This deployment includes only the core application and PostgreSQL database. For 
 
 1. Check container logs:
 ```bash
-az containerapp logs show --resource-group palo-llm-playground-rg --name <container-app-name>
+az containerapp logs show --resource-group Applied-LLM-Platform-rg --name <container-app-name>
 ```
 
 2. Verify environment variables are set correctly
@@ -326,11 +326,11 @@ az containerapp logs show --resource-group palo-llm-playground-rg --name <contai
 
 ### Out of memory errors
 
-Increase the memory allocation in the ARM template:
-```json
-"resources": {
-  "cpu": 1.0,
-  "memory": "2Gi"
+Increase the memory allocation in the Bicep template:
+```bicep
+resources: {
+  cpu: json('1.0')
+  memory: '2Gi'
 }
 ```
 
@@ -354,12 +354,13 @@ For development/testing, you can reduce costs by:
 To delete all resources:
 
 ```bash
-az group delete --name palo-llm-playground-rg --yes --no-wait
+az group delete --name Applied-LLM-Platform-rg --yes --no-wait
 ```
 
 ## References
 
 - [Azure Container Apps Documentation](https://docs.microsoft.com/en-us/azure/container-apps/)
 - [Azure Database for PostgreSQL](https://docs.microsoft.com/en-us/azure/postgresql/)
-- [ARM Template Reference](https://docs.microsoft.com/en-us/azure/templates/)
+- [Azure Bicep Documentation](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
+- [Bicep Template Reference](https://docs.microsoft.com/en-us/azure/templates/)
 - [Next.js Docker Documentation](https://nextjs.org/docs/deployment#docker-image)

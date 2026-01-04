@@ -1,7 +1,6 @@
 import {
   BarVisualizer,
   AgentState,
-  TrackReference,
   useVoiceAssistant,
 } from '@livekit/components-react'
 import { useEffect } from 'react'

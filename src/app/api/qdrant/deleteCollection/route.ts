@@ -1,5 +1,5 @@
-import { QdrantClient } from '@qdrant/js-client-rest'
-import { NextResponse } from 'next/server'
+import { QdrantClient } from '@qdrant/js-client-rest';
+import { NextResponse } from 'next/server';
 
 /*
 ====FE Code deleteCollection====
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   }
 }
 
-const deleteCollection = async (collectionName: string, dimension: number) => {
+const deleteCollection = async (collectionName: string, _dimension: number) => {
   const client = new QdrantClient({ host: 'localhost', port: 6333 })
   await client.deleteCollection(collectionName)
 }

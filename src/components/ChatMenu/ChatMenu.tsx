@@ -3,31 +3,23 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
-import { Button } from '../ui/button'
-import { Spinner } from '../ui/spinner'
-import './chat.css'
+import { MenuItemsListParamsType } from '@/app/api/runChatMenu/tools'
+import { isJsonParsable } from '@/lib/jsonHelpers'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React from 'react'
 import {
-  FaEye,
-  FaEyeSlash,
-  FaFileDownload,
-  FaInfoCircle,
   FaMagic,
 } from 'react-icons/fa'
 import {
   JsonView,
   allExpanded,
   darkStyles,
-  defaultStyles,
 } from 'react-json-view-lite'
-import 'react-json-view-lite/dist/index.css'
-import ExamplesDropDown from './ExamplesDropDown'
-import { MenuItemsListParamsType } from '@/app/api/runChatMenu/tools'
-import { MenuBox } from './MenuBox'
-import { isJsonParsable } from '@/lib/jsonHelpers'
-import { isPathExistInMenuItemsFromId } from '../NavBar/mockMenu'
+import { Button } from '../ui/button'
+import { Spinner } from '../ui/spinner'
 import { exampleQuery } from './exampleQuery'
+import ExamplesDropDown from './ExamplesDropDown'
+import { MenuBox } from './MenuBox'
 const SYSTEM_PROMPT: ChatCompletionMessageParam = {
   role: 'system',
   content:
@@ -42,7 +34,7 @@ const ChatMenu = () => {
   )
   const [isLoading, setIsLoading] = useState(false)
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
-  const [menuOutput, setMenuOutput] = useState<MenuItemsListParamsType[]>(
+  const [, setMenuOutput] = useState<MenuItemsListParamsType[]>(
 []
   )
   const handleSendMessage = async () => {

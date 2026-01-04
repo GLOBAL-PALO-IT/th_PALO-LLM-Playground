@@ -1,27 +1,21 @@
 import { MenuItemsListParamsType } from "@/app/api/runChatMenu/tools";
-import Link from 'next/link'
-import { generatePath, isPathExistInMenuItemsFromId } from "../NavBar/mockMenu";
+import Link from 'next/link';
 import { useState } from "react";
 import {
   FaEye,
   FaEyeSlash,
-  FaMagic,
-} from 'react-icons/fa'
+} from 'react-icons/fa';
 import {
   JsonView,
   allExpanded,
   darkStyles,
-  defaultStyles,
-} from 'react-json-view-lite'
-import 'react-json-view-lite/dist/index.css'
+} from 'react-json-view-lite';
+import { generatePath, isPathExistInMenuItemsFromId } from "../NavBar/mockMenu";
 export const MenuBox = ({ selectedMenu }: MenuItemsListParamsType) => {
   const [showDetails, setShowDetails] = useState(false);
   const {
     title,
     description,
-    category,
-    reasoning,
-    reasoningInThai,
     categoryId,
     itemId,
   } = selectedMenu

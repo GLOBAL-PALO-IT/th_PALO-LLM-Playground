@@ -1,13 +1,5 @@
 'use client'
-import React from 'react'
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { MainSentence } from "./MainSentence"
-import { SentenceList } from "./SentenceList"
-import OpenAI from 'openai'
-import { calculateCosineSimilarity } from '@/lib/utils'
-import { QueryShowCases } from "./types"
-import { exampleOfQuery } from "./exampleOfQuery"
 import {
   Select,
   SelectContent,
@@ -15,6 +7,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { calculateCosineSimilarity } from '@/lib/utils'
+import OpenAI from 'openai'
+import { useState } from "react"
+import { exampleOfQuery } from "./exampleOfQuery"
+import { MainSentence } from "./MainSentence"
+import { SentenceList } from "./SentenceList"
+import { QueryShowCases } from "./types"
 export const SentenceSimilarityPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [mainSentence, setMainSentence] = useState("");
@@ -131,15 +130,6 @@ export const SentenceSimilarityPage = () => {
     
     setMainEmbedding(newMainEmbedding);
     setEmbeddings(newEmbeddings);
-    setSimilarities(newSimilarities);
-  };
-
-  const handleCalculateSimilarity = () => {
-    if (!mainEmbedding || embeddings.includes(null)) return;
-
-    const newSimilarities = embeddings.map(embedding =>
-      embedding ? calculateCosineSimilarity(mainEmbedding, embedding) : null
-    );
     setSimilarities(newSimilarities);
   };
 

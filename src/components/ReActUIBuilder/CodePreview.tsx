@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live'
+import { LiveProvider, LiveError, LivePreview } from 'react-live'
 
 const scope = { React, useState }
 

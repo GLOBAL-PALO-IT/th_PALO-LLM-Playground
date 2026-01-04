@@ -1,9 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-import * as React from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,28 +7,19 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 import { cn } from '@/lib/utils'
+import * as React from 'react'
 import { menuItems } from './mockMenu'
 
 const NavBarStack = () => {
-  const pathName = usePathname()
 
   return (
     <nav className="">
       <div className="px-4">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden"></div>
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex flex-shrink-0 items-center">
-              <Image
-                height={32}
-                width={127}
-                src="https://www.palo-it.com/hubfs/colour_logo.svg"
-                alt="Company"
-              />
-            </div>
+          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">           
             <div className="hidden sm:ml-6 sm:block">
               <NavigationMenu>
                 <NavigationMenuList>

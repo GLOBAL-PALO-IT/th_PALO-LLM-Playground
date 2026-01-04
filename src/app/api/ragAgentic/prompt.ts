@@ -1,4 +1,4 @@
-import { SearchResult, SearchResultPoint } from "@/types/qdrant";
+import { SearchResult } from "@/types/qdrant";
 export const qaPlannerPrompt = (question: string) => {
     const prompt = `You are a strategic AI research assistant specializing in breaking down complex problems into actionable steps. For the given question, generate a detailed step-by-step plan that would help someone systematically solve the problem.
 

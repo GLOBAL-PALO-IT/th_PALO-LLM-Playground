@@ -1,34 +1,25 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import neo4j, { Node, Relationship } from 'neo4j-driver'
-import { Button } from '../ui/button'
-import { Spinner } from '../ui/spinner'
-import './chat.css'
+import { Card } from '@/components/ui/card'
+import { Textarea } from '@/components/ui/textarea'
 import { Document } from '@langchain/core/documents'
+import { ChainValues } from '@langchain/core/utils/types'
+import neo4j from 'neo4j-driver'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   FaEye,
   FaEyeSlash,
-  FaFileDownload,
-  FaInfoCircle,
   FaMagic,
-  FaRegClipboard,
 } from 'react-icons/fa'
 import {
   JsonView,
-  allExpanded,
   collapseAllNested,
   darkStyles,
-  defaultStyles,
 } from 'react-json-view-lite'
-import 'react-json-view-lite/dist/index.css'
-import { Input } from '@/components/ui/input'
-import { Card } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
-import { ChainValues } from '@langchain/core/utils/types'
+import ReactMarkdown from 'react-markdown'
+import { Button } from '../ui/button'
+import { Spinner } from '../ui/spinner'
 
 const RAGChat = () => {
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
@@ -36,7 +27,7 @@ const RAGChat = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showFormattedPrompt, setShowFormattedPrompt] = useState(true)
   const [showMetadata, setShowMetadata] = useState(false)
-  const [neo4jConnection, setNeo4jConnection] = useState<string>('')
+  const [, setNeo4jConnection] = useState<string>('')
   const [intermediateSteps, setIntermediateSteps] = useState<[]>([])
   const [rawText, setRawText] = useState<string>('')
   const [docs, setDocs] = useState<Document[]>([])

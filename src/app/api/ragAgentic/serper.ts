@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { z } from "zod";
 import { SearchResult } from '@/types/qdrant'
 import { SerperData, serperDataSchema } from '@/types/serper';
 

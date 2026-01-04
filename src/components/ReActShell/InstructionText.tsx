@@ -1,7 +1,5 @@
 import React from 'react'
-import { parseInstructionText } from './utils'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { ExecutionSchema } from '@/app/api/runReasoningAction/types'
 const InstructionText: React.FC<{ steps: ChatCompletionMessageParam[] }> = ({
   steps,
 }) => {

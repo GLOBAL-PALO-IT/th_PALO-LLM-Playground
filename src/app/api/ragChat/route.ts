@@ -1,21 +1,25 @@
 import { ModelName } from '@/lib/utils'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import { searchQuery } from '@/lib/qdrant'
 import { ragChatPromptBuilder } from './prompt'
 import { openaiInstance } from '@/lib/openai'
 
+// Removed edge runtime to avoid Node.js module conflicts
+// export const runtime = 'edge'
+
 export async function POST(request: Request) {
   const { 
     messages, 
     searchIndex, 
-    topK = 10 
+    topK = 10,
+    stream = false 
   }:
     {
       messages: ChatCompletionMessageParam[];
       searchIndex: string
       topK: number
+      stream?: boolean
     } =
     await request.json()
   console.log(messages)
@@ -31,7 +35,64 @@ export async function POST(request: Request) {
     }
     const { prompt, searchResult } = await getPromptWithContext(question, searchIndex, topK)
     
+    // Support streaming for real-time responses
+    if (stream) {
+      const completion = await openaiInstance().chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        model: ModelName.GPT4O,
+        temperature: 0.2,
+        max_tokens: 8192,
+        top_p: 0.2,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        stream: true,
+      })
+
+      // Create a readable stream for the client
+      const encoder = new TextEncoder()
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            // Send search results first
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+              type: 'searchResult', 
+              data: searchResult 
+            })}\n\n`))
+
+            // Then stream the content
+            for await (const chunk of completion) {
+              const content = chunk.choices[0]?.delta?.content || ''
+              if (content) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                  type: 'content',
+                  content 
+                })}\n\n`))
+              }
+            }
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+            controller.close()
+          } catch (error) {
+            console.error('Streaming error:', error)
+            controller.error(error)
+          }
+        },
+      })
+
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      })
+    }
     
+    // Non-streaming fallback
     const completion = await openaiInstance().chat.completions.create({
       messages: [
         {
