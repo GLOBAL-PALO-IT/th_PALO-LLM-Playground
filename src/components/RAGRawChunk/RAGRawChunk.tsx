@@ -1,11 +1,11 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
-
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import OpenAI from 'openai'
+import { useCallback, useEffect, useState } from 'react'
+import './chat.css'
 
 import { calculateCosineSimilarity } from '@/lib/utils'
 import { chunk } from 'llm-chunk'
