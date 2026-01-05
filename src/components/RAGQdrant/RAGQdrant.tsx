@@ -6,17 +6,18 @@ import { Document } from '@langchain/core/documents'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import {
-  EmbeddingQdrant,
-  OperationInfo,
+    EmbeddingQdrant,
+    OperationInfo,
 } from '@/app/api/qdrant/insertEmbeddings/types'
 import { Textarea } from '@/components/ui/textarea'
 import { SearchResult } from '@/types/qdrant'
 import OpenAI from 'openai'
 import {
-  JsonView,
-  collapseAllNested,
-  darkStyles,
+    JsonView,
+    collapseAllNested,
+    darkStyles,
 } from 'react-json-view-lite'
+import 'react-json-view-lite/dist/index.css'
 import SplitterDropDown from './SplitterDropDown'
 
 const RAGQdrant = () => {

@@ -8,15 +8,17 @@ import { isJsonParsable } from '@/lib/jsonHelpers'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React from 'react'
 import {
-  FaMagic,
+    FaMagic,
 } from 'react-icons/fa'
 import {
-  JsonView,
-  allExpanded,
-  darkStyles,
+    JsonView,
+    allExpanded,
+    darkStyles,
 } from 'react-json-view-lite'
+import 'react-json-view-lite/dist/index.css'
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
+import './chat.css'
 import { exampleQuery } from './exampleQuery'
 import ExamplesDropDown from './ExamplesDropDown'
 import { MenuBox } from './MenuBox'

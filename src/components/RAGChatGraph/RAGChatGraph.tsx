@@ -8,18 +8,20 @@ import neo4j from 'neo4j-driver'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  FaEye,
-  FaEyeSlash,
-  FaMagic,
+    FaEye,
+    FaEyeSlash,
+    FaMagic,
 } from 'react-icons/fa'
 import {
-  JsonView,
-  collapseAllNested,
-  darkStyles,
+    JsonView,
+    collapseAllNested,
+    darkStyles,
 } from 'react-json-view-lite'
+import 'react-json-view-lite/dist/index.css'
 import ReactMarkdown from 'react-markdown'
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
+import './chat.css'
 
 const RAGChat = () => {
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])

@@ -2,14 +2,15 @@ import { MenuItemsListParamsType } from "@/app/api/runChatMenu/tools";
 import Link from 'next/link';
 import { useState } from "react";
 import {
-  FaEye,
-  FaEyeSlash,
+    FaEye,
+    FaEyeSlash,
 } from 'react-icons/fa';
 import {
-  JsonView,
-  allExpanded,
-  darkStyles,
+    JsonView,
+    allExpanded,
+    darkStyles,
 } from 'react-json-view-lite';
+import 'react-json-view-lite/dist/index.css';
 import { generatePath, isPathExistInMenuItemsFromId } from "../NavBar/mockMenu";
 export const MenuBox = ({ selectedMenu }: MenuItemsListParamsType) => {
   const [showDetails, setShowDetails] = useState(false);

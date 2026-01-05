@@ -1,10 +1,10 @@
 'use client'
 
 import {
-  AgentState,
-  LiveKitRoom,
-  RoomAudioRenderer,
-  useMaybeRoomContext,
+    AgentState,
+    LiveKitRoom,
+    RoomAudioRenderer,
+    useMaybeRoomContext,
 } from '@livekit/components-react'
 
 import type { ConnectionDetails } from '@/app/api/connection-details/types'
@@ -12,14 +12,15 @@ import { NoAgentNotification } from '@/components/NoAgentNotification'
 import { Card } from '@/components/ui/card'
 import '@livekit/components-styles'
 import {
-  MediaDeviceFailure,
-  Participant,
-  RoomEvent,
-  TrackPublication,
-  TranscriptionSegment,
+    MediaDeviceFailure,
+    Participant,
+    RoomEvent,
+    TrackPublication,
+    TranscriptionSegment,
 } from 'livekit-client'
 import { useCallback, useEffect, useState } from 'react'
 import ControlBar from './ControlBar'
+import './livekit.css'
 import SimpleVoiceAssistant from './SimpleVoiceAssistant'
 interface Transcription {
   segment: TranscriptionSegment
